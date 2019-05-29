@@ -42,7 +42,7 @@ func GetCacheDir() string {
 	return dir
 }
 
-// GetHomeDir returns the home directory for the current user
+// GetHomeDir returns the OS-specific home directory for the current user
 func GetHomeDir() string {
 	dir, err := os.UserHomeDir()
 	if err != nil {
