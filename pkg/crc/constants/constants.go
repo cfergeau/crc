@@ -33,7 +33,7 @@ var (
 	MachineCacheDir = filepath.Join(GetCacheDir(), "crc")
 )
 
-// GetHomeDir returns the OS-specific cache directory for the current user
+// GetCacheDir returns the OS-specific cache directory for the current user
 func GetCacheDir() string {
 	dir, err := os.UserCacheDir()
 	if err != nil {
