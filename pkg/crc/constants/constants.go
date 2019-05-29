@@ -52,7 +52,7 @@ func GetHomeDir() string {
 	return os.Getenv("HOME")
 }
 
-// EnsureBaseDirExists create the ~/.crc dir if its not there
+// EnsureBaseDirExists create the CrcBaseDir dir if its not there
 func EnsureBaseDirExists() error {
 	_, err := os.Stat(CrcBaseDir)
 	if err != nil {
