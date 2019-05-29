@@ -3,7 +3,6 @@ package constants
 import (
 	"os"
 	"path/filepath"
-	"runtime"
 )
 
 const (
@@ -31,11 +30,26 @@ var (
 	LogFilePath     = filepath.Join(CrcBaseDir, LogFile)
 	MachineBaseDir  = CrcBaseDir
 	MachineCertsDir = filepath.Join(MachineBaseDir, "certs")
-	MachineCacheDir = filepath.Join(MachineBaseDir, "cache")
+	MachineCacheDir = filepath.Join(GetCacheDir(), "crc")
 )
+
+// GetHomeDir returns the OS-specific cache directory for the current user
+func GetCacheDir() string {
+	dir, err := os.UserCacheDir()
+	if err != nil {
+		return filepath.Join(MachineBaseDir, "cache")
+        }
+	return dir
+}
 
 // GetHomeDir returns the home directory for the current user
 func GetHomeDir() string {
+	dir, err := os.UserHomeDir()
+	if err != nil {
+		// fallback to ??
+        }
+	return dir
+        /*
 	if runtime.GOOS == "windows" {
 		if homeDrive, homePath := os.Getenv("HOMEDRIVE"), os.Getenv("HOMEPATH"); len(homeDrive) > 0 && len(homePath) > 0 {
 			homeDir := filepath.Join(homeDrive, homePath)
@@ -50,6 +64,7 @@ func GetHomeDir() string {
 		}
 	}
 	return os.Getenv("HOME")
+        */
 }
 
 // EnsureBaseDirExists create the CrcBaseDir dir if its not there
