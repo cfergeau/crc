@@ -4,7 +4,6 @@ import (
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/errors"
 	"github.com/code-ready/crc/pkg/crc/input"
-	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/crc/pkg/crc/machine"
 	"github.com/code-ready/crc/pkg/crc/output"
 	"github.com/code-ready/machine/libmachine/state"
@@ -35,11 +34,11 @@ func runStop(arguments []string) {
 		Name: constants.DefaultName,
 	}
 
-	commandResult, err := machine.Stop(stopConfig)
+	vmState, err := machine.Stop(stopConfig)
 	if err != nil {
 		// Here we are checking the VM state and if it is still running then
 		// Ask user to forcefully power off it.
-		if commandResult.State == state.Running {
+		if vmState == state.Running {
 			// Most of the time force kill don't work and libvirt throw
 			// Device or resource busy error. To make sure we give some
 			// graceful time to cluster before kill it.
@@ -51,16 +50,11 @@ func runStop(arguments []string) {
 		}
 		errors.Exit(1)
 	}
-	if commandResult.Success {
-		output.Out("CodeReady Containers instance stopped")
-	} else {
-		/* If we did not get an error, the status should be true */
-		logging.Warnf("Unexpected status %v", commandResult.Success)
-	}
+	output.Out("CodeReady Containers instance stopped")
 }
 
 func killVM(killConfig machine.PowerOffConfig) {
-	_, err := machine.PowerOff(killConfig)
+	err := machine.PowerOff(killConfig)
 	if err != nil {
 		errors.Exit(1)
 	}

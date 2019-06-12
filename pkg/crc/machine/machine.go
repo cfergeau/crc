@@ -40,7 +40,7 @@ import (
 func Start(startConfig StartConfig) (StartResult, error) {
 	defer unsetMachineLogging()
 
-	result := &StartResult{Name: startConfig.Name}
+	result := &StartResult{}
 
 	// Set libmachine logging
 	err := setMachineLogging(startConfig.Debug)
@@ -62,7 +62,6 @@ func Start(startConfig StartConfig) (StartResult, error) {
 	logging.Infof("Extracting the %s Bundle tarball ...", filepath.Base(machineConfig.BundlePath))
 	crcBundleMetadata, extractedPath, err := bundle.GetCrcBundleInfo(machineConfig)
 	if err != nil {
-		result.Error = err.Error()
 		return *result, errors.Newf("Error to get bundle Metadata %v", err)
 	}
 
@@ -79,7 +78,6 @@ func Start(startConfig StartConfig) (StartResult, error) {
 	// Get the content of kubeadmin-password file
 	kubeadminPassword, err := ioutil.ReadFile(filepath.Join(extractedPath, crcBundleMetadata.ClusterInfo.KubeadminPasswordFile))
 	if err != nil {
-		result.Error = err.Error()
 		return *result, errors.Newf("Error reading the %s file %v", filepath.Join(extractedPath, crcBundleMetadata.ClusterInfo.KubeadminPasswordFile), err)
 	}
 
@@ -101,65 +99,57 @@ func Start(startConfig StartConfig) (StartResult, error) {
 
 		host, err := createHost(libMachineAPIClient, driverInfo.DriverPath, machineConfig)
 		if err != nil {
-			result.Error = err.Error()
+			//logging.ErrorF("Error creating host: %v %v", err, host)
 			return *result, errors.Newf("Error creating host: %v", err)
 		}
 
 		vmState, err := host.Driver.GetState()
 		if err != nil {
-			result.Error = err.Error()
 			return *result, errors.Newf("Error getting the state for host: %v", err)
 		}
 
-		result.Status = vmState.String()
+		result.Status = vmState
 	} else {
 		host, err := libMachineAPIClient.Load(machineConfig.Name)
 		if err != nil {
-			result.Error = err.Error()
 			return *result, errors.Newf("Error loading host: %v", err)
 		}
 
 		if host.Driver.DriverName() != startConfig.VMDriver {
 			err := errors.Newf("VM driver '%s' was requested, but loaded VM is using '%s' instead",
 				startConfig.VMDriver, host.Driver.DriverName())
-			result.Error = err.Error()
 			return *result, err
 		}
 		vmState, err := host.Driver.GetState()
 		if err != nil {
-			result.Error = err.Error()
 			return *result, errors.Newf("Error getting the state for host: %v", err)
 		}
 		if vmState == state.Running {
-			result.Status = vmState.String()
+			result.Status = vmState
 			return *result, nil
 		}
 
 		if vmState != state.Running {
 			logging.Infof("Starting stopped VM ...")
 			if err := host.Driver.Start(); err != nil {
-				result.Error = err.Error()
 				return *result, errors.Newf("Error starting stopped VM: %v", err)
 			}
 			if err := libMachineAPIClient.Save(host); err != nil {
-				result.Error = err.Error()
 				return *result, errors.Newf("Error saving state for VM: %v", err)
 			}
 		}
 
 		vmState, err = host.Driver.GetState()
 		if err != nil {
-			result.Error = err.Error()
 			return *result, errors.Newf("Error getting the state: %v", err)
 		}
 
-		result.Status = vmState.String()
+		result.Status = vmState
 	}
 
 	// Post-VM start
 	host, err := libMachineAPIClient.Load(machineConfig.Name)
 	if err != nil {
-		result.Error = err.Error()
 		return *result, errors.Newf("Error loading %s vm: %v", machineConfig.Name, err)
 	}
 	// Check the certs validity inside the vm
@@ -172,20 +162,17 @@ func Start(startConfig StartConfig) (StartResult, error) {
 		return nil
 	}
 	if err := errors.RetryAfter(4, checkCertValidity, time.Second); err != nil {
-		result.Error = err.Error()
 		return *result, errors.New(err.Error())
 	}
 	// Add nameserver to VM if provided by User
 	if startConfig.NameServer != "" {
 		if addNameServerToInstance(host.Driver, startConfig.NameServer); err != nil {
-			result.Error = err.Error()
 			return *result, errors.New(err.Error())
 		}
 	}
 
 	instanceIP, err := host.Driver.GetIP()
 	if err != nil {
-		result.Error = err.Error()
 		return *result, errors.Newf("Error getting the IP: %v", err)
 	}
 
@@ -200,7 +187,6 @@ func Start(startConfig StartConfig) (StartResult, error) {
 	}
 
 	if err := errors.RetryAfter(30, determinHostIP, 2*time.Second); err != nil {
-		result.Error = err.Error()
 		return *result, errors.Newf("Error determining host IP: %v", err)
 	}
 
@@ -218,13 +204,11 @@ func Start(startConfig StartConfig) (StartResult, error) {
 	// If driver need dns service then start it
 	if driverInfo.UseDNSService {
 		if _, err := dns.RunPostStart(servicePostStartConfig); err != nil {
-			result.Error = err.Error()
 			return *result, errors.Newf("Error running post start: %v", err)
 		}
 	}
 	// Check DNS looksup before starting the kubelet
 	if queryOutput, err := dns.CheckCRCLocalDNSReachable(servicePostStartConfig); err != nil {
-		result.Error = err.Error()
 		return *result, errors.Newf("Failed internal dns query: %v : %s", err, queryOutput)
 	}
 	logging.Infof("Check internal and public dns query ...")
@@ -241,7 +225,6 @@ func Start(startConfig StartConfig) (StartResult, error) {
 		filepath.Join(extractedPath, "kubeconfig"),
 		kubeConfigFilePath,
 		0644); err != nil {
-		result.Error = err.Error()
 		return *result, errors.Newf("Error to copy kubeconfig content %v", err)
 	}
 
@@ -250,7 +233,6 @@ func Start(startConfig StartConfig) (StartResult, error) {
 		// Update the user pull secret before kubelet start.
 		logging.Info("Adding user's pull secret and cluster ID ...")
 		if err := pullsecret.AddPullSecretAndClusterID(host.Driver, startConfig.PullSecret, kubeConfigFilePath); err != nil {
-			result.Error = err.Error()
 			return *result, errors.Newf("Failed to update user pull secret or cluster ID: %v", err)
 		}
 	}
@@ -259,7 +241,6 @@ func Start(startConfig StartConfig) (StartResult, error) {
 	sd := systemd.NewInstanceSystemdCommander(host.Driver)
 	kubeletStarted, err := sd.Start("kubelet")
 	if err != nil {
-		result.Error = err.Error()
 		return *result, errors.Newf("Error starting kubelet: %s", err)
 	}
 	if kubeletStarted {
@@ -268,7 +249,8 @@ func Start(startConfig StartConfig) (StartResult, error) {
 	result.KubeletStarted = kubeletStarted
 
 	// If no error, return usage message
-	if result.Error == "" {
+	//if result.Error == "" {
+        if true {
 		time.Sleep(time.Minute * 3)
 		logging.Infof("To access the cluster using 'oc', run 'oc login -u kubeadmin -p %s %s'", result.ClusterConfig.KubeAdminPass, result.ClusterConfig.ClusterAPI)
 		logging.Infof("Access the OpenShift web-console here: %s", result.ClusterConfig.WebConsoleURL)
@@ -278,64 +260,50 @@ func Start(startConfig StartConfig) (StartResult, error) {
 	// Approve the node certificate.
 	ocConfig := oc.UseOCWithConfig(machineConfig.Name)
 	if err := oc.ApproveNodeCSR(ocConfig); err != nil {
-		result.Error = err.Error()
 		return *result, errors.Newf("Error approving the node csr %v", err)
 	}
 
 	return *result, err
 }
 
-func Stop(stopConfig StopConfig) (StopResult, error) {
+func Stop(stopConfig StopConfig) (state.State, error) {
 	defer unsetMachineLogging()
 
-	result := &StopResult{Name: stopConfig.Name}
 	// Set libmachine logging
 	err := setMachineLogging(stopConfig.Debug)
 	if err != nil {
-		return *result, errors.New(err.Error())
+		return state.None, errors.New(err.Error())
 	}
 
 	libMachineAPIClient := libmachine.NewClient(constants.MachineBaseDir, constants.MachineCertsDir)
 	host, err := libMachineAPIClient.Load(stopConfig.Name)
 
 	if err != nil {
-		result.Success = false
-		result.Error = err.Error()
-		return *result, errors.New(err.Error())
+		return state.None, errors.New(err.Error())
 	}
 
-	result.State, _ = host.Driver.GetState()
+        vmState,_ := host.Driver.GetState()
 
 	if err := host.Stop(); err != nil {
-		result.Success = false
-		result.Error = err.Error()
-		return *result, errors.New(err.Error())
+		return vmState, errors.New(err.Error())
 	}
 
-	result.Success = true
-	return *result, nil
+	return vmState, nil
 }
 
-func PowerOff(PowerOff PowerOffConfig) (PowerOffResult, error) {
-	result := &PowerOffResult{Name: PowerOff.Name}
-
+func PowerOff(PowerOff PowerOffConfig) (error) {
 	libMachineAPIClient := libmachine.NewClient(constants.MachineBaseDir, constants.MachineCertsDir)
 	host, err := libMachineAPIClient.Load(PowerOff.Name)
 
 	if err != nil {
-		result.Success = false
-		result.Error = err.Error()
-		return *result, errors.New(err.Error())
+		return errors.New(err.Error())
 	}
 
 	if err := host.Kill(); err != nil {
-		result.Success = false
-		result.Error = err.Error()
-		return *result, errors.New(err.Error())
+		return errors.New(err.Error())
 	}
 
-	result.Success = true
-	return *result, nil
+	return nil
 }
 
 func Delete(deleteConfig DeleteConfig) (error) {

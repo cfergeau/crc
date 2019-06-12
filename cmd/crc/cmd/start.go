@@ -19,6 +19,7 @@ import (
 	"github.com/code-ready/crc/pkg/crc/preflight"
 	ps "github.com/code-ready/crc/pkg/crc/pullsecret"
 	"github.com/code-ready/crc/pkg/crc/validation"
+	"github.com/code-ready/machine/libmachine/state"
 )
 
 func init() {
@@ -69,7 +70,7 @@ func runStart(arguments []string) {
 	if err != nil {
 		errors.Exit(1)
 	}
-	if commandResult.Status == "Running" {
+	if commandResult.Status != state.Running {
 		output.Out("CodeReady Containers instance is running")
 	} else {
 		logging.Warnf("Unexpected status: %s", commandResult.Status)

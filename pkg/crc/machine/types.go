@@ -33,9 +33,8 @@ type ClusterConfig struct {
 }
 
 type StartResult struct {
-	Name           string
-	Status         string
-	Error          string
+	Error          error
+	Status         state.State
 	ClusterConfig  ClusterConfig
 	KubeletStarted bool
 }
@@ -47,19 +46,6 @@ type StopConfig struct {
 
 type PowerOffConfig struct {
 	Name string
-}
-
-type StopResult struct {
-	Name    string
-	Success bool
-	State   state.State
-	Error   string
-}
-
-type PowerOffResult struct {
-	Name    string
-	Success bool
-	Error   string
 }
 
 type DeleteConfig struct {
