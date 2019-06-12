@@ -291,9 +291,9 @@ func Stop(stopConfig StopConfig) (state.State, error) {
 	return vmState, nil
 }
 
-func PowerOff(PowerOff PowerOffConfig) (error) {
+func PowerOff(powerOff PowerOffConfig) (error) {
 	libMachineAPIClient := libmachine.NewClient(constants.MachineBaseDir, constants.MachineCertsDir)
-	host, err := libMachineAPIClient.Load(PowerOff.Name)
+	host, err := libMachineAPIClient.Load(powerOff.Name)
 
 	if err != nil {
 		return errors.New(err.Error())
