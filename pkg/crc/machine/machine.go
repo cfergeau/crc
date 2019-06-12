@@ -338,16 +338,12 @@ func PowerOff(PowerOff PowerOffConfig) (PowerOffResult, error) {
 	return *result, nil
 }
 
-func Delete(deleteConfig DeleteConfig) (DeleteResult, error) {
-	result := &DeleteResult{Name: deleteConfig.Name, Success: true}
-
+func Delete(deleteConfig DeleteConfig) (error) {
 	libMachineAPIClient := libmachine.NewClient(constants.MachineBaseDir, constants.MachineCertsDir)
 	host, err := libMachineAPIClient.Load(deleteConfig.Name)
 
 	if err != nil {
-		result.Success = false
-		result.Error = err.Error()
-		return *result, errors.New(err.Error())
+		return errors.New(err.Error())
 	}
 
 	m := errors.MultiError{}
@@ -355,11 +351,9 @@ func Delete(deleteConfig DeleteConfig) (DeleteResult, error) {
 	m.Collect(libMachineAPIClient.Remove(deleteConfig.Name))
 
 	if len(m.Errors) != 0 {
-		result.Success = false
-		result.Error = m.ToError().Error()
-		return *result, errors.New(m.ToError().Error())
+		return errors.New(m.ToError().Error())
 	}
-	return *result, nil
+	return nil
 }
 
 func Ip(ipConfig IpConfig) (IpResult, error) {

@@ -38,7 +38,7 @@ func runDelete(arguments []string) {
 		deleteCache()
 	}
 
-	_, err := machine.Delete(deleteConfig)
+	err := machine.Delete(deleteConfig)
 	if err != nil {
 		errors.Exit(1)
 	}
