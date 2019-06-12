@@ -31,14 +31,11 @@ var deleteCmd = &cobra.Command{
 var clearCache bool
 
 func runDelete(arguments []string) {
-	deleteConfig := machine.DeleteConfig{
-		Name: constants.DefaultName,
-	}
 	if clearCache {
 		deleteCache()
 	}
 
-	err := machine.Delete(deleteConfig)
+	err := machine.Delete(constants.DefaultName)
 	if err != nil {
 		errors.Exit(1)
 	}

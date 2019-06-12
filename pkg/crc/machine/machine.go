@@ -266,17 +266,17 @@ func Start(startConfig StartConfig) (StartResult, error) {
 	return *result, err
 }
 
-func Stop(stopConfig StopConfig) (state.State, error) {
+func Stop(machineName string, debug bool) (state.State, error) {
 	defer unsetMachineLogging()
 
 	// Set libmachine logging
-	err := setMachineLogging(stopConfig.Debug)
+	err := setMachineLogging(debug)
 	if err != nil {
 		return state.None, errors.New(err.Error())
 	}
 
 	libMachineAPIClient := libmachine.NewClient(constants.MachineBaseDir, constants.MachineCertsDir)
-	host, err := libMachineAPIClient.Load(stopConfig.Name)
+	host, err := libMachineAPIClient.Load(machineName)
 
 	if err != nil {
 		return state.None, errors.New(err.Error())
@@ -291,9 +291,9 @@ func Stop(stopConfig StopConfig) (state.State, error) {
 	return vmState, nil
 }
 
-func PowerOff(powerOff PowerOffConfig) (error) {
+func PowerOff(machineName string) (error) {
 	libMachineAPIClient := libmachine.NewClient(constants.MachineBaseDir, constants.MachineCertsDir)
-	host, err := libMachineAPIClient.Load(powerOff.Name)
+	host, err := libMachineAPIClient.Load(machineName)
 
 	if err != nil {
 		return errors.New(err.Error())
@@ -306,9 +306,9 @@ func PowerOff(powerOff PowerOffConfig) (error) {
 	return nil
 }
 
-func Delete(deleteConfig DeleteConfig) (error) {
+func Delete(machineName string) (error) {
 	libMachineAPIClient := libmachine.NewClient(constants.MachineBaseDir, constants.MachineCertsDir)
-	host, err := libMachineAPIClient.Load(deleteConfig.Name)
+	host, err := libMachineAPIClient.Load(machineName)
 
 	if err != nil {
 		return errors.New(err.Error())
@@ -316,7 +316,7 @@ func Delete(deleteConfig DeleteConfig) (error) {
 
 	m := errors.MultiError{}
 	m.Collect(host.Driver.Remove())
-	m.Collect(libMachineAPIClient.Remove(deleteConfig.Name))
+	m.Collect(libMachineAPIClient.Remove(machineName))
 
 	if len(m.Errors) != 0 {
 		return errors.New(m.ToError().Error())

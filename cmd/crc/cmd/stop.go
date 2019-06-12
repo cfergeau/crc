@@ -25,16 +25,9 @@ var stopCmd = &cobra.Command{
 }
 
 func runStop(arguments []string) {
-	stopConfig := machine.StopConfig{
-		Name:  constants.DefaultName,
-		Debug: isDebugLog(),
-	}
+	const machineName string = constants.DefaultName
 
-	killConfig := machine.PowerOffConfig{
-		Name: constants.DefaultName,
-	}
-
-	vmState, err := machine.Stop(stopConfig)
+	vmState, err := machine.Stop(machineName, isDebugLog())
 	if err != nil {
 		// Here we are checking the VM state and if it is still running then
 		// Ask user to forcefully power off it.
@@ -44,7 +37,7 @@ func runStop(arguments []string) {
 			// graceful time to cluster before kill it.
 			yes := input.PromptUserForYesOrNo("Do you want to force power off", globalForce)
 			if yes {
-				killVM(killConfig)
+				killVM(machineName)
 				errors.Exit(0)
 			}
 		}
@@ -53,8 +46,8 @@ func runStop(arguments []string) {
 	output.Out("CodeReady Containers instance stopped")
 }
 
-func killVM(killConfig machine.PowerOffConfig) {
-	err := machine.PowerOff(killConfig)
+func killVM(machineName string) {
+	err := machine.PowerOff(machineName)
 	if err != nil {
 		errors.Exit(1)
 	}

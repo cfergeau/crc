@@ -39,19 +39,6 @@ type StartResult struct {
 	KubeletStarted bool
 }
 
-type StopConfig struct {
-	Name  string
-	Debug bool
-}
-
-type PowerOffConfig struct {
-	Name string
-}
-
-type DeleteConfig struct {
-	Name string
-}
-
 type IpConfig struct {
 	Name  string
 	Debug bool
