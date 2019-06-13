@@ -99,6 +99,7 @@ func Start(startConfig StartConfig) (StartResult, error) {
 
 		host, err := createHost(libMachineAPIClient, driverInfo.DriverPath, machineConfig)
 		if err != nil {
+			/* here we got an error from crc.errors.NewF */
 			//logging.ErrorF("Error creating host: %v %v", err, host)
 			return *result, errors.Newf("Error creating host: %v", err)
 		}

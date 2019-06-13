@@ -33,6 +33,7 @@ type ClusterConfig struct {
 }
 
 type StartResult struct {
+	//Name           string
 	Error          error
 	Status         state.State
 	ClusterConfig  ClusterConfig
@@ -48,7 +49,7 @@ type IpResult struct {
 	Name    string
 	IP      string
 	Success bool
-	Error   string
+	Error   error
 }
 
 type ClusterStatusConfig struct {
