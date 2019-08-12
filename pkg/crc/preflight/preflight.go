@@ -61,20 +61,62 @@ func (check *PreflightCheck) shouldWarn() bool {
 	return cfg.GetBool(check.getWarnConfigName())
 }
 
+func startCheckOp(msg string) {
+	logging.Infof(msg)
+}
+
+type opStatus int
+
+const (
+	success = iota
+	failure
+	skipped
+)
+
+const (
+	DeleteLine = "\x1b[2K\x1b[1000D"
+	CursorUp   = "\x1b[1A"
+	ColorReset = "\x1b[0m"
+	ColorRed   = "\x1b[31m"
+	ColorGreen = "\x1b[32m"
+)
+
+func setCheckOpStatus(msg string, status opStatus) {
+	// http://www.lihaoyi.com/post/BuildyourownCommandLinewithANSIescapecodes.html#cursor-navigation
+
+	var statusStr string
+
+	switch status {
+	case success:
+		statusStr = ColorGreen + " ✓"
+	case failure:
+		statusStr = ColorRed + " ✗"
+	case skipped:
+		statusStr = " ⍻"
+	}
+	fmt.Print(CursorUp + DeleteLine)
+	logging.Infof(msg + statusStr + ColorReset)
+}
+
 func (check *PreflightCheck) doCheck() error {
 	if check.checkDescription == "" {
 		panic(fmt.Sprintf("Should not happen, empty description for check '%s'", check.configKeySuffix))
 	} else {
 		logging.Infof("%s", check.checkDescription)
 	}
+	startCheckOp(check.checkDescription)
 	if check.shouldSkip() {
-		logging.Warn("Skipping above check ...")
+		//logging.Warn("Skipping above check ...")
+		setCheckOpStatus(check.checkDescription, skipped)
 		return nil
 	}
 
 	err := check.check()
 	if err != nil {
+		setCheckOpStatus(check.checkDescription, failure)
 		logging.Debug(err.Error())
+	} else {
+		setCheckOpStatus(check.checkDescription, success)
 	}
 	return err
 }
