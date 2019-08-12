@@ -325,28 +325,23 @@ func Delete(machineName string) (error) {
 	return nil
 }
 
-func Ip(ipConfig IpConfig) (IpResult, error) {
-	result := &IpResult{Name: ipConfig.Name, Success: true}
-
-	err := setMachineLogging(ipConfig.Debug)
+func Ip(machineName string, debug bool) (string, error) {
+	err := setMachineLogging(debug)
 	if err != nil {
-		return *result, err
+		return "", err
 	}
 
 	libMachineAPIClient := libmachine.NewClient(constants.MachineBaseDir, constants.MachineCertsDir)
-	host, err := libMachineAPIClient.Load(ipConfig.Name)
+	host, err := libMachineAPIClient.Load(machineName)
 
 	if err != nil {
-		result.Success = false
-		result.Error = err.Error()
-		return *result, errors.New(err.Error())
+		return "", errors.New(err.Error())
 	}
-	if result.IP, err = host.Driver.GetIP(); err != nil {
-		result.Success = false
-		result.Error = err.Error()
-		return *result, errors.New(err.Error())
+        var IP string
+        if IP, err = host.Driver.GetIP(); err != nil {
+		return IP, errors.New(err.Error())
 	}
-	return *result, nil
+	return IP, nil
 }
 
 func Status(statusConfig ClusterStatusConfig) (ClusterStatusResult, error) {

@@ -40,18 +40,6 @@ type StartResult struct {
 	KubeletStarted bool
 }
 
-type IpConfig struct {
-	Name  string
-	Debug bool
-}
-
-type IpResult struct {
-	Name    string
-	IP      string
-	Success bool
-	Error   error
-}
-
 type ClusterStatusConfig struct {
 	Name string
 }

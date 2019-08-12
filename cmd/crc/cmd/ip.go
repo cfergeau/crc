@@ -23,14 +23,9 @@ var ipCmd = &cobra.Command{
 }
 
 func runIP(arguments []string) {
-	ipConfig := machine.IpConfig{
-		Name:  constants.DefaultName,
-		Debug: isDebugLog(),
-	}
-
-	result, err := machine.Ip(ipConfig)
+	IP, err := machine.Ip(constants.DefaultName, isDebugLog())
 	if err != nil {
 		errors.Exit(1)
 	}
-	output.Out(result.IP)
+	output.Out(IP)
 }
