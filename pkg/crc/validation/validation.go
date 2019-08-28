@@ -65,6 +65,11 @@ func ValidateBundle(bundle string) error {
 		}
 		return fmt.Errorf("Please provide the path to a valid bundle using the -b option")
 	}
+
+	if os.Getenv("CRC_DEBUG_NO_BUNDLE_VERSION_CHECK") != "" {
+		return nil
+	}
+
 	// Check if the version of the bundle provided by user is same as what is released with crc.
 	releaseBundleVersion := version.GetBundleVersion()
 	userProvidedBundleVersion := filepath.Base(bundle)
