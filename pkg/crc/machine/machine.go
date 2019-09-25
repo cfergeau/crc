@@ -128,14 +128,16 @@ func Start(startConfig StartConfig) (StartResult, error) {
 			return *result, errors.Newf("Error getting bundle metadata: %v", err)
 		}
 
-		// Check if certificate is going to expire in next 7 days
-		buildTime, err := crcBundleMetadata.GetBundleBuildTime()
+		// Check if certificate is expired/going to expire in the next 7 days
+		err := checkBundleCertsExpiry(crcBundleMetadata)
 		if err != nil {
-			result.Error = err.Error()
-			return *result, errors.Newf("Error getting bundle build time: %v", err)
-		}
-		if goingToExpire, duration := cluster.CheckCertsValidityUsingBundleBuildTime(buildTime); goingToExpire {
-			logging.Warnf("Bundle certificates are going to expire in %d days, better to use new release", duration)
+			switch err.(type) {
+			case certsExpiringError:
+				logging.Warn(err.Error())
+			default:
+				result.Error = err.Error()
+				return *result, errors.New(err.Error())
+			}
 		}
 
 		openshiftVersion := crcBundleMetadata.GetOpenshiftVersion()
@@ -253,17 +255,19 @@ func Start(startConfig StartConfig) (StartResult, error) {
 
 	// Check the certs validity inside the vm
 	logging.Info("Verifying validity of the cluster certificates ...")
-	expiringIn7Days, duration, err := cluster.CheckCertsValidity(sshRunner)
+	err = checkVMCertsExpiry(sshRunner)
 	if err != nil {
-		result.Error = err.Error()
-		return *result, errors.New(err.Error())
-	}
-	// Only show when VM is started from stopped state.
-	if exists {
-		if expiringIn7Days {
-			logging.Warnf("Bundle certificates are going to expire in %d days, better to use new release", duration)
+		switch err.(type) {
+		case certsExpiringError:
+			if exists {
+				logging.Warn(err.Error())
+			}
+		default:
+			result.Error = err.Error()
+			return *result, errors.New(err.Error())
 		}
 	}
+
 	// Add nameserver to VM if provided by User
 	if startConfig.NameServer != "" {
 		if err = addNameServerToInstance(sshRunner, startConfig.NameServer); err != nil {
