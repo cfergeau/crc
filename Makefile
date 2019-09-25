@@ -122,7 +122,7 @@ clean: clean_docs
        
 
 .PHONY: integration ## Run integration tests
-integration:
+integration: install
 GODOG_OPTS = --godog.tags=$(GOOS)
 ifndef PULL_SECRET_FILE
 	PULL_SECRET_FILE = --pull-secret-file=$(HOME)/Downloads/crc-pull-secret
