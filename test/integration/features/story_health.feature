@@ -52,6 +52,8 @@ Feature:
 
     @darwin @linux @windows
     Scenario: Create and test app
+        Given executing "crc status" succeeds
+        And stdout contains "Running (v4."
         When executing "oc new-app centos/httpd-24-centos7~https://github.com/sclorg/httpd-ex" succeeds
         Then stdout should contain "Creating resources"
         And stdout should contain

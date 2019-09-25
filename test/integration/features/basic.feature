@@ -105,6 +105,7 @@ Feature: Basic test
     
     @darwin @linux @windows
     Scenario: CRC status and disk space check
+        Given executing "crc start" succeeds
         When with up to "15" retries with wait period of "1m" command "crc status" output should not contain "Stopped"
         And stdout should contain "Running"
         And stdout should match ".*Disk Usage: *\d+\.\d+GB of 32.\d+GB.*"
@@ -132,6 +133,7 @@ Feature: Basic test
 
     @darwin @linux @windows
     Scenario: CRC status check
+        Given executing "crc stop" fails
         When with up to "2" retries with wait period of "1m" command "crc status" output should not contain "Running"
         And stdout should contain "Stopped"
 
