@@ -2,6 +2,7 @@ package machine
 
 import (
 	"encoding/json"
+	//"flag"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
@@ -33,6 +34,8 @@ import (
 	"github.com/code-ready/machine/libmachine/log"
 	"github.com/code-ready/machine/libmachine/ssh"
 	"github.com/code-ready/machine/libmachine/state"
+
+	"k8s.io/klog/v2"
 )
 
 func init() {
@@ -40,6 +43,11 @@ func init() {
 	if runtime.GOOS == crcos.WINDOWS.String() {
 		ssh.SetDefaultClient(ssh.Native)
 	}
+	/*
+		klog.InitFlags(nil)
+		flag.Set("v", "3")
+		flag.Parse()
+	*/
 }
 
 func fillClusterConfig(bundleInfo *bundle.CrcBundleInfo, clusterConfig *ClusterConfig) error {
@@ -61,10 +69,10 @@ func getCrcBundleInfo(bundlePath string) (*bundle.CrcBundleInfo, error) {
 	bundleName := filepath.Base(bundlePath)
 	bundleInfo, err := bundle.GetCachedBundleInfo(bundleName)
 	if err == nil {
-		logging.Infof("Loading bundle: %s ...", bundleName)
+		klog.Infof("Loading bundle: %s ...", bundleName)
 		return bundleInfo, nil
 	}
-	logging.Infof("Extracting bundle: %s ...", bundleName)
+	klog.Infof("Extracting bundle: %s ...", bundleName)
 	return bundle.Extract(bundlePath)
 }
 
@@ -138,14 +146,14 @@ func Start(startConfig StartConfig) (StartResult, error) {
 			return *result, errors.Newf("Error getting bundle build time: %v", err)
 		}
 		if goingToExpire, duration := cluster.CheckCertsValidityUsingBundleBuildTime(buildTime); goingToExpire {
-			logging.Warnf("Bundle certificates are going to expire in %d days, better to use new release", duration)
+			klog.Warningf("Bundle certificates are going to expire in %d days, better to use new release", duration)
 		}
 
 		openshiftVersion := crcBundleMetadata.GetOpenshiftVersion()
 		if openshiftVersion == "" {
-			logging.Infof("Creating VM...")
+			klog.Infof("Creating VM...")
 		} else {
-			logging.Infof("Creating CodeReady Containers VM for OpenShift %s...", openshiftVersion)
+			klog.Infof("Creating CodeReady Containers VM for OpenShift %s...", openshiftVersion)
 		}
 
 		// Retrieve metadata info
@@ -184,7 +192,7 @@ func Start(startConfig StartConfig) (StartResult, error) {
 			return *result, errors.Newf("Error loading bundle metadata: %v", err)
 		}
 		if bundleName != filepath.Base(startConfig.BundlePath) {
-			logging.Fatalf("Bundle '%s' was requested, but the existing VM is using '%s'",
+			klog.Fatalf("Bundle '%s' was requested, but the existing VM is using '%s'",
 				filepath.Base(startConfig.BundlePath), bundleName)
 		}
 		if host.Driver.DriverName() != startConfig.VMDriver {
@@ -201,18 +209,18 @@ func Start(startConfig StartConfig) (StartResult, error) {
 		if IsRunning(vmState) {
 			openshiftVersion := crcBundleMetadata.GetOpenshiftVersion()
 			if openshiftVersion == "" {
-				logging.Infof("A CodeReady Containers VM is already running")
+				klog.Infof("A CodeReady Containers VM is already running")
 			} else {
-				logging.Infof("A CodeReady Containers VM for OpenShift %s is already running", openshiftVersion)
+				klog.Infof("A CodeReady Containers VM for OpenShift %s is already running", openshiftVersion)
 			}
 			result.Status = vmState.String()
 			return *result, nil
 		} else {
 			openshiftVersion := crcBundleMetadata.GetOpenshiftVersion()
 			if openshiftVersion == "" {
-				logging.Infof("Starting CodeReady Containers VM ...")
+				klog.Infof("Starting CodeReady Containers VM ...")
 			} else {
-				logging.Infof("Starting CodeReady Containers VM for OpenShift %s...", openshiftVersion)
+				klog.Infof("Starting CodeReady Containers VM for OpenShift %s...", openshiftVersion)
 			}
 			if err := host.Driver.Start(); err != nil {
 				result.Error = err.Error()
@@ -248,7 +256,7 @@ func Start(startConfig StartConfig) (StartResult, error) {
 	}
 	sshRunner := crcssh.CreateRunnerWithPrivateKey(host.Driver, privateKeyPath)
 
-	logging.Debug("Waiting until ssh is available")
+	klog.V(2).Info("until ssh is available")
 	if err := cluster.WaitForSsh(sshRunner); err != nil {
 		result.Error = err.Error()
 		return *result, errors.New("Failed to connect to the CRC VM with SSH")
@@ -256,14 +264,14 @@ func Start(startConfig StartConfig) (StartResult, error) {
 
 	// Check the certs validity inside the vm
 	needsCertsRenewal := false
-	logging.Info("Verifying validity of the cluster certificates ...")
+	klog.Info("Verifying validity of the cluster certificates ...")
 	expiringIn7Days, duration, err := cluster.CheckCertsValidity(sshRunner)
 	if err != nil {
 		needsCertsRenewal = true
 	} else if exists {
 		// Only show when VM is started from stopped state.
 		if expiringIn7Days {
-			logging.Warnf("Bundle certificates are going to expire in %d days, better to use new release", duration)
+			klog.Warningf("Bundle certificates are going to expire in %d days, better to use new release", duration)
 		}
 	}
 	// Add nameserver to VM if provided by User
@@ -318,10 +326,10 @@ func Start(startConfig StartConfig) (StartResult, error) {
 		result.Error = err.Error()
 		return *result, errors.Newf("Failed internal DNS query: %v : %s", err, queryOutput)
 	}
-	logging.Infof("Check internal and public DNS query ...")
+	klog.Infof("Check internal and public DNS query ...")
 
 	if queryOutput, err := dns.CheckCRCPublicDNSReachable(servicePostStartConfig); err != nil {
-		logging.Warnf("Failed public DNS query from the cluster: %v : %s", err, queryOutput)
+		klog.Warningf("Failed public DNS query from the cluster: %v : %s", err, queryOutput)
 	}
 
 	// Additional steps to perform after newly created VM is up
@@ -332,7 +340,7 @@ func Start(startConfig StartConfig) (StartResult, error) {
 		}
 		// Copy Kubeconfig file from bundle extract path to machine directory.
 		// In our case it would be ~/.crc/machines/crc/
-		logging.Infof("Copying kubeconfig file to instance dir ...")
+		klog.Infof("Copying kubeconfig file to instance dir ...")
 		kubeConfigFilePath := filepath.Join(constants.MachineInstanceDir, startConfig.Name, "kubeconfig")
 		err := crcos.CopyFileContents(crcBundleMetadata.GetKubeConfigPath(),
 			kubeConfigFilePath,
@@ -350,7 +358,7 @@ func Start(startConfig StartConfig) (StartResult, error) {
 	}
 
 	if needsCertsRenewal {
-		logging.Infof("Cluster TLS certificates have expired, renewing them...")
+		klog.Infof("Cluster TLS certificates have expired, renewing them...")
 		err = RegenerateCertificates(sshRunner, startConfig.Name)
 		if err != nil {
 			result.Error = err.Error()
@@ -360,7 +368,7 @@ func Start(startConfig StartConfig) (StartResult, error) {
 
 	if !exists {
 		// Update the user pull secret before kubelet start.
-		logging.Info("Adding user's pull secret and cluster ID ...")
+		klog.Info("Adding user's pull secret and cluster ID ...")
 		kubeConfigFilePath := filepath.Join(constants.MachineInstanceDir, startConfig.Name, "kubeconfig")
 		if err := pullsecret.AddPullSecretAndClusterID(sshRunner, pullSecret, kubeConfigFilePath); err != nil {
 			result.Error = err.Error()

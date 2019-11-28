@@ -22,6 +22,8 @@ import (
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/version"
 	"github.com/spf13/cobra"
+
+	"k8s.io/klog/v2"
 )
 
 func init() {
@@ -38,6 +40,10 @@ var versionCmd = &cobra.Command{
 }
 
 func runPrintVersion(arguments []string) {
+	klog.Warningf("crc version: %s+%s\n", version.GetCRCVersion(), version.GetCommitSha())
+	klog.V(3).Infof("crc version: %s+%s\n", version.GetCRCVersion(), version.GetCommitSha())
+	klog.V(10).Infof("crc version: %s+%s\n", version.GetCRCVersion(), version.GetCommitSha())
+	klog.V(10).Infof("crc version: %s+%s\n", version.GetCRCVersion(), version.GetCommitSha())
 	fmt.Printf("crc version: %s+%s\n", version.GetCRCVersion(), version.GetCommitSha())
 	var embedded string
 	if !constants.BundleEmbedded() {

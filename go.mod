@@ -23,6 +23,8 @@ require (
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
 	golang.org/x/sys v0.0.0-20190712062909-fae7ac547cb7
 	gopkg.in/AlecAivazis/survey.v1 v1.8.5
+	k8s.io/klog v1.0.0
+	k8s.io/klog/v2 v2.0.0-20191023130815-8422fac62d1e
 )
 
 go 1.12

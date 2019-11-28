@@ -1,16 +1,21 @@
 package cmd
 
 import (
+	"flag"
+
 	"github.com/code-ready/crc/pkg/crc/errors"
 	"github.com/code-ready/crc/pkg/crc/machine"
 	"github.com/code-ready/crc/pkg/crc/output"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 
 	cmdConfig "github.com/code-ready/crc/cmd/crc/cmd/config"
 
 	"github.com/code-ready/crc/pkg/crc/config"
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/logging"
+
+	"k8s.io/klog/v2"
 )
 
 var rootCmd = &cobra.Command{
@@ -49,6 +54,12 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&logging.LogLevel, "log-level", constants.DefaultLogLevel, "log level (e.g. \"debug | info | warn | error\")")
 	rootCmd.PersistentFlags().BoolVarP(&globalForce, "force", "f", false, "Forcefully perform an action")
+
+	klog.InitFlags(nil)
+	//flag.Set("v", "3")
+	flag.Parse()
+
+	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 }
 
 func runPrerun() {
