@@ -116,8 +116,8 @@ func CheckCRCLocalDNSReachable(serviceConfig services.ServicePostStartConfig) (s
 }
 
 func CheckCRCPublicDNSReachable(serviceConfig services.ServicePostStartConfig) (string, error) {
-	stdout, _, err := serviceConfig.SSHRunner.Run(fmt.Sprintf("host -R 3 %s", publicDNSQueryURI))
-	return stdout, err
+	_, stderr, err := serviceConfig.SSHRunner.Run(fmt.Sprintf("curl -I %s", publicDNSQueryURI))
+	return stderr, err
 }
 
 func addOpenShiftHosts(serviceConfig services.ServicePostStartConfig) error {
