@@ -105,6 +105,12 @@ $(BUILD_DIR)/windows-amd64/crc.exe: $(SOURCES)
 $(HOST_BUILD_DIR)/crc-embedder: $(SOURCES)
 	go build --tags="build" -ldflags="$(LDFLAGS)" -o $(HOST_BUILD_DIR)/crc-embedder ./cmd/crc-embedder
 
+$(BUILD_DIR)/linux-amd64/crc-command-runner: $(SOURCES)
+	GOOS=linux GOARCH=amd64 go build -ldflags="$(LDFLAGS)" -o $(BUILD_DIR)/linux-amd64/crc-command-runner ./cmd/command-runner
+
+.phony: command-runner
+command-runner: $(BUILD_DIR)/linux-amd64/crc-command-runner
+
 .PHONY: cross ## Cross compiles all binaries
 cross: $(BUILD_DIR)/macos-amd64/crc $(BUILD_DIR)/linux-amd64/crc $(BUILD_DIR)/windows-amd64/crc.exe
 
