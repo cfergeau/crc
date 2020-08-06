@@ -97,7 +97,7 @@ func checkVMConnectivity(sshRunner *crcssh.Runner, hostname string) (string, err
 }
 
 func CheckCRCLocalDNSReachable(serviceConfig services.ServicePostStartConfig) (string, error) {
-	appsURI := fmt.Sprintf("foo.%s", serviceConfig.BundleMetadata.ClusterInfo.AppsDomain)
+	appsURI := serviceConfig.BundleMetadata.GetAppHostname("foo")
 	// Try 30 times for 1 second interval, In nested environment most of time crc failed to get
 	// Internal dns query resolved for some time.
 	var queryOutput string
