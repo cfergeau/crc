@@ -91,10 +91,23 @@ func RunPostStart(serviceConfig services.ServicePostStartConfig) (services.Servi
 	return *result, nil
 }
 
+type CommandError struct {
+	Stdout string
+	Stderr string
+	Err    error
+}
+
+func (e CommandError) Error() string {
+	return fmt.Sprintf("%s: %s", e.Err.Error(), e.Stdout)
+}
+
 func checkVMConnectivity(sshRunner *crcssh.Runner, hostname string) error {
 	output, err := sshRunner.Run(fmt.Sprintf("host -R 3 %s", hostname))
 	if err != nil {
-		return fmt.Errorf("Failed to query %s: %s:\n%s", hostname, err, output)
+		return CommandError{
+			Err:    fmt.Errorf("Failed to query %s: %v", hostname, err),
+			Stdout: output,
+		}
 	}
 
 	return nil
