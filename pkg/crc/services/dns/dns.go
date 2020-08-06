@@ -7,6 +7,7 @@ import (
 	"github.com/code-ready/crc/pkg/crc/errors"
 	"github.com/code-ready/crc/pkg/crc/network"
 	"github.com/code-ready/crc/pkg/crc/services"
+	crcssh "github.com/code-ready/crc/pkg/crc/ssh"
 )
 
 const (
@@ -90,6 +91,11 @@ func RunPostStart(serviceConfig services.ServicePostStartConfig) (services.Servi
 	return *result, nil
 }
 
+func checkVMConnectivity(sshRunner *crcssh.Runner, hostname string) (string, error) {
+	return sshRunner.Run(fmt.Sprintf("host -R 3 %s", hostname))
+
+}
+
 func CheckCRCLocalDNSReachable(serviceConfig services.ServicePostStartConfig) (string, error) {
 	appsURI := fmt.Sprintf("foo.%s", serviceConfig.BundleMetadata.ClusterInfo.AppsDomain)
 	// Try 30 times for 1 second interval, In nested environment most of time crc failed to get
@@ -97,7 +103,7 @@ func CheckCRCLocalDNSReachable(serviceConfig services.ServicePostStartConfig) (s
 	var queryOutput string
 	var err error
 	checkLocalDNSReach := func() error {
-		queryOutput, err = serviceConfig.SSHRunner.Run(fmt.Sprintf("host -R 3 %s", appsURI))
+		queryOutput, err = checkVMConnectivity(serviceConfig.SSHRunner, appsURI)
 		if err != nil {
 			return &errors.RetriableError{Err: err}
 		}
@@ -111,5 +117,5 @@ func CheckCRCLocalDNSReachable(serviceConfig services.ServicePostStartConfig) (s
 }
 
 func CheckCRCPublicDNSReachable(serviceConfig services.ServicePostStartConfig) (string, error) {
-	return serviceConfig.SSHRunner.Run(fmt.Sprintf("host -R 3 %s", publicDNSQueryURI))
+	return checkVMConnectivity(serviceConfig.SSHRunner, publicDNSQueryURI)
 }
