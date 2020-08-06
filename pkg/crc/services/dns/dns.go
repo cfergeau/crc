@@ -91,31 +91,31 @@ func RunPostStart(serviceConfig services.ServicePostStartConfig) (services.Servi
 	return *result, nil
 }
 
-func checkVMConnectivity(sshRunner *crcssh.Runner, hostname string) (string, error) {
-	return sshRunner.Run(fmt.Sprintf("host -R 3 %s", hostname))
+func checkVMConnectivity(sshRunner *crcssh.Runner, hostname string) error {
+	output, err := sshRunner.Run(fmt.Sprintf("host -R 3 %s", hostname))
+	if err != nil {
+		return fmt.Errorf("Failed to query %s: %s:\n%s", hostname, err, output)
+	}
 
+	return nil
 }
 
-func CheckCRCLocalDNSReachable(serviceConfig services.ServicePostStartConfig) (string, error) {
+func CheckCRCLocalDNSReachable(serviceConfig services.ServicePostStartConfig) error {
 	appsURI := serviceConfig.BundleMetadata.GetAppHostname("foo")
 	// Try 30 times for 1 second interval, In nested environment most of time crc failed to get
 	// Internal dns query resolved for some time.
-	var queryOutput string
 	var err error
 	checkLocalDNSReach := func() error {
-		queryOutput, err = checkVMConnectivity(serviceConfig.SSHRunner, appsURI)
+		err = checkVMConnectivity(serviceConfig.SSHRunner, appsURI)
 		if err != nil {
 			return &errors.RetriableError{Err: err}
 		}
 		return nil
 	}
 
-	if err := errors.RetryAfter(30, checkLocalDNSReach, time.Second); err != nil {
-		return queryOutput, err
-	}
-	return queryOutput, err
+	return errors.RetryAfter(30, checkLocalDNSReach, time.Second)
 }
 
-func CheckCRCPublicDNSReachable(serviceConfig services.ServicePostStartConfig) (string, error) {
+func CheckCRCPublicDNSReachable(serviceConfig services.ServicePostStartConfig) error {
 	return checkVMConnectivity(serviceConfig.SSHRunner, publicDNSQueryURI)
 }

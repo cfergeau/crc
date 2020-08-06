@@ -315,13 +315,13 @@ func Start(startConfig StartConfig) (StartResult, error) {
 	}
 
 	// Check DNS lookup before starting the kubelet
-	if queryOutput, err := dns.CheckCRCLocalDNSReachable(servicePostStartConfig); err != nil {
-		return startError(startConfig.Name, fmt.Sprintf("Failed internal DNS query: %s", queryOutput), err)
+	if err := dns.CheckCRCLocalDNSReachable(servicePostStartConfig); err != nil {
+		return startError(startConfig.Name, "Failed internal DNS query", err)
 	}
 	logging.Info("Check internal and public DNS query ...")
 
-	if queryOutput, err := dns.CheckCRCPublicDNSReachable(servicePostStartConfig); err != nil {
-		logging.Warnf("Failed public DNS query from the cluster: %v : %s", err, queryOutput)
+	if err := dns.CheckCRCPublicDNSReachable(servicePostStartConfig); err != nil {
+		logging.Warnf("Failed public DNS query from the cluster: %v", err)
 	}
 
 	// Check DNS lookup from host to VM
