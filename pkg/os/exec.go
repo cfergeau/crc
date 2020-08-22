@@ -2,12 +2,25 @@ package os
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
 
 	"github.com/code-ready/crc/pkg/crc/logging"
 )
+
+type ExecError struct {
+	Err    error
+	Stdout string
+	Stderr string
+	//Command string
+	//Errno int
+}
+
+func (err ExecError) Error() string {
+	return fmt.Sprintf("%s %v: %s", err.Stdout, err.Err, err.Stderr)
+}
 
 func runCmd(command string, args []string, env map[string]string) (string, string, error) {
 	cmd := exec.Command(command, args...) // #nosec G204

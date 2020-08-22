@@ -81,14 +81,14 @@ func fixKvmEnabled() error {
 
 	switch {
 	case strings.Contains(flags, "vmx"):
-		stdOut, stdErr, err := crcos.RunWithPrivilege("Load kvm_intel kernel module", "modprobe", "kvm_intel")
+		_, _, err := crcos.RunWithPrivilege("Load kvm_intel kernel module", "modprobe", "kvm_intel")
 		if err != nil {
-			return fmt.Errorf("Failed to load kvm intel module: %s %v: %s", stdOut, err, stdErr)
+			return fmt.Errorf("Failed to load kvm intel module: %v", err)
 		}
 	case strings.Contains(flags, "svm"):
-		stdOut, stdErr, err := crcos.RunWithPrivilege("Load kvm_amd kernel module", "modprobe", "kvm_amd")
+		_, _, err := crcos.RunWithPrivilege("Load kvm_amd kernel module", "modprobe", "kvm_amd")
 		if err != nil {
-			return fmt.Errorf("Failed to load kvm amd module: %s %v: %s", stdOut, err, stdErr)
+			return fmt.Errorf("Failed to load kvm amd module: %v", err)
 		}
 	default:
 		logging.Debug("Unable to detect processor details")
@@ -110,9 +110,9 @@ func checkLibvirtInstalled() error {
 
 func fixLibvirtInstalled() error {
 	logging.Debug("Trying to install libvirt")
-	stdOut, stdErr, err := crcos.RunWithPrivilege("install virtualization related packages", "yum", "install", "-y", "libvirt", "libvirt-daemon-kvm", "qemu-kvm")
+	_, _, err := crcos.RunWithPrivilege("install virtualization related packages", "yum", "install", "-y", "libvirt", "libvirt-daemon-kvm", "qemu-kvm")
 	if err != nil {
-		return fmt.Errorf("Could not install required packages: %s %v: %s", stdOut, err, stdErr)
+		return fmt.Errorf("Could not install required packages: %v", err)
 	}
 	logging.Debug("libvirt was successfully installed")
 	return nil
