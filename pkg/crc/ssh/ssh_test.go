@@ -61,10 +61,9 @@ func TestRunner(t *testing.T) {
 		assert.NoError(t, runner.CopyData([]byte(`hello world`), "/hello", 0644))
 
 		cmdRunner := NewRemoteCommandRunner(runner)
-		stdout, stderr, err := cmdRunner.Run("echo", "hello")
+		stdout, err := cmdRunner.Run("echo", "hello")
 		assert.NoError(t, err)
 		assert.Equal(t, "hello", stdout)
-		assert.Empty(t, stderr)
 	}
 }
 

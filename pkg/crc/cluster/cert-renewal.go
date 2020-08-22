@@ -14,7 +14,7 @@ import (
 
 func waitForPendingCsrs(ocConfig oc.Config) error {
 	waitForPendingCsr := func() error {
-		output, _, err := ocConfig.RunOcCommand("get", "csr")
+		output, err := ocConfig.RunOcCommand("get", "csr")
 		if err != nil {
 			return &errors.RetriableError{Err: err}
 		}

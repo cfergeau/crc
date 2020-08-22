@@ -97,9 +97,9 @@ func AddPullSecret(sshRunner *ssh.Runner, ocConfig oc.Config, pullSec string) er
 	if err := WaitForOpenshiftResource(ocConfig, "secret"); err != nil {
 		return err
 	}
-	_, stderr, err := ocConfig.RunOcCommandPrivate(cmdArgs...)
+	_, err := ocConfig.RunOcCommandPrivate(cmdArgs...)
 	if err != nil {
-		return fmt.Errorf("Failed to add Pull secret %v: %s", err, stderr)
+		return fmt.Errorf("Failed to add Pull secret: %v", err)
 	}
 	return nil
 }
@@ -112,9 +112,9 @@ func UpdateClusterID(ocConfig oc.Config) error {
 	if err := WaitForOpenshiftResource(ocConfig, "clusterversion"); err != nil {
 		return err
 	}
-	_, stderr, err := ocConfig.RunOcCommand(cmdArgs...)
+	_, err := ocConfig.RunOcCommand(cmdArgs...)
 	if err != nil {
-		return fmt.Errorf("Failed to update cluster ID %v: %s", err, stderr)
+		return fmt.Errorf("Failed to update cluster ID: %v", err)
 	}
 
 	return nil
@@ -164,8 +164,8 @@ func AddProxyConfigToCluster(sshRunner *ssh.Runner, ocConfig oc.Config, proxy *n
 	logging.Debugf("Patch string %s", string(patchEncode))
 
 	cmdArgs := []string{"patch", "proxy", "cluster", "-p", fmt.Sprintf("'%s'", string(patchEncode)), "-n", "openshift-config", "--type", "merge"}
-	if _, stderr, err := ocConfig.RunOcCommand(cmdArgs...); err != nil {
-		return fmt.Errorf("Failed to add proxy details %v: %s", err, stderr)
+	if _, err := ocConfig.RunOcCommand(cmdArgs...); err != nil {
+		return fmt.Errorf("Failed to add proxy details: %v", err)
 	}
 	return nil
 }
@@ -191,8 +191,8 @@ func addProxyCACertToCluster(sshRunner *ssh.Runner, ocConfig oc.Config, proxy *n
 		return err
 	}
 	cmdArgs := []string{"apply", "-f", proxyConfigMapFileName}
-	if _, stderr, err := ocConfig.RunOcCommand(cmdArgs...); err != nil {
-		return fmt.Errorf("Failed to add proxy cert details %v: %s", err, stderr)
+	if _, err := ocConfig.RunOcCommand(cmdArgs...); err != nil {
+		return fmt.Errorf("Failed to add proxy cert details: %v", err)
 	}
 	return nil
 }
@@ -253,9 +253,9 @@ func WaitforRequestHeaderClientCaFile(ocConfig oc.Config) error {
 		cmdArgs := []string{"get", "configmaps/extension-apiserver-authentication", `-ojsonpath={.data.requestheader-client-ca-file}`,
 			"-n", "kube-system"}
 
-		stdout, stderr, err := ocConfig.RunOcCommand(cmdArgs...)
+		stdout, err := ocConfig.RunOcCommand(cmdArgs...)
 		if err != nil {
-			return fmt.Errorf("Failed to get request header client ca file %v: %s", err, stderr)
+			return fmt.Errorf("Failed to get request header client ca file: %v", err)
 		}
 		if stdout == "" {
 			return &errors.RetriableError{Err: fmt.Errorf("missing .data.requestheader-client-ca-file")}
@@ -273,7 +273,7 @@ func DeleteOpenshiftAPIServerPods(ocConfig oc.Config) error {
 
 	deleteOpenshiftAPIServerPods := func() error {
 		cmdArgs := []string{"delete", "pod", "--all", "-n", "openshift-apiserver"}
-		_, _, err := ocConfig.RunOcCommand(cmdArgs...)
+		_, err := ocConfig.RunOcCommand(cmdArgs...)
 		if err != nil {
 			return &errors.RetriableError{Err: err}
 		}
@@ -289,7 +289,7 @@ func CheckProxySettingsForOperator(ocConfig oc.Config, proxy *network.ProxyConfi
 		return true, nil
 	}
 	cmdArgs := []string{"set", "env", "deployment", deployment, "--list", "-n", namespace}
-	out, _, err := ocConfig.RunOcCommand(cmdArgs...)
+	out, err := ocConfig.RunOcCommand(cmdArgs...)
 	if err != nil {
 		return false, err
 	}

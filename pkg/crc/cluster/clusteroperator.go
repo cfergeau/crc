@@ -3,7 +3,6 @@ package cluster
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/code-ready/crc/pkg/crc/logging"
@@ -49,9 +48,9 @@ func getStatus(ocConfig oc.Config, selector []string) (*Status, error) {
 		Available: true,
 	}
 
-	data, stderr, err := ocConfig.RunOcCommandPrivate("get", "co", "-ojson")
+	data, err := ocConfig.RunOcCommand("get", "co", "-ojson")
 	if err != nil {
-		return cs, fmt.Errorf("%s", stderr)
+		return cs, err
 	}
 
 	var co K8sResource

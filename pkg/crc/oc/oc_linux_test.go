@@ -16,7 +16,7 @@ func TestRunCommand(t *testing.T) {
 		Context:        "a-context",
 		Cluster:        "a-cluster",
 	}
-	stdout, _, err := ocConfig.RunOcCommand("a-command")
+	stdout, err := ocConfig.RunOcCommand("a-command")
 	assert.NoError(t, err)
 	assert.Equal(t, "a-command --context a-context --cluster a-cluster --kubeconfig kubeconfig-file\n", stdout)
 }
@@ -27,7 +27,7 @@ func TestRunCommandWithoutContextAndCluster(t *testing.T) {
 		OcBinaryPath:   "/bin/echo",
 		KubeconfigPath: "kubeconfig-file",
 	}
-	stdout, _, err := ocConfig.RunOcCommand("a-command")
+	stdout, err := ocConfig.RunOcCommand("a-command")
 	assert.NoError(t, err)
 	assert.Equal(t, "a-command --kubeconfig kubeconfig-file\n", stdout)
 }

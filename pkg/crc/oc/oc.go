@@ -27,7 +27,7 @@ func UseOCWithConfig(machineName string) Config {
 	}
 }
 
-func (oc Config) runCommand(isPrivate bool, args ...string) (string, string, error) {
+func (oc Config) runCommand(isPrivate bool, args ...string) (string, error) {
 	if oc.Context != "" {
 		args = append(args, "--context", oc.Context)
 	}
@@ -45,16 +45,12 @@ func (oc Config) runCommand(isPrivate bool, args ...string) (string, string, err
 	return oc.Runner.Run(oc.OcBinaryPath, args...)
 }
 
-func (oc Config) RunOcCommand(args ...string) (string, string, error) {
+func (oc Config) RunOcCommand(args ...string) (string, error) {
 	return oc.runCommand(false, args...)
 }
 
-func (oc Config) RunOcCommandPrivate(args ...string) (string, string, error) {
+func (oc Config) RunOcCommandPrivate(args ...string) (string, error) {
 	return oc.runCommand(true, args...)
-}
-
-type SSHRunner struct {
-	Runner *ssh.Runner
 }
 
 func UseOCWithSSH(sshRunner *ssh.Runner) Config {

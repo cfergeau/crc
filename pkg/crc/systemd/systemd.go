@@ -58,27 +58,27 @@ func (c Commander) Status(name string) (states.State, error) {
 }
 
 func (c Commander) DaemonReload() error {
-	stdOut, stdErr, err := c.commandRunner.RunPrivileged("executing systemctl daemon-reload command", "systemctl", "daemon-reload")
+	stdOut, err := c.commandRunner.RunPrivileged("executing systemctl daemon-reload command", "systemctl", "daemon-reload")
 	if err != nil {
-		return fmt.Errorf("Executing systemctl daemon-reload failed: %s %v: %s", stdOut, err, stdErr)
+		return fmt.Errorf("Executing systemctl daemon-reload failed: %s: %v", stdOut, err)
 	}
 	return nil
 }
 
 func (c Commander) service(name string, action actions.Action) (states.State, error) {
 	var (
-		stdOut, stdErr string
-		err            error
+		stdOut string
+		err    error
 	)
 	if action.IsPriviledged() {
 		msg := fmt.Sprintf("executing systemctl %s %s", action.String(), name)
-		stdOut, stdErr, err = c.commandRunner.RunPrivileged(msg, "systemctl", action.String(), name)
+		stdOut, err = c.commandRunner.RunPrivileged(msg, "systemctl", action.String(), name)
 	} else {
-		stdOut, stdErr, err = c.commandRunner.Run("systemctl", action.String(), name)
+		stdOut, err = c.commandRunner.Run("systemctl", action.String(), name)
 	}
 
 	if err != nil {
-		return states.Error, fmt.Errorf("Executing systemctl action failed: %s %v: %s", stdOut, err, stdErr)
+		return states.Error, fmt.Errorf("Executing systemctl action failed: %s: %v", stdOut, err)
 	}
 
 	return states.Compare(stdOut), nil

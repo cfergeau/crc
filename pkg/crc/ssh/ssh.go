@@ -93,24 +93,22 @@ type remoteCommandRunner struct {
 	sshRunner *Runner
 }
 
-func (cmdRunner *remoteCommandRunner) Run(cmd string, args ...string) (string, string, error) {
+func (cmdRunner *remoteCommandRunner) Run(cmd string, args ...string) (string, error) {
 	commandline := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
-	out, err := cmdRunner.sshRunner.Run(commandline)
-	return out, "", err
+
+	return cmdRunner.sshRunner.Run(commandline)
 }
 
-func (cmdRunner *remoteCommandRunner) RunPrivate(cmd string, args ...string) (string, string, error) {
+func (cmdRunner *remoteCommandRunner) RunPrivate(cmd string, args ...string) (string, error) {
 	commandline := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
-	out, err := cmdRunner.sshRunner.RunPrivate(commandline)
-	return out, "", err
+
+	return cmdRunner.sshRunner.RunPrivate(commandline)
 }
 
-func (cmdRunner *remoteCommandRunner) RunPrivileged(reason string, cmdAndArgs ...string) (string, string, error) {
+func (cmdRunner *remoteCommandRunner) RunPrivileged(reason string, cmdAndArgs ...string) (string, error) {
 	commandline := fmt.Sprintf("sudo %s", strings.Join(cmdAndArgs, " "))
 
-	out, err := cmdRunner.sshRunner.Run(commandline)
-
-	return out, "", err
+	return cmdRunner.sshRunner.Run(commandline)
 }
 
 func NewRemoteCommandRunner(runner *Runner) crcos.CommandRunner {

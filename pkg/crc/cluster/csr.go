@@ -13,9 +13,9 @@ import (
 func WaitForOpenshiftResource(ocConfig oc.Config, resource string) error {
 	logging.Debugf("Waiting for availability of resource type '%s'", resource)
 	waitForAPIServer := func() error {
-		stdout, stderr, err := ocConfig.RunOcCommand("get", resource)
+		stdout, err := ocConfig.RunOcCommand("get", resource)
 		if err != nil {
-			logging.Debug(stderr)
+			logging.Debugf("%v", err)
 			return &errors.RetriableError{Err: err}
 		}
 		logging.Debug(stdout)
@@ -33,9 +33,9 @@ func ApproveNodeCSR(ocConfig oc.Config) error {
 
 	logging.Debug("Approving pending CSRs")
 	// Execute 'oc get csr -oname' and store the output
-	csrsJSON, stderr, err := ocConfig.RunOcCommandPrivate("get", "csr", "-ojson")
+	csrsJSON, err := ocConfig.RunOcCommand("get", "csr", "-ojson")
 	if err != nil {
-		return fmt.Errorf("Not able to get csr names (%v : %s)", err, stderr)
+		return fmt.Errorf("Not able to get csr names (%v)", err)
 	}
 	var csrs K8sResource
 	err = json.Unmarshal([]byte(csrsJSON), &csrs)
@@ -46,9 +46,9 @@ func ApproveNodeCSR(ocConfig oc.Config) error {
 		/* When the CSR hasn't been approved, csr.status is empty in the json data */
 		if len(csr.Status.Conditions) == 0 {
 			logging.Debugf("Approving csr %s", csr.Metadata.Name)
-			_, stderr, err := ocConfig.RunOcCommand("adm", "certificate", "approve", csr.Metadata.Name)
+			_, err := ocConfig.RunOcCommand("adm", "certificate", "approve", csr.Metadata.Name)
 			if err != nil {
-				return fmt.Errorf("Not able to approve csr (%v : %s)", err, stderr)
+				return fmt.Errorf("Not able to approve csr (%v)", err)
 			}
 		}
 	}
