@@ -27,11 +27,11 @@ func CreateRunnerWithPrivateKey(driver drivers.Driver, privateKey string) *Runne
 }
 
 // Create a host using the driver's config
-func (runner *Runner) Run(command string) (string, error) {
+func (runner *Runner) Run(command string, args ...string) (string, error) {
 	return runner.runSSHCommandFromDriver(command, false)
 }
 
-func (runner *Runner) RunPrivate(command string) (string, error) {
+func (runner *Runner) RunPrivate(command string, args ...string) (string, error) {
 	return runner.runSSHCommandFromDriver(command, true)
 }
 
@@ -43,7 +43,7 @@ func (runner *Runner) CopyData(data []byte, destFilename string, mode os.FileMod
 	logging.Debugf("Creating %s with permissions 0%o in the CRC VM", destFilename, mode)
 	base64Data := base64.StdEncoding.EncodeToString(data)
 	command := fmt.Sprintf("sudo install -m 0%o /dev/null %s && cat <<EOF | base64 --decode | sudo tee %s\n%s\nEOF", mode, destFilename, destFilename, base64Data)
-	_, err := runner.RunPrivate(command)
+	_, err := runner.runSSHCommandFromDriver(command, true)
 
 	return err
 }
