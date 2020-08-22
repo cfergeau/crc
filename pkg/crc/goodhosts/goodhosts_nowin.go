@@ -26,7 +26,7 @@ func UpdateHostsFile(instanceIP string, hostnames ...string) error {
 
 func AddToHostsFile(instanceIP string, hostnames ...string) error {
 	for _, hostname := range hostnames {
-		if _, _, err := crcos.RunWithDefaultLocale(goodhostPath, "add", instanceIP, hostname); err != nil {
+		if _, err := crcos.RunWithDefaultLocale(goodhostPath, "add", instanceIP, hostname); err != nil {
 			return err
 		}
 	}
@@ -36,13 +36,13 @@ func AddToHostsFile(instanceIP string, hostnames ...string) error {
 func RemoveFromHostsFile(instanceIP string, hostnames ...string) error {
 	// If only instanceIP provided then remove all the entry from that instance IP
 	if len(hostnames) == 0 {
-		if _, _, err := crcos.RunWithDefaultLocale(goodhostPath, "rm", instanceIP); err != nil {
+		if _, err := crcos.RunWithDefaultLocale(goodhostPath, "rm", instanceIP); err != nil {
 			return err
 		}
 		return nil
 	}
 	for _, hostname := range hostnames {
-		if _, _, err := crcos.RunWithDefaultLocale(goodhostPath, "rm", hostname); err != nil {
+		if _, err := crcos.RunWithDefaultLocale(goodhostPath, "rm", hostname); err != nil {
 			return err
 		}
 	}

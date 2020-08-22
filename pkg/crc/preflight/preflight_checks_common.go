@@ -144,7 +144,7 @@ func fixGoodhostsBinaryCached() error {
 
 func getCurrentOcversion() (string, error) {
 	ocPath := filepath.Join(constants.CrcOcBinDir, constants.OcBinaryName)
-	stdOut, _, err := crcos.RunWithDefaultLocale(ocPath, "version", "--client")
+	stdOut, err := crcos.RunWithDefaultLocale(ocPath, "version", "--client")
 	if len(strings.Split(stdOut, ":")) < 2 {
 		return "", fmt.Errorf("Unable to parse the version information of %s", ocPath)
 	}

@@ -22,7 +22,7 @@ func (err ExecError) Error() string {
 	return fmt.Sprintf("%s %v: %s", err.Stdout, err.Err, err.Stderr)
 }
 
-func runCmd(command string, args []string, env map[string]string) (string, string, error) {
+func runCmd(command string, args []string, env map[string]string) (string, error) {
 	cmd := exec.Command(command, args...) // #nosec G204
 	if len(env) != 0 {
 		cmd.Env = os.Environ()
@@ -39,16 +39,17 @@ func runCmd(command string, args []string, env map[string]string) (string, strin
 		logging.Debugf("Command failed: %v", err)
 		logging.Debugf("stdout: %s", stdOut.String())
 		logging.Debugf("stderr: %s", stdErr.String())
+		err = ExecError{err, stdOut.String(), stdErr.String()}
 	}
-	return stdOut.String(), stdErr.String(), err
+	return stdOut.String(), err
 }
 
-func run(command string, args []string, env map[string]string) (string, string, error) {
+func run(command string, args []string, env map[string]string) (string, error) {
 	logging.Debugf("Running '%s %s'", command, strings.Join(args, " "))
 	return runCmd(command, args, env)
 }
 
-func runPrivate(command string, args []string, env map[string]string) (string, string, error) {
+func runPrivate(command string, args []string, env map[string]string) (string, error) {
 	logging.Debugf("About to run a hidden command")
 	return runCmd(command, args, env)
 }
@@ -61,17 +62,16 @@ func RunWithPrivilege(reason string, cmdAndArgs ...string) (string, error) {
 		return "", err
 	}
 	logging.Infof("Will use root access: %s", reason)
-	stdout, _, err := run(sudo, cmdAndArgs, map[string]string{})
-	return stdout, err
+	return run(sudo, cmdAndArgs, map[string]string{})
 }
 
 var defaultLocaleEnv = map[string]string{"LC_ALL": "C", "LANG": "C"}
 
-func RunWithDefaultLocale(command string, args ...string) (string, string, error) {
+func RunWithDefaultLocale(command string, args ...string) (string, error) {
 	return run(command, args, defaultLocaleEnv)
 }
 
-func RunWithDefaultLocalePrivate(command string, args ...string) (string, string, error) {
+func RunWithDefaultLocalePrivate(command string, args ...string) (string, error) {
 	return runPrivate(command, args, defaultLocaleEnv)
 }
 
@@ -83,11 +83,13 @@ type CommandRunner interface {
 type localRunner struct{}
 
 func (r *localRunner) Run(command string, args ...string) (string, string, error) {
-	return RunWithDefaultLocale(command, args...)
+	stdout, err := RunWithDefaultLocale(command, args...)
+	return stdout, "", err
 }
 
 func (r *localRunner) RunPrivate(command string, args ...string) (string, string, error) {
-	return RunWithDefaultLocalePrivate(command, args...)
+	stdout, err := RunWithDefaultLocalePrivate(command, args...)
+	return stdout, "", err
 }
 
 func (r *localRunner) RunPrivileged(reason string, cmdAndArgs ...string) (string, string, error) {

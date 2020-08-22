@@ -160,7 +160,7 @@ func addFileWritePermissionToUser(filename string) error {
 
 func getHyperKitMachineDriverVersion() (string, error) {
 	driverBinPath := filepath.Join(constants.CrcBinDir, hyperkit.MachineDriverCommand)
-	stdOut, _, err := crcos.RunWithDefaultLocale(driverBinPath, "version")
+	stdOut, err := crcos.RunWithDefaultLocale(driverBinPath, "version")
 	if len(strings.Split(stdOut, ":")) < 2 {
 		return "", fmt.Errorf("Unable to parse the version information of %s", driverBinPath)
 	}

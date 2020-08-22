@@ -95,19 +95,19 @@ func createResolverFile(instanceIP string, domain string, filename string) (bool
 // restartNetwork is required to update the resolver file on OSx.
 func restartNetwork() error {
 	// https://medium.com/@kumar_pravin/network-restart-on-mac-os-using-shell-script-ab19ba6e6e99
-	netDeviceList, _, err := crcos.RunWithDefaultLocale("networksetup", "-listallnetworkservices")
+	netDeviceList, err := crcos.RunWithDefaultLocale("networksetup", "-listallnetworkservices")
 	netDeviceList = strings.TrimSpace(netDeviceList)
 	if err != nil {
 		return err
 	}
 	for _, netdevice := range strings.Split(netDeviceList, "\n")[1:] {
 		time.Sleep(1 * time.Second)
-		stdout, stderr, _ := crcos.RunWithDefaultLocale("networksetup", "-setnetworkserviceenabled", netdevice, "off")
-		logging.Debugf("Disabling the %s Device (stdout: %s), (stderr: %s)", netdevice, stdout, stderr)
-		stdout, stderr, err = crcos.RunWithDefaultLocale("networksetup", "-setnetworkserviceenabled", netdevice, "on")
-		logging.Debugf("Enabling the %s Device (stdout: %s), (stderr: %s)", netdevice, stdout, stderr)
+		stdout, _ := crcos.RunWithDefaultLocale("networksetup", "-setnetworkserviceenabled", netdevice, "off")
+		logging.Debugf("Disabling the %s Device (stdout: %s)", netdevice, stdout)
+		stdout, err = crcos.RunWithDefaultLocale("networksetup", "-setnetworkserviceenabled", netdevice, "on")
+		logging.Debugf("Enabling the %s Device (stdout: %s)", netdevice, stdout)
 		if err != nil {
-			return fmt.Errorf("%s: %v", stderr, err)
+			return err
 		}
 	}
 
@@ -134,7 +134,7 @@ func waitForNetwork() error {
 	// retry up to 5 times
 	for i := 0; i < 5; i++ {
 		for _, ns := range hostResolv.NameServers {
-			_, _, err := crcos.RunWithDefaultLocale("ping", "-c4", ns.IPAddress)
+			_, err := crcos.RunWithDefaultLocale("ping", "-c4", ns.IPAddress)
 			if err == nil {
 				return nil
 			}
