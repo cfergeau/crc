@@ -14,9 +14,9 @@ import (
 func WaitForOpenshiftResource(ocConfig oc.Config, resource string) error {
 	logging.Debugf("Waiting for availability of resource type '%s'", resource)
 	waitForAPIServer := func() error {
-		stdout, stderr, err := ocConfig.WithFailFast().RunOcCommand("get", resource)
+		stdout, err := ocConfig.WithFailFast().RunOcCommand("get", resource)
 		if err != nil {
-			logging.Debug(stderr)
+			logging.Debugf("%v", err)
 			return &crcerrors.RetriableError{Err: err}
 		}
 		logging.Debug(stdout)
@@ -28,9 +28,9 @@ func WaitForOpenshiftResource(ocConfig oc.Config, resource string) error {
 // approveNodeCSR approves the certificate for the node.
 func approveNodeCSR(ocConfig oc.Config, expectedSignerName string) error {
 	logging.Debug("Approving pending CSRs")
-	output, stderr, err := ocConfig.RunOcCommand("get", "csr", "-ojson")
+	output, err := ocConfig.RunOcCommand("get", "csr", "-ojson")
 	if err != nil {
-		return fmt.Errorf("Failed to get all certificate signing requests: %v %s", err, stderr)
+		return fmt.Errorf("Failed to get all certificate signing requests: %v", err)
 	}
 	var csrs k8scerts.CertificateSigningRequestList
 	err = json.Unmarshal([]byte(output), &csrs)
@@ -51,9 +51,9 @@ func approveNodeCSR(ocConfig oc.Config, expectedSignerName string) error {
 			continue
 		}
 		logging.Debugf("Approving csr %s (signerName: %s)", csr.ObjectMeta.Name, signerName)
-		_, stderr, err := ocConfig.RunOcCommand("adm", "certificate", "approve", csr.ObjectMeta.Name)
+		_, err := ocConfig.RunOcCommand("adm", "certificate", "approve", csr.ObjectMeta.Name)
 		if err != nil {
-			return fmt.Errorf("Not able to approve csr (%v : %s)", err, stderr)
+			return fmt.Errorf("Not able to approve csr (%v)", err)
 		}
 	}
 	return nil

@@ -61,19 +61,19 @@ type mockRunner struct {
 	file string
 }
 
-func (r *mockRunner) Run(executablePath string, args ...string) (string, string, error) {
+func (r *mockRunner) Run(executablePath string, args ...string) (string, error) {
 	bin, err := ioutil.ReadFile(r.file)
-	return string(bin), "", err
+	return string(bin), err
 }
 
-func (r *mockRunner) RunPrivate(executablePath string, args ...string) (string, string, error) {
+func (r *mockRunner) RunPrivate(executablePath string, args ...string) (string, error) {
 	bin, err := ioutil.ReadFile(r.file)
-	return string(bin), "", err
+	return string(bin), err
 }
 
-func (r *mockRunner) RunPrivileged(reason string, args ...string) (string, string, error) {
+func (r *mockRunner) RunPrivileged(reason string, args ...string) (string, error) {
 	bin, err := ioutil.ReadFile(r.file)
-	return string(bin), "", err
+	return string(bin), err
 }
 
 func (r *mockRunner) GetKubeconfigPath() string {

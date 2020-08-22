@@ -53,7 +53,7 @@ func TestRunner(t *testing.T) {
 	assert.NoError(t, err)
 	defer runner.Close()
 
-	bin, _, err := runner.Run("echo hello")
+	bin, err := runner.Run("echo hello")
 	assert.NoError(t, err)
 	assert.Equal(t, "hello", bin)
 	assert.NoError(t, runner.CopyData([]byte(`hello world`), "/hello", 0644))

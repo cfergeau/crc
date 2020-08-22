@@ -24,7 +24,7 @@ const vmPullSecretPath = "/var/lib/kubelet/config.json"
 
 func WaitForSSH(ctx context.Context, sshRunner *ssh.Runner) error {
 	checkSSHConnectivity := func() error {
-		_, _, err := sshRunner.Run("exit 0")
+		_, err := sshRunner.Run("exit 0")
 		if err != nil {
 			return &errors.RetriableError{Err: err}
 		}
@@ -56,7 +56,7 @@ func CheckCertsValidity(sshRunner *ssh.Runner) (map[string]bool, error) {
 }
 
 func checkCertValidity(sshRunner *ssh.Runner, cert string) (bool, error) {
-	output, _, err := sshRunner.Run(fmt.Sprintf(`date --date="$(sudo openssl x509 -in %s -noout -enddate | cut -d= -f 2)" --iso-8601=seconds`, cert))
+	output, err := sshRunner.Run(fmt.Sprintf(`date --date="$(sudo openssl x509 -in %s -noout -enddate | cut -d= -f 2)" --iso-8601=seconds`, cert))
 	if err != nil {
 		return false, err
 	}
@@ -75,7 +75,7 @@ func checkCertValidity(sshRunner *ssh.Runner, cert string) (bool, error) {
 func GetRootPartitionUsage(sshRunner *ssh.Runner) (int64, int64, error) {
 	cmd := "df -B1 --output=size,used,target /sysroot | tail -1"
 
-	out, _, err := sshRunner.Run(cmd)
+	out, err := sshRunner.Run(cmd)
 
 	if err != nil {
 		return 0, 0, err
@@ -97,7 +97,7 @@ func EnsurePullSecretPresentInTheCluster(ocConfig oc.Config, pullSec PullSecretL
 		return err
 	}
 
-	stdout, _, err := ocConfig.RunOcCommandPrivate("get", "secret", "pull-secret", "-n", "openshift-config", "-o", `jsonpath="{['data']['\.dockerconfigjson']}"`)
+	stdout, err := ocConfig.RunOcCommandPrivate("get", "secret", "pull-secret", "-n", "openshift-config", "-o", `jsonpath="{['data']['\.dockerconfigjson']}"`)
 	if err != nil {
 		return err
 	}
@@ -119,37 +119,37 @@ func EnsurePullSecretPresentInTheCluster(ocConfig oc.Config, pullSec PullSecretL
 		fmt.Sprintf(`'{"data":{".dockerconfigjson":"%s"}}'`, base64OfPullSec),
 		"-n", "openshift-config", "--type", "merge"}
 
-	_, stderr, err := ocConfig.RunOcCommandPrivate(cmdArgs...)
+	_, err = ocConfig.RunOcCommandPrivate(cmdArgs...)
 	if err != nil {
-		return fmt.Errorf("Failed to add Pull secret %v: %s", err, stderr)
+		return fmt.Errorf("Failed to add Pull secret: %v", err)
 	}
 	return nil
 }
 
 func RemovePullSecretFromCluster(ocConfig oc.Config, sshRunner *ssh.Runner) error {
 	logging.Info("Removing user's pull secret from instance disk and from cluster secret...")
-	if _, _, err := sshRunner.RunPrivileged("Removing user's pull secret", "rm", "-fr", vmPullSecretPath); err != nil {
+	if _, err := sshRunner.RunPrivileged("Removing user's pull secret", "rm", "-fr", vmPullSecretPath); err != nil {
 		return err
 	}
 	cmdArgs := []string{"patch", "secret", "pull-secret", "-p",
 		`'{"data":{".dockerconfigjson":"e30K"}}'`,
 		"-n", "openshift-config", "--type", "merge"}
 
-	_, stderr, err := ocConfig.RunOcCommand(cmdArgs...)
+	_, err := ocConfig.RunOcCommand(cmdArgs...)
 	if err != nil {
-		return fmt.Errorf("Failed to remove Pull secret %w: %s", err, stderr)
+		return fmt.Errorf("Failed to remove Pull secret %w", err)
 	}
 
 	cmdArgs = []string{"delete", "machineconfigs", "--all"}
-	_, stderr, err = ocConfig.RunOcCommand(cmdArgs...)
+	_, err = ocConfig.RunOcCommand(cmdArgs...)
 	if err != nil {
-		return fmt.Errorf("Failed to remove machineconfigs %w: %s", err, stderr)
+		return fmt.Errorf("Failed to remove machineconfigs %w", err)
 	}
 
 	cmdArgs = []string{"delete", "machineconfigpools", "--all"}
-	_, stderr, err = ocConfig.RunOcCommand(cmdArgs...)
+	_, err = ocConfig.RunOcCommand(cmdArgs...)
 	if err != nil {
-		return fmt.Errorf("Failed to remove machineconfigpools %w: %s", err, stderr)
+		return fmt.Errorf("Failed to remove machineconfigpools %w", err)
 	}
 
 	return nil
@@ -160,7 +160,7 @@ func EnsureClusterIDIsNotEmpty(ocConfig oc.Config) error {
 		return err
 	}
 
-	stdout, _, err := ocConfig.RunOcCommand("get", "clusterversion", "version", "-o", `jsonpath="{['spec']['clusterID']}"`)
+	stdout, err := ocConfig.RunOcCommand("get", "clusterversion", "version", "-o", `jsonpath="{['spec']['clusterID']}"`)
 	if err != nil {
 		return err
 	}
@@ -173,9 +173,9 @@ func EnsureClusterIDIsNotEmpty(ocConfig oc.Config) error {
 	cmdArgs := []string{"patch", "clusterversion", "version", "-p",
 		fmt.Sprintf(`'{"spec":{"clusterID":"%s"}}'`, clusterID), "--type", "merge"}
 
-	_, stderr, err := ocConfig.RunOcCommand(cmdArgs...)
+	_, err = ocConfig.RunOcCommand(cmdArgs...)
 	if err != nil {
-		return fmt.Errorf("Failed to update cluster ID %v: %s", err, stderr)
+		return fmt.Errorf("Failed to update cluster ID: %v", err)
 	}
 
 	return nil
@@ -225,8 +225,8 @@ func AddProxyConfigToCluster(sshRunner *ssh.Runner, ocConfig oc.Config, proxy *n
 	logging.Debugf("Patch string %s", string(patchEncode))
 
 	cmdArgs := []string{"patch", "proxy", "cluster", "-p", fmt.Sprintf("'%s'", string(patchEncode)), "-n", "openshift-config", "--type", "merge"}
-	if _, stderr, err := ocConfig.RunOcCommandPrivate(cmdArgs...); err != nil {
-		return fmt.Errorf("Failed to add proxy details %v: %s", err, stderr)
+	if _, err := ocConfig.RunOcCommandPrivate(cmdArgs...); err != nil {
+		return fmt.Errorf("Failed to add proxy details %v", err)
 	}
 	return nil
 }
@@ -253,8 +253,8 @@ func addProxyCACertToCluster(sshRunner *ssh.Runner, ocConfig oc.Config, proxy *n
 		return err
 	}
 	cmdArgs := []string{"apply", "-f", proxyConfigMapFileName}
-	if _, stderr, err := ocConfig.RunOcCommandPrivate(cmdArgs...); err != nil {
-		return fmt.Errorf("Failed to add proxy cert details %v: %s", err, stderr)
+	if _, err := ocConfig.RunOcCommandPrivate(cmdArgs...); err != nil {
+		return fmt.Errorf("Failed to add proxy cert details %v", err)
 	}
 	return nil
 }
@@ -291,7 +291,7 @@ func addProxyCACertToInstance(sshRunner *ssh.Runner, proxy *network.ProxyConfig)
 	if err := sshRunner.CopyData([]byte(proxy.ProxyCACert), "/etc/pki/ca-trust/source/anchors/openshift-config-user-ca-bundle.crt", 0600); err != nil {
 		return err
 	}
-	if _, _, err := sshRunner.Run("sudo update-ca-trust"); err != nil {
+	if _, err := sshRunner.Run("sudo update-ca-trust"); err != nil {
 		return err
 	}
 	return nil
@@ -314,7 +314,7 @@ func (p *PullSecretMemoizer) Value() (string, error) {
 }
 
 func EnsurePullSecretPresentOnInstanceDisk(sshRunner *ssh.Runner, pullSecret PullSecretLoader) error {
-	if _, _, err := sshRunner.Run(fmt.Sprintf("test -e %s", vmPullSecretPath)); err == nil {
+	if _, err := sshRunner.Run(fmt.Sprintf("test -e %s", vmPullSecretPath)); err == nil {
 		return nil
 	}
 	logging.Info("Adding user's pull secret to instance disk...")
@@ -342,9 +342,9 @@ func WaitForRequestHeaderClientCaFile(sshRunner *ssh.Runner) error {
 func WaitForAPIServer(ctx context.Context, ocConfig oc.Config) error {
 	logging.Info("Waiting for kube-apiserver availability... [takes around 2min]")
 	waitForAPIServer := func() error {
-		stdout, stderr, err := ocConfig.WithFailFast().RunOcCommand("get", "nodes")
+		stdout, err := ocConfig.WithFailFast().RunOcCommand("get", "nodes")
 		if err != nil {
-			logging.Debug(stderr)
+			logging.Debug(err)
 			return &errors.RetriableError{Err: err}
 		}
 		logging.Debug(stdout)
@@ -360,7 +360,7 @@ func DeleteOpenshiftAPIServerPods(ocConfig oc.Config) error {
 
 	deleteOpenshiftAPIServerPods := func() error {
 		cmdArgs := []string{"delete", "pod", "--all", "-n", "openshift-apiserver"}
-		_, _, err := ocConfig.WithFailFast().RunOcCommand(cmdArgs...)
+		_, err := ocConfig.WithFailFast().RunOcCommand(cmdArgs...)
 		if err != nil {
 			return &errors.RetriableError{Err: err}
 		}
@@ -376,7 +376,7 @@ func CheckProxySettingsForOperator(ocConfig oc.Config, proxy *network.ProxyConfi
 		return true, nil
 	}
 	cmdArgs := []string{"set", "env", "deployment", deployment, "--list", "-n", namespace}
-	out, _, err := ocConfig.RunOcCommandPrivate(cmdArgs...)
+	out, err := ocConfig.RunOcCommandPrivate(cmdArgs...)
 	if err != nil {
 		return false, err
 	}

@@ -90,7 +90,7 @@ func getStatus(ocConfig oc.Config, ignoreClusterOperators, selector []string) (*
 		Available: true,
 	}
 
-	data, _, err := ocConfig.WithFailFast().RunOcCommandPrivate("get", "co", "-ojson")
+	data, err := ocConfig.WithFailFast().RunOcCommandPrivate("get", "co", "-ojson")
 	if err != nil {
 		return nil, err
 	}

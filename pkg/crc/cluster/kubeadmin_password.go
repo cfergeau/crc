@@ -49,9 +49,9 @@ func UpdateKubeAdminUserPassword(ocConfig oc.Config) error {
 	cmdArgs := []string{"patch", "secret", "htpass-secret", "-p",
 		fmt.Sprintf(`'{"data":{"htpasswd":"%s"}}'`, base64Data),
 		"-n", "openshift-config", "--type", "merge"}
-	_, stderr, err := ocConfig.RunOcCommandPrivate(cmdArgs...)
+	_, err = ocConfig.RunOcCommandPrivate(cmdArgs...)
 	if err != nil {
-		return fmt.Errorf("Failed to update kubeadmin password %v: %s", err, stderr)
+		return fmt.Errorf("Failed to update kubeadmin password %v", err)
 	}
 
 	return ioutil.WriteFile(kubeAdminPasswordFile, []byte(kubeAdminPassword), 0600)
