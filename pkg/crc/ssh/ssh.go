@@ -89,7 +89,7 @@ func (runner *Runner) runSSHCommand(command string, runPrivate bool) (string, er
 	}
 
 	if err != nil {
-		return string(stdout), &crcos.ExecError{
+		return "", &crcos.ExecError{
 			Err:    fmt.Errorf("ssh command error: %s - %w", command, err),
 			Stdout: string(stdout),
 			Stderr: string(stderr),
