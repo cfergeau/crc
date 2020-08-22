@@ -53,9 +53,9 @@ func stopAllContainers(vm *virtualMachine) error {
 	if err := systemd.NewInstanceSystemdCommander(sshRunner).Stop("kubelet"); err != nil {
 		return err
 	}
-	_, stderr, err := sshRunner.RunPrivileged("stopping all containers", `-- sh -c 'crictl stop $(crictl ps -q)'`)
+	_, _, err = sshRunner.RunPrivileged("stopping all containers", `-- sh -c 'crictl stop $(crictl ps -q)'`)
 	if err != nil {
-		logging.Errorf("Failed to stop all containers: %v - %s", err, stderr)
+		logging.Errorf("Failed to stop all containers: %v", err)
 		return err
 	}
 	return nil
