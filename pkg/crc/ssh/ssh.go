@@ -9,6 +9,7 @@ import (
 
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/logging"
+	crcos "github.com/code-ready/crc/pkg/os"
 )
 
 type Runner struct {
@@ -72,7 +73,7 @@ func (runner *Runner) runSSHCommand(command string, runPrivate bool) (string, er
 		logging.Debugf("Running SSH command: %s", command)
 	}
 
-	stdout, _, err := runner.client.Run(command)
+	stdout, stderr, err := runner.client.Run(command)
 	if runPrivate {
 		if err != nil {
 			logging.Debugf("SSH command failed")
@@ -84,9 +85,11 @@ func (runner *Runner) runSSHCommand(command string, runPrivate bool) (string, er
 	}
 
 	if err != nil {
-		return string(stdout), fmt.Errorf(`ssh command error:
-command : %s
-err     : %w\n`, command, err)
+		return "", crcos.ExecError{
+			Err:    fmt.Errorf("ssh command error: %s - %v", command, err),
+			Stdout: string(stdout),
+			Stderr: string(stderr),
+		}
 	}
 
 	return string(stdout), nil
