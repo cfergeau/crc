@@ -80,10 +80,10 @@ func (runner *Runner) runSSHCommandFromDriver(command string, runPrivate bool) (
 	}
 
 	if err != nil {
-		return "", fmt.Errorf(`ssh command error:
-command : %s
-err     : %v
-output  : %s`, command, err, output)
+		return "", crcos.ExecError{
+			Err:    fmt.Errorf("ssh command error: %s - %v", command, err),
+			Stdout: output,
+		}
 	}
 
 	return output, nil
