@@ -1,8 +1,10 @@
 package ssh
 
 import (
+	"bytes"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -56,6 +58,16 @@ func (runner *Runner) CopyFile(srcFilename string, destFilename string, mode os.
 	return runner.CopyData(data, destFilename, mode)
 }
 
+func stringFromReadCloser(stream io.ReadCloser) (string, error) {
+	buf := new(bytes.Buffer)
+	_, err := buf.ReadFrom(stream)
+	if err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
+}
+
 func (runner *Runner) runSSHCommandFromDriver(command string, runPrivate bool) (string, error) {
 	client, err := drivers.GetSSHClientFromDriver(runner.driver, runner.privateSSHKey)
 	if err != nil {
@@ -68,7 +80,11 @@ func (runner *Runner) runSSHCommandFromDriver(command string, runPrivate bool) (
 		logging.Debugf("About to run SSH command:\n%s", command)
 	}
 
-	output, err := client.Output(command)
+	stdout, stderr, err := client.Start(command)
+	var (
+		stdoutStr string
+		stderrStr string
+	)
 	if runPrivate {
 		if err != nil {
 			logging.Debugf("SSH command failed")
@@ -76,17 +92,21 @@ func (runner *Runner) runSSHCommandFromDriver(command string, runPrivate bool) (
 			logging.Debugf("SSH command succeeded")
 		}
 	} else {
-		logging.Debugf("SSH command results: err: %v, output: %s", err, output)
+		stdoutStr, _ = stringFromReadCloser(stdout)
+		stderrStr, _ = stringFromReadCloser(stderr)
+		logging.Debugf("SSH command results: err: %v, stdout: %s stderr: %s", err, stdoutStr, stderrStr)
 	}
 
 	if err != nil {
 		return "", crcos.ExecError{
 			Err:    fmt.Errorf("ssh command error: %s - %v", command, err),
-			Stdout: output,
+			Stdout: stdoutStr,
 		}
 	}
+	defer stdout.Close()
+	defer stderr.Close()
 
-	return output, nil
+	return stdoutStr, nil
 }
 
 type remoteCommandRunner struct {
