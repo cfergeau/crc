@@ -129,13 +129,13 @@ func fixResolverFilePermissions() error {
 	// Check if resolver directory available or not
 	if _, err := os.Stat(resolverDir); os.IsNotExist(err) {
 		logging.Debugf("Creating %s directory", resolverDir)
-		_, _, err := crcos.RunPrivileged(fmt.Sprintf("Creating dir %s", resolverDir), "mkdir", resolverDir)
+		_, err := crcos.RunPrivileged(fmt.Sprintf("Creating dir %s", resolverDir), "mkdir", resolverDir)
 		if err != nil {
 			return fmt.Errorf("Unable to create the resolver Dir: %v", err)
 		}
 	}
 	logging.Debugf("Making %s readable/writable by the current user", resolverFile)
-	_, _, err := crcos.RunPrivileged(fmt.Sprintf("Creating file %s", resolverFile), "touch", resolverFile)
+	_, err := crcos.RunPrivileged(fmt.Sprintf("Creating file %s", resolverFile), "touch", resolverFile)
 	if err != nil {
 		return fmt.Errorf("Unable to create the resolver file: %v", err)
 	}
@@ -171,7 +171,7 @@ func addFileWritePermissionToUser(filename string) error {
 		return fmt.Errorf("Failed to get current user id")
 	}
 
-	_, _, err = crcos.RunPrivileged(fmt.Sprintf("Changing ownership of %s", filename), "chown", currentUser.Username, filename)
+	_, err = crcos.RunPrivileged(fmt.Sprintf("Changing ownership of %s", filename), "chown", currentUser.Username, filename)
 	if err != nil {
 		return fmt.Errorf("Unable to change ownership of the filename: %v", err)
 	}

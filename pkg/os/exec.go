@@ -56,13 +56,14 @@ func runPrivate(command string, args []string, env map[string]string) (string, s
 
 // RunPrivileged executes a command using sudo
 // provide a reason why root is needed as the first argument
-func RunPrivileged(reason string, cmdAndArgs ...string) (string, string, error) {
+func RunPrivileged(reason string, cmdAndArgs ...string) (string, error) {
 	sudo, err := exec.LookPath("sudo")
 	if err != nil {
-		return "", "", errors.New("sudo executable not found")
+		return "", errors.New("sudo executable not found")
 	}
 	logging.Infof("Using root access: %s", reason)
-	return run(sudo, cmdAndArgs, map[string]string{})
+	stdout, _, err := run(sudo, cmdAndArgs, map[string]string{})
+	return stdout, err
 }
 
 var defaultLocaleEnv = map[string]string{"LC_ALL": "C", "LANG": "C"}
@@ -91,7 +92,8 @@ func (r *localRunner) RunPrivate(command string, args ...string) (string, string
 }
 
 func (r *localRunner) RunPrivileged(reason string, cmdAndArgs ...string) (string, string, error) {
-	return RunPrivileged(reason, cmdAndArgs...)
+	stdout, err := RunPrivileged(reason, cmdAndArgs...)
+	return stdout, "", err
 }
 
 func NewLocalCommandRunner() CommandRunner {
