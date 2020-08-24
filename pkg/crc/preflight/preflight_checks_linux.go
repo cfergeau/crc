@@ -81,12 +81,12 @@ func fixKvmEnabled() error {
 
 	switch {
 	case strings.Contains(flags, "vmx"):
-		_, _, err := crcos.RunWithPrivilege("Load kvm_intel kernel module", "modprobe", "kvm_intel")
+		_, err := crcos.RunWithPrivilege("Load kvm_intel kernel module", "modprobe", "kvm_intel")
 		if err != nil {
 			return fmt.Errorf("Failed to load kvm intel module: %v", err)
 		}
 	case strings.Contains(flags, "svm"):
-		_, _, err := crcos.RunWithPrivilege("Load kvm_amd kernel module", "modprobe", "kvm_amd")
+		_, err := crcos.RunWithPrivilege("Load kvm_amd kernel module", "modprobe", "kvm_amd")
 		if err != nil {
 			return fmt.Errorf("Failed to load kvm amd module: %v", err)
 		}
@@ -110,7 +110,7 @@ func checkLibvirtInstalled() error {
 
 func fixLibvirtInstalled() error {
 	logging.Debug("Trying to install libvirt")
-	_, _, err := crcos.RunWithPrivilege("install virtualization related packages", "yum", "install", "-y", "libvirt", "libvirt-daemon-kvm", "qemu-kvm")
+	_, err := crcos.RunWithPrivilege("install virtualization related packages", "yum", "install", "-y", "libvirt", "libvirt-daemon-kvm", "qemu-kvm")
 	if err != nil {
 		return fmt.Errorf("Could not install required packages: %v", err)
 	}
@@ -174,7 +174,7 @@ func fixUserPartOfLibvirtGroup() error {
 		logging.Debugf("user.Current() failed: %v", err)
 		return fmt.Errorf("Failed to get current user id")
 	}
-	_, _, err = crcos.RunWithPrivilege("add user to libvirt group", "usermod", "-a", "-G", "libvirt", currentUser.Username)
+	_, err = crcos.RunWithPrivilege("add user to libvirt group", "usermod", "-a", "-G", "libvirt", currentUser.Username)
 	if err != nil {
 		return fmt.Errorf("Failed to add user to libvirt group")
 	}
@@ -255,7 +255,7 @@ func checkOldMachineDriverLibvirtInstalled() error {
 func fixOldMachineDriverLibvirtInstalled() error {
 	oldLibvirtDriverPath := filepath.Join("/usr/local/bin/", libvirt.MachineDriverCommand)
 	logging.Debugf("Removing %s", oldLibvirtDriverPath)
-	_, _, err := crcos.RunWithPrivilege("remove old libvirt driver", "rm", "-f", oldLibvirtDriverPath)
+	_, err := crcos.RunWithPrivilege("remove old libvirt driver", "rm", "-f", oldLibvirtDriverPath)
 	if err != nil {
 		logging.Debugf("Removal of %s failed", oldLibvirtDriverPath)
 		/* Ignoring error, an obsolete file being still present is not a fatal error */

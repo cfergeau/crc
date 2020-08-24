@@ -32,13 +32,14 @@ func checkIfRunningAsNormalUser() error {
 func setSuid(path string) error {
 	logging.Debugf("Making %s suid", path)
 
-	_, _, err := crcos.RunWithPrivilege(fmt.Sprintf("change ownership of %s", path), "chown", "root", path)
+	_, err := crcos.RunWithPrivilege(fmt.Sprintf("change ownership of %s", path), "chown", "root", path)
 	if err != nil {
-		return fmt.Errorf("Unable to set ownership of %s to root: %v", path, err)
+		return fmt.Errorf("Unable to set ownership of %s to root: %v",
+			path, err)
 	}
 
 	/* Can't do this before the chown as the chown will reset the suid bit */
-	_, _, err = crcos.RunWithPrivilege(fmt.Sprintf("set suid for %s", path), "chmod", "u+s,g+x", path)
+	_, err = crcos.RunWithPrivilege(fmt.Sprintf("set suid for %s", path), "chmod", "u+s,g+x", path)
 	if err != nil {
 		return fmt.Errorf("Unable to set suid bit on %s: %v", path, err)
 	}
