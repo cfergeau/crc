@@ -55,7 +55,7 @@ func (c *Cache) GetExecutableName() string {
  * It returns <version> as a string
  */
 func getVersionGeneric(executablePath string, args ...string) (string, error) { //nolint:deadcode,unused
-	stdOut, _, err := crcos.RunWithDefaultLocale(executablePath, args...)
+	stdOut, err := crcos.RunWithDefaultLocale(executablePath, args...)
 	if err != nil {
 		return "", err
 	}
@@ -73,7 +73,7 @@ func NewAdminHelperCache() *Cache {
 		url,
 		version,
 		func(executable string) (string, error) {
-			out, _, err := crcos.RunWithDefaultLocale(executable, "--version")
+			out, err := crcos.RunWithDefaultLocale(executable, "--version")
 			if err != nil {
 				return "", err
 			}

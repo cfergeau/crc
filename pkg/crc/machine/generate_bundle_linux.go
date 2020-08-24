@@ -16,7 +16,7 @@ func copyDiskImage(destDir string) (string, string, error) {
 	srcPath := filepath.Join(constants.MachineInstanceDir, constants.DefaultName, imageName)
 	destPath := filepath.Join(destDir, imageName)
 
-	_, _, err := crcos.RunWithDefaultLocale("qemu-img", "convert", "-f", "qcow2", "-O", destFormat, srcPath, destPath)
+	_, err := crcos.RunWithDefaultLocale("qemu-img", "convert", "-f", "qcow2", "-O", destFormat, srcPath, destPath)
 	if err != nil {
 		return "", "", err
 	}

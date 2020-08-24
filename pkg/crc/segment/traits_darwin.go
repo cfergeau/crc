@@ -14,7 +14,7 @@ func traits() analytics.Traits {
 		Set("os", runtime.GOOS).
 		Set("used_installer", version.IsInstaller())
 
-	version, _, err := crcos.RunWithDefaultLocale("sw_vers", "-productVersion")
+	version, err := crcos.RunWithDefaultLocale("sw_vers", "-productVersion")
 	if err != nil {
 		return base
 	}

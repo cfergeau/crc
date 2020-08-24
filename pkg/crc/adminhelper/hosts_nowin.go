@@ -9,7 +9,7 @@ import (
 )
 
 func execute(args ...string) error {
-	_, _, err := crcos.RunWithDefaultLocale(BinPath, args...)
+	_, err := crcos.RunWithDefaultLocale(BinPath, args...)
 	return err
 }
 

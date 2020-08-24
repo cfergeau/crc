@@ -27,7 +27,7 @@ func getHyperKitMachineDriverVersion(executablePath string) (string, error) {
 }
 
 func getQcowToolVersion(executablePath string) (string, error) {
-	stdout, _, err := crcos.RunWithDefaultLocale(executablePath, "--version")
+	stdout, err := crcos.RunWithDefaultLocale(executablePath, "--version")
 	return strings.TrimSpace(stdout), err
 }
 

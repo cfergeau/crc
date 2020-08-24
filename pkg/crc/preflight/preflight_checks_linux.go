@@ -84,12 +84,12 @@ func fixKvmEnabled() error {
 
 	switch {
 	case strings.Contains(flags, "vmx"):
-		_, _, err := crcos.RunPrivileged("Loading kvm_intel kernel module", "modprobe", "kvm_intel")
+		_, err := crcos.RunPrivileged("Loading kvm_intel kernel module", "modprobe", "kvm_intel")
 		if err != nil {
 			return fmt.Errorf("Failed to load kvm intel module: %v", err)
 		}
 	case strings.Contains(flags, "svm"):
-		_, _, err := crcos.RunPrivileged("Loading kvm_amd kernel module", "modprobe", "kvm_amd")
+		_, err := crcos.RunPrivileged("Loading kvm_amd kernel module", "modprobe", "kvm_amd")
 		if err != nil {
 			return fmt.Errorf("Failed to load kvm amd module: %v", err)
 		}
@@ -102,9 +102,9 @@ func fixKvmEnabled() error {
 }
 
 func getLibvirtCapabilities() (*libvirtxml.Caps, error) {
-	stdOut, _, err := crcos.RunWithDefaultLocale("virsh", "--readonly", "--connect", "qemu:///system", "capabilities")
+	stdOut, err := crcos.RunWithDefaultLocale("virsh", "--readonly", "--connect", "qemu:///system", "capabilities")
 	if err != nil {
-		stdOut, _, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///session", "capabilities")
+		stdOut, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///session", "capabilities")
 		if err != nil {
 			return nil, fmt.Errorf("Failed to run 'virsh capabilities': %v", err)
 		}
@@ -150,7 +150,7 @@ func checkLibvirtInstalled() error {
 func fixLibvirtInstalled(distro *linux.OsRelease) func() error {
 	return func() error {
 		logging.Debug("Trying to install libvirt")
-		_, _, err := crcos.RunPrivileged("Installing virtualization packages", "/bin/sh", "-c", installLibvirtCommand(distro))
+		_, err := crcos.RunPrivileged("Installing virtualization packages", "/bin/sh", "-c", installLibvirtCommand(distro))
 		if err != nil {
 			return fmt.Errorf("Could not install required packages: %v", err)
 		}
@@ -174,7 +174,7 @@ func installLibvirtCommand(distro *linux.OsRelease) string {
 
 func checkLibvirtVersion() error {
 	logging.Debugf("Checking if libvirt version is >=%s", minSupportedLibvirtVersion)
-	stdOut, _, err := crcos.RunWithDefaultLocale("virsh", "-v")
+	stdOut, err := crcos.RunWithDefaultLocale("virsh", "-v")
 	if err != nil {
 		return fmt.Errorf("Failed to run virsh")
 	}
@@ -229,7 +229,7 @@ func fixUserPartOfLibvirtGroup() error {
 		logging.Debugf("user.Current() failed: %v", err)
 		return fmt.Errorf("Failed to get current user id")
 	}
-	_, _, err = crcos.RunPrivileged("Adding user to the libvirt group", "usermod", "-a", "-G", "libvirt", currentUser.Username)
+	_, err = crcos.RunPrivileged("Adding user to the libvirt group", "usermod", "-a", "-G", "libvirt", currentUser.Username)
 	if err != nil {
 		return fmt.Errorf("Failed to add user to libvirt group")
 	}
@@ -496,7 +496,7 @@ func fixMachineDriverLibvirtInstalled() error {
 
 func checkLibvirtCrcNetworkAvailable() error {
 	logging.Debug("Checking if libvirt 'crc' network exists")
-	_, _, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-info", "crc")
+	_, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-info", "crc")
 	if err != nil {
 		return fmt.Errorf("Libvirt network crc not found")
 	}
@@ -535,9 +535,9 @@ func fixLibvirtCrcNetworkAvailable() error {
 	// For time being we are going to override the crc network according what we have in our binary template.
 	// We also don't care about the error or output from those commands atm.
 	// #nosec G204
-	_, _, _ = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-destroy", libvirt.DefaultNetwork)
+	_, _ = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-destroy", libvirt.DefaultNetwork)
 	// #nosec G204
-	_, _, _ = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-undefine", libvirt.DefaultNetwork)
+	_, _ = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-undefine", libvirt.DefaultNetwork)
 	// Create the network according to our defined template
 	cmd := exec.Command("virsh", "--connect", "qemu:///system", "net-define", "/dev/stdin")
 	cmd.Stdin = strings.NewReader(netXMLDef)
@@ -554,19 +554,19 @@ func fixLibvirtCrcNetworkAvailable() error {
 
 func removeLibvirtCrcNetwork() error {
 	logging.Debug("Removing libvirt 'crc' network")
-	_, _, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-info", libvirt.DefaultNetwork)
+	_, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-info", libvirt.DefaultNetwork)
 	if err != nil {
 		// Ignore if no crc network exists for libvirt
 		// User may have manually deleted the `crc` network from libvirt
 		return nil
 	}
-	_, _, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-destroy", libvirt.DefaultNetwork)
+	_, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-destroy", libvirt.DefaultNetwork)
 	if err != nil {
 		logging.Debugf("%v", err)
 		return fmt.Errorf("Failed to destroy libvirt 'crc' network")
 	}
 
-	_, _, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-undefine", libvirt.DefaultNetwork)
+	_, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-undefine", libvirt.DefaultNetwork)
 	if err != nil {
 		logging.Debugf("%v", err)
 		return fmt.Errorf("Failed to undefine libvirt 'crc' network")
@@ -576,20 +576,20 @@ func removeLibvirtCrcNetwork() error {
 }
 
 func removeCrcVM() error {
-	stdout, _, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "domstate", constants.DefaultName)
+	stdout, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "domstate", constants.DefaultName)
 	if err != nil {
 		//  User may have run `crc delete` before `crc cleanup`
 		//  in that case there is no crc vm so return early.
 		return nil
 	}
 	if strings.TrimSpace(stdout) == "running" {
-		_, _, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "destroy", constants.DefaultName)
+		_, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "destroy", constants.DefaultName)
 		if err != nil {
 			logging.Debugf("%v", err)
 			return fmt.Errorf("Failed to destroy 'crc' VM")
 		}
 	}
-	_, _, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "undefine", constants.DefaultName)
+	_, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "undefine", constants.DefaultName)
 	if err != nil {
 		logging.Debugf("%v", err)
 		return fmt.Errorf("Failed to undefine 'crc' VM")
@@ -631,7 +631,7 @@ func trimSpacesFromXML(str string) string {
 
 func checkLibvirtCrcNetworkDefinition() error {
 	logging.Debug("Checking if libvirt 'crc' definition is up to date")
-	stdOut, _, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-dumpxml", "--inactive", "crc")
+	stdOut, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-dumpxml", "--inactive", "crc")
 	if err != nil {
 		return fmt.Errorf("Failed to get 'crc' network XML: %s", err)
 	}
@@ -655,7 +655,7 @@ func checkLibvirtCrcNetworkDefinition() error {
 
 func checkLibvirtCrcNetworkActive() error {
 	logging.Debug("Checking if libvirt 'crc' network is active")
-	stdOut, _, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-info", "crc")
+	stdOut, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-info", "crc")
 	if err != nil {
 		return fmt.Errorf("Failed to query 'crc' network information")
 	}
@@ -673,11 +673,11 @@ func checkLibvirtCrcNetworkActive() error {
 
 func fixLibvirtCrcNetworkActive() error {
 	logging.Debug("Starting libvirt 'crc' network")
-	_, _, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-start", "crc")
+	_, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-start", "crc")
 	if err != nil {
 		return fmt.Errorf("Failed to start libvirt 'crc' network: %v", err)
 	}
-	_, _, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-autostart", "crc")
+	_, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-autostart", "crc")
 	if err != nil {
 		return fmt.Errorf("Failed to autostart libvirt 'crc' network: %v", err)
 	}
