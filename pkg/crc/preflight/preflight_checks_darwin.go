@@ -151,7 +151,7 @@ func addFileWritePermissionToUser(filename string) error {
 
 	err = os.Chmod(filename, 0600)
 	if err != nil {
-		return fmt.Errorf("Unable to change permissions of the filename: %s %v: %s", stdOut, err, stdErr)
+		return fmt.Errorf("Unable to change permissions of the filename: %v", err)
 	}
 	logging.Debugf("%s is readable/writable by current user", filename)
 
