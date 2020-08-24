@@ -97,7 +97,7 @@ func AddPullSecret(sshRunner *ssh.Runner, ocConfig oc.Config, pullSec string) er
 	if err := WaitForOpenshiftResource(ocConfig, "secret"); err != nil {
 		return err
 	}
-	_, err := ocConfig.RunOcCommandPrivate(cmdArgs...)
+	_, err := ocConfig.RunOcCommandRedacted([]string{base64OfPullSec}, cmdArgs...)
 	if err != nil {
 		return fmt.Errorf("Failed to add Pull secret: %v", err)
 	}

@@ -65,7 +65,7 @@ func (r *mockRunner) Run(binaryPath string, args ...string) (string, error) {
 	return string(bin), err
 }
 
-func (r *mockRunner) RunPrivate(binaryPath string, args ...string) (string, error) {
+func (r *mockRunner) RunRedacted(redactedData []string, binaryPath string, args ...string) (string, error) {
 	bin, err := ioutil.ReadFile(r.file)
 	return string(bin), err
 }

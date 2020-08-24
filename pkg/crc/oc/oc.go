@@ -27,7 +27,7 @@ func UseOCWithConfig(machineName string) Config {
 	}
 }
 
-func (oc Config) runCommand(isPrivate bool, args ...string) (string, error) {
+func (oc Config) runCommand(redactedData []string, args ...string) (string, error) {
 	if oc.Context != "" {
 		args = append(args, "--context", oc.Context)
 	}
@@ -38,19 +38,15 @@ func (oc Config) runCommand(isPrivate bool, args ...string) (string, error) {
 		args = append(args, "--kubeconfig", oc.KubeconfigPath)
 	}
 
-	if isPrivate {
-		return oc.Runner.RunPrivate(oc.OcBinaryPath, args...)
-	}
-
-	return oc.Runner.Run(oc.OcBinaryPath, args...)
+	return oc.Runner.RunRedacted(redactedData, oc.OcBinaryPath, args...)
 }
 
 func (oc Config) RunOcCommand(args ...string) (string, error) {
-	return oc.runCommand(false, args...)
+	return oc.runCommand([]string{}, args...)
 }
 
-func (oc Config) RunOcCommandPrivate(args ...string) (string, error) {
-	return oc.runCommand(true, args...)
+func (oc Config) RunOcCommandRedacted(redactedData []string, args ...string) (string, error) {
+	return oc.runCommand(redactedData, args...)
 }
 
 func UseOCWithSSH(sshRunner *ssh.Runner) Config {

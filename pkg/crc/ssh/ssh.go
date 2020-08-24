@@ -28,13 +28,16 @@ func CreateRunnerWithPrivateKey(driver drivers.Driver, privateKey string) *Runne
 	return &Runner{driver: driver, privateSSHKey: privateKey}
 }
 
-// Create a host using the driver's config
 func (runner *Runner) Run(command string, args ...string) (string, error) {
-	return runner.runSSHCommandFromDriver(command, false)
+	cmd := fmt.Sprintf("%s %s", command, strings.Join(args, " "))
+
+	return runner.runSSHCommandFromDriver(cmd, []string{})
 }
 
-func (runner *Runner) RunPrivate(command string, args ...string) (string, error) {
-	return runner.runSSHCommandFromDriver(command, true)
+func (runner *Runner) RunRedacted(redactedData []string, command string, args ...string) (string, error) {
+	cmd := fmt.Sprintf("%s %s", command, strings.Join(args, " "))
+
+	return runner.runSSHCommandFromDriver(cmd, redactedData)
 }
 
 func (runner *Runner) SetPrivateKeyPath(path string) {
@@ -45,7 +48,7 @@ func (runner *Runner) CopyData(data []byte, destFilename string, mode os.FileMod
 	logging.Debugf("Creating %s with permissions 0%o in the CRC VM", destFilename, mode)
 	base64Data := base64.StdEncoding.EncodeToString(data)
 	command := fmt.Sprintf("sudo install -m 0%o /dev/null %s && cat <<EOF | base64 --decode | sudo tee %s\n%s\nEOF", mode, destFilename, destFilename, base64Data)
-	_, err := runner.runSSHCommandFromDriver(command, true)
+	_, err := runner.runSSHCommandFromDriver(command, []string{base64Data})
 
 	return err
 }
@@ -58,6 +61,15 @@ func (runner *Runner) CopyFile(srcFilename string, destFilename string, mode os.
 	return runner.CopyData(data, destFilename, mode)
 }
 
+func redactPrivateData(str string, redactedData []string) string {
+	result := str
+	for _, redactedStr := range redactedData {
+		result = strings.ReplaceAll(result, redactedStr, "xxx")
+	}
+
+	return result
+}
+
 func stringFromReadCloser(stream io.ReadCloser) (string, error) {
 	buf := new(bytes.Buffer)
 	_, err := buf.ReadFrom(stream)
@@ -68,17 +80,15 @@ func stringFromReadCloser(stream io.ReadCloser) (string, error) {
 	return buf.String(), nil
 }
 
-func (runner *Runner) runSSHCommandFromDriver(command string, runPrivate bool) (string, error) {
+func (runner *Runner) runSSHCommandFromDriver(command string, redactedData []string) (string, error) {
 	client, err := drivers.GetSSHClientFromDriver(runner.driver, runner.privateSSHKey)
 	if err != nil {
 		return "", err
 	}
 
-	if runPrivate {
-		logging.Debugf("About to run SSH command with hidden output")
-	} else {
-		logging.Debugf("About to run SSH command:\n%s", command)
-	}
+	runPrivate := (len(redactedData) != 0)
+
+	logging.Debugf("About to run SSH command:\n%s", redactPrivateData(command, redactedData))
 
 	stdout, stderr, err := client.Start(command)
 	var (
@@ -119,10 +129,10 @@ func (cmdRunner *remoteCommandRunner) Run(cmd string, args ...string) (string, e
 	return cmdRunner.sshRunner.Run(commandline)
 }
 
-func (cmdRunner *remoteCommandRunner) RunPrivate(cmd string, args ...string) (string, error) {
+func (cmdRunner *remoteCommandRunner) RunRedacted(redactedData []string, cmd string, args ...string) (string, error) {
 	commandline := fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
 
-	return cmdRunner.sshRunner.RunPrivate(commandline)
+	return cmdRunner.sshRunner.RunRedacted(redactedData, commandline)
 }
 
 func (cmdRunner *remoteCommandRunner) RunPrivileged(reason string, cmdAndArgs ...string) (string, error) {
