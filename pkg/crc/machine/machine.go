@@ -398,7 +398,7 @@ func (client *client) Start(startConfig StartConfig) (StartResult, error) {
 
 	logging.Info("Updating kubeconfig")
 	if err := eventuallyWriteKubeconfig(ocConfig, instanceIP, clusterConfig); err != nil {
-		log.Warnf("Cannot update kubeconfig: %v", err)
+		logging.Warnf("Cannot update kubeconfig: %v", err)
 	}
 
 	// Approve the node certificate.
