@@ -27,9 +27,6 @@ import (
 	"github.com/code-ready/crc/pkg/crc/machine/bundle"
 	"github.com/code-ready/crc/pkg/crc/machine/config"
 
-	"github.com/code-ready/machine/libmachine"
-	"github.com/code-ready/machine/libmachine/drivers"
-	"github.com/code-ready/machine/libmachine/host"
 	"github.com/code-ready/machine/libmachine/log"
 	"github.com/code-ready/machine/libmachine/ssh"
 	"github.com/code-ready/machine/libmachine/state"
@@ -69,20 +66,6 @@ func getCrcBundleInfo(bundlePath string) (*bundle.CrcBundleInfo, error) {
 	}
 	logging.Infof("Extracting bundle: %s ...", bundleName)
 	return bundle.Extract(bundlePath)
-}
-
-func getBundleMetadataFromDriver(driver drivers.Driver) (*bundle.CrcBundleInfo, error) {
-	bundleName, err := driver.GetBundleName()
-	if err != nil {
-		err := fmt.Errorf("Error getting bundle name from CodeReady Containers instance, make sure you ran 'crc setup' and are using the latest bundle")
-		return nil, err
-	}
-	metadata, err := bundle.GetCachedBundleInfo(bundleName)
-	if err != nil {
-		return nil, err
-	}
-
-	return metadata, err
 }
 
 func IsRunning(st state.State) bool {
@@ -154,7 +137,7 @@ func (client *client) Start(startConfig StartConfig) (StartResult, error) {
 			return startError(startConfig.Name, "Error loading machine", err)
 		}
 
-		crcBundleMetadata, err = getBundleMetadataFromDriver(driver)
+		crcBundleMetadata, err = client.getBundleMetadata()
 		if err != nil {
 			return startError(startConfig.Name, "Error loading bundle metadata", err)
 		}
@@ -447,12 +430,7 @@ func (client *client) PowerOff(powerOff PowerOffConfig) (PowerOffResult, error) 
 	defer unsetMachineLogging()
 
 	client.SetMachineName(powerOff.Name)
-	host, err := client.getHost()
-	if err != nil {
-		return powerOffError(powerOff.Name, "Cannot load machine", err)
-	}
-
-	if err := host.Kill(); err != nil {
+	if err := client.Kill(); err != nil {
 		return powerOffError(powerOff.Name, "Cannot kill machine", err)
 	}
 
@@ -470,16 +448,7 @@ func (client *client) Delete(deleteConfig DeleteConfig) (DeleteResult, error) {
 	defer unsetMachineLogging()
 
 	client.SetMachineName(deleteConfig.Name)
-	driver, err := client.getDriver()
-	if err != nil {
-		return deleteError(deleteConfig.Name, "Cannot load machine", err)
-	}
-
-	if err := driver.Remove(); err != nil {
-		return deleteError(deleteConfig.Name, "Driver cannot remove machine", err)
-	}
-
-	if err := client.apiClient.Remove(deleteConfig.Name); err != nil {
+	if err := client.Remove(); err != nil {
 		return deleteError(deleteConfig.Name, "Cannot remove machine", err)
 	}
 
@@ -497,11 +466,7 @@ func (client *client) IP(ipConfig IPConfig) (IPResult, error) {
 	defer unsetMachineLogging()
 
 	client.SetMachineName(ipConfig.Name)
-	driver, err := client.getDriver()
-	if err != nil {
-		return ipError(ipConfig.Name, "Cannot load machine", err)
-	}
-	ip, err := driver.GetIP()
+	ip, err := client.GetIP()
 	if err != nil {
 		return ipError(ipConfig.Name, "Cannot get IP", err)
 	}
@@ -519,7 +484,7 @@ func (client *client) Status(statusConfig ClusterStatusConfig) (ClusterStatusRes
 	}
 	defer unsetMachineLogging()
 
-	_, err = client.apiClient.Exists(statusConfig.Name)
+	_, err = client.Exists(statusConfig.Name)
 	if err != nil {
 		return statusError(statusConfig.Name, "Cannot check if machine exists", err)
 	}
@@ -530,17 +495,13 @@ func (client *client) Status(statusConfig ClusterStatusConfig) (ClusterStatusRes
 	var diskSize int64
 
 	client.SetMachineName(statusConfig.Name)
-	driver, err := client.getDriver()
-	if err != nil {
-		return statusError(statusConfig.Name, "Cannot load machine", err)
-	}
-	vmStatus, err := driver.GetState()
+	vmStatus, err := client.GetState()
 	if err != nil {
 		return statusError(statusConfig.Name, "Cannot get machine state", err)
 	}
 
 	if IsRunning(vmStatus) {
-		crcBundleMetadata, err := getBundleMetadataFromDriver(driver)
+		crcBundleMetadata, err := client.getBundleMetadata()
 		if err != nil {
 			return statusError(statusConfig.Name, "Error loading bundle metadata", err)
 		}
@@ -550,7 +511,10 @@ func (client *client) Status(statusConfig ClusterStatusConfig) (ClusterStatusRes
 		}
 		proxyConfig.ApplyToEnvironment()
 
-		sshRunner := crcssh.CreateRunner(driver)
+		sshRunner, err := client.GetSSHRunner()
+		if err != nil {
+			return statusError(statusConfig.Name, "Error getting SSH connection to the VM", err)
+		}
 		// check if all the clusteroperators are running
 		ocConfig := oc.UseOCWithSSH(sshRunner)
 		operatorsStatus, err := cluster.GetClusterOperatorsStatus(ocConfig)
@@ -639,17 +603,13 @@ func (client *client) GetConsoleURL(consoleConfig ConsoleConfig) (ConsoleResult,
 	// We might need to improve and use crc status logic, only
 	// return if the Openshift is running as part of status.
 	client.SetMachineName(consoleConfig.Name)
-	driver, err := client.getDriver()
-	if err != nil {
-		return consoleURLError("Cannot load machine", err)
-	}
 
-	vmState, err := driver.GetState()
+	vmState, err := client.GetState()
 	if err != nil {
 		return consoleURLError("Error getting the state for host", err)
 	}
 
-	crcBundleMetadata, err := getBundleMetadataFromDriver(driver)
+	crcBundleMetadata, err := client.getBundleMetadata()
 	if err != nil {
 		return consoleURLError("Error loading bundle metadata", err)
 	}

@@ -4,11 +4,14 @@ import (
 	"fmt"
 
 	"github.com/code-ready/crc/pkg/crc/constants"
+	"github.com/code-ready/crc/pkg/crc/machine/bundle"
 	"github.com/code-ready/crc/pkg/crc/machine/config"
+	"github.com/code-ready/crc/pkg/crc/ssh"
 
 	"github.com/code-ready/machine/libmachine"
 	"github.com/code-ready/machine/libmachine/drivers"
 	"github.com/code-ready/machine/libmachine/host"
+	"github.com/code-ready/machine/libmachine/state"
 )
 
 type Client interface {
@@ -85,4 +88,70 @@ func (client *client) createHost(machineConfig config.MachineConfig) error {
 	client.host = host
 
 	return nil
+}
+
+func (client *client) getBundleMetadata() (*bundle.CrcBundleInfo, error) {
+	driver, err := client.getDriver()
+	if err != nil {
+		return nil, err
+	}
+	bundleName, err := driver.GetBundleName()
+	if err != nil {
+		err := fmt.Errorf("Error getting bundle name from CodeReady Containers instance, make sure you ran 'crc setup' and are using the latest bundle")
+		return nil, err
+	}
+	metadata, err := bundle.GetCachedBundleInfo(bundleName)
+	if err != nil {
+		return nil, err
+	}
+
+	return metadata, err
+}
+
+func (client *client) Kill() error {
+	host, err := client.getHost()
+	if err != nil {
+		return err
+	}
+	return host.Kill()
+}
+
+func (client *client) Remove() error {
+	driver, err := client.getDriver()
+	if err != nil {
+		return err
+	}
+	if err := driver.Remove(); err != nil {
+		return err
+	}
+
+	if err := client.apiClient.Remove(client.machineName); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (client *client) GetIP() (string, error) {
+	driver, err := client.getDriver()
+	if err != nil {
+		return "", err
+	}
+	return driver.GetIP()
+}
+
+func (client *client) GetState() (state.State, error) {
+	driver, err := client.getDriver()
+	if err != nil {
+		return state.Error, err
+	}
+	return driver.GetState()
+}
+
+func (client *client) GetSSHRunner() (*ssh.Runner, error) {
+	driver, err := client.getDriver()
+	if err != nil {
+		return nil, err
+	}
+	return ssh.CreateRunner(driver), nil
 }
