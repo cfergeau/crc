@@ -594,17 +594,6 @@ func (client *client) Exists(name string) (bool, error) {
 	return exists, nil
 }
 
-func createHost(api libmachine.API, machineConfig config.MachineConfig) (*host.Host, error) {
-	vm, err := newHost(api, machineConfig)
-	if err != nil {
-		return nil, fmt.Errorf("Error creating new host: %s", err)
-	}
-	if err := api.Create(vm); err != nil {
-		return nil, fmt.Errorf("Error creating the VM: %s", err)
-	}
-	return vm, nil
-}
-
 func setMachineLogging(logs bool) error {
 	if !logs {
 		log.SetDebug(true)
