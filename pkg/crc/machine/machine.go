@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"time"
 
@@ -27,17 +26,8 @@ import (
 	"github.com/code-ready/crc/pkg/crc/machine/bundle"
 	"github.com/code-ready/crc/pkg/crc/machine/config"
 
-	"github.com/code-ready/machine/libmachine/log"
 	"github.com/code-ready/machine/libmachine/ssh"
-	"github.com/code-ready/machine/libmachine/state"
 )
-
-func init() {
-	// Force using the golang SSH implementation for windows
-	if runtime.GOOS == crcos.WINDOWS.String() {
-		ssh.SetDefaultClient(ssh.Native)
-	}
-}
 
 func getClusterConfig(bundleInfo *bundle.CrcBundleInfo) (*ClusterConfig, error) {
 	kubeadminPassword, err := bundleInfo.GetKubeadminPassword()
@@ -66,10 +56,6 @@ func getCrcBundleInfo(bundlePath string) (*bundle.CrcBundleInfo, error) {
 	}
 	logging.Infof("Extracting bundle: %s ...", bundleName)
 	return bundle.Extract(bundlePath)
-}
-
-func IsRunning(st state.State) bool {
-	return st == state.Running
 }
 
 func (client *client) Start(startConfig StartConfig) (StartResult, error) {
@@ -132,11 +118,6 @@ func (client *client) Start(startConfig StartConfig) (StartResult, error) {
 
 		privateKeyPath = crcBundleMetadata.GetSSHKeyPath()
 	} else {
-		driver, err := client.getDriver()
-		if err != nil {
-			return startError(startConfig.Name, "Error loading machine", err)
-		}
-
 		crcBundleMetadata, err = client.getBundleMetadata()
 		if err != nil {
 			return startError(startConfig.Name, "Error loading bundle metadata", err)
@@ -152,7 +133,7 @@ func (client *client) Start(startConfig StartConfig) (StartResult, error) {
 					filepath.Base(startConfig.BundlePath),
 					bundleName))
 		}
-		vmState, err := driver.GetState()
+		vmState, err := client.GetState()
 		if err != nil {
 			return startError(startConfig.Name, "Error getting the machine state", err)
 		}
@@ -175,7 +156,7 @@ func (client *client) Start(startConfig StartConfig) (StartResult, error) {
 		} else {
 			logging.Infof("Starting CodeReady Containers VM for OpenShift %s...", openshiftVersion)
 		}
-		if err := driver.Start(); err != nil {
+		if err := client.DriverStart(); err != nil {
 			return startError(startConfig.Name, "Error starting stopped VM", err)
 		}
 		if err := client.Save(); err != nil {
@@ -191,17 +172,15 @@ func (client *client) Start(startConfig StartConfig) (StartResult, error) {
 	}
 
 	// Post-VM start
-	driver, err := client.getDriver()
+	vmState, err := client.GetState()
 	if err != nil {
-		return startError(startConfig.Name, fmt.Sprintf("Error loading %s vm", startConfig.Name), err)
+		return startError(startConfig.Name, "Error getting VM state", err)
 	}
 
-	vmState, err := driver.GetState()
+	sshRunner, err := client.GetSSHRunnerWithPrivateKey(privateKeyPath)
 	if err != nil {
-		return startError(startConfig.Name, "Error getting the state", err)
+		return startError(startConfig.Name, "Error getting SSH connection to the VM", err)
 	}
-
-	sshRunner := crcssh.CreateRunnerWithPrivateKey(driver, privateKeyPath)
 
 	logging.Debug("Waiting until ssh is available")
 	if err := cluster.WaitForSSH(sshRunner); err != nil {
@@ -243,7 +222,7 @@ func (client *client) Start(startConfig StartConfig) (StartResult, error) {
 		}
 	}
 
-	instanceIP, err := driver.GetIP()
+	instanceIP, err := client.GetIP()
 	if err != nil {
 		return startError(startConfig.Name, "Error getting the IP", err)
 	}
@@ -403,15 +382,10 @@ func (client *client) Stop(stopConfig StopConfig) (StopResult, error) {
 	}
 
 	client.SetMachineName(stopConfig.Name)
-	driver, err := client.getDriver()
 
-	if err != nil {
-		return stopError(stopConfig.Name, "Cannot load machine", err)
-	}
+	state, _ := client.GetState()
 
-	state, _ := driver.GetState()
-
-	if err := client.host.Stop(); err != nil {
+	if err := client.HostStop(); err != nil {
 		return stopError(stopConfig.Name, "Cannot stop machine", err)
 	}
 
@@ -556,25 +530,6 @@ func (client *client) Exists(name string) (bool, error) {
 		return false, fmt.Errorf("Error checking if the host exists: %s", err)
 	}
 	return exists, nil
-}
-
-func setMachineLogging(logs bool) error {
-	if !logs {
-		log.SetDebug(true)
-		logfile, err := logging.OpenLogFile(constants.LogFilePath)
-		if err != nil {
-			return err
-		}
-		log.SetOutWriter(logfile)
-		log.SetErrWriter(logfile)
-	} else {
-		log.SetDebug(true)
-	}
-	return nil
-}
-
-func unsetMachineLogging() {
-	logging.CloseLogFile()
 }
 
 func addNameServerToInstance(sshRunner *crcssh.Runner, ns string) error {

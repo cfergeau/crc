@@ -2,15 +2,21 @@ package machine
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/machine/bundle"
 	"github.com/code-ready/crc/pkg/crc/machine/config"
-	"github.com/code-ready/crc/pkg/crc/ssh"
+	crcssh "github.com/code-ready/crc/pkg/crc/ssh"
+	crcos "github.com/code-ready/crc/pkg/os"
+
+	"github.com/code-ready/crc/pkg/crc/logging"
 
 	"github.com/code-ready/machine/libmachine"
 	"github.com/code-ready/machine/libmachine/drivers"
 	"github.com/code-ready/machine/libmachine/host"
+	"github.com/code-ready/machine/libmachine/log"
+	"github.com/code-ready/machine/libmachine/ssh"
 	"github.com/code-ready/machine/libmachine/state"
 )
 
@@ -44,11 +50,12 @@ func (client *client) Close() {
 }
 
 func (client *client) Save() error {
-	if client.host != nil {
-		return fmt.Errorf("Invalid client.host")
+	host, err := client.getHost()
+	if err != nil {
+		return err
 	}
 
-	return client.apiClient.Save(client.host)
+	return client.apiClient.Save(host)
 }
 
 func (client *client) SetMachineName(name string) {
@@ -90,6 +97,22 @@ func (client *client) createHost(machineConfig config.MachineConfig) error {
 	return nil
 }
 
+func (client *client) Remove() error {
+	driver, err := client.getDriver()
+	if err != nil {
+		return err
+	}
+	if err := driver.Remove(); err != nil {
+		return err
+	}
+
+	if err := client.apiClient.Remove(client.machineName); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (client *client) getBundleMetadata() (*bundle.CrcBundleInfo, error) {
 	driver, err := client.getDriver()
 	if err != nil {
@@ -116,22 +139,6 @@ func (client *client) Kill() error {
 	return host.Kill()
 }
 
-func (client *client) Remove() error {
-	driver, err := client.getDriver()
-	if err != nil {
-		return err
-	}
-	if err := driver.Remove(); err != nil {
-		return err
-	}
-
-	if err := client.apiClient.Remove(client.machineName); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (client *client) GetIP() (string, error) {
 	driver, err := client.getDriver()
 	if err != nil {
@@ -148,10 +155,66 @@ func (client *client) GetState() (state.State, error) {
 	return driver.GetState()
 }
 
-func (client *client) GetSSHRunner() (*ssh.Runner, error) {
+func (client *client) GetSSHRunner() (*crcssh.Runner, error) {
 	driver, err := client.getDriver()
 	if err != nil {
 		return nil, err
 	}
-	return ssh.CreateRunner(driver), nil
+	return crcssh.CreateRunner(driver), nil
+}
+
+func (client *client) GetSSHRunnerWithPrivateKey(privateKeyPath string) (*crcssh.Runner, error) {
+	driver, err := client.getDriver()
+	if err != nil {
+		return nil, err
+	}
+	return crcssh.CreateRunnerWithPrivateKey(driver, privateKeyPath), nil
+}
+
+func (client *client) HostStop() error {
+	host, err := client.getHost()
+	if err != nil {
+		return err
+	}
+
+	return host.Stop()
+}
+
+func (client *client) DriverStart() error {
+	driver, err := client.getDriver()
+	if err != nil {
+		return err
+	}
+
+	return driver.Start()
+}
+
+func setMachineLogging(logs bool) error {
+	if !logs {
+		log.SetDebug(true)
+		logfile, err := logging.OpenLogFile(constants.LogFilePath)
+		if err != nil {
+			return err
+		}
+		log.SetOutWriter(logfile)
+		log.SetErrWriter(logfile)
+	} else {
+		log.SetDebug(true)
+	}
+	return nil
+}
+
+func unsetMachineLogging() {
+	logging.CloseLogFile()
+}
+
+func init() {
+	// Force using the golang SSH implementation for windows
+	if runtime.GOOS == crcos.WINDOWS.String() {
+		ssh.SetDefaultClient(ssh.Native)
+	}
+}
+
+func IsRunning(st state.State) bool {
+	return st == state.Running
 }
