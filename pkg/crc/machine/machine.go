@@ -71,7 +71,7 @@ func getCrcBundleInfo(bundlePath string) (*bundle.CrcBundleInfo, error) {
 	return bundle.Extract(bundlePath)
 }
 
-func getBundleMetadataFromDriver(driver drivers.Driver) (string, *bundle.CrcBundleInfo, error) {
+func getBundleMetadataFromDriver(driver drivers.Driver) (*bundle.CrcBundleInfo, error) {
 	bundleName, err := driver.GetBundleName()
 	/* FIXME: the bundleName == "" check can be removed when all machine
 	* drivers have been rebuilt with
@@ -79,14 +79,14 @@ func getBundleMetadataFromDriver(driver drivers.Driver) (string, *bundle.CrcBund
 	 */
 	if bundleName == "" || err != nil {
 		err := fmt.Errorf("Error getting bundle name from CodeReady Containers instance, make sure you ran 'crc setup' and are using the latest bundle")
-		return "", nil, err
+		return nil, err
 	}
 	metadata, err := bundle.GetCachedBundleInfo(bundleName)
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 
-	return bundleName, metadata, err
+	return metadata, err
 }
 
 func IsRunning(st state.State) bool {
@@ -170,11 +170,11 @@ func (client *client) Start(startConfig StartConfig) (StartResult, error) {
 			return startError(startConfig.Name, "Error loading machine", err)
 		}
 
-		var bundleName string
-		bundleName, crcBundleMetadata, err = getBundleMetadataFromDriver(host.Driver)
+		crcBundleMetadata, err = getBundleMetadataFromDriver(host.Driver)
 		if err != nil {
 			return startError(startConfig.Name, "Error loading bundle metadata", err)
 		}
+		bundleName := crcBundleMetadata.GetBundleName()
 		if bundleName != filepath.Base(startConfig.BundlePath) {
 			logging.Debugf("Bundle '%s' was requested, but the existing VM is using '%s'",
 				filepath.Base(startConfig.BundlePath), bundleName)
@@ -562,7 +562,7 @@ func (*client) Status(statusConfig ClusterStatusConfig) (ClusterStatusResult, er
 	}
 
 	if IsRunning(vmStatus) {
-		_, crcBundleMetadata, err := getBundleMetadataFromDriver(host.Driver)
+		crcBundleMetadata, err := getBundleMetadataFromDriver(host.Driver)
 		if err != nil {
 			return statusError(statusConfig.Name, "Error loading bundle metadata", err)
 		}
@@ -685,7 +685,7 @@ func (*client) GetConsoleURL(consoleConfig ConsoleConfig) (ConsoleResult, error)
 		return consoleURLError("Error getting the state for host", err)
 	}
 
-	_, crcBundleMetadata, err := getBundleMetadataFromDriver(host.Driver)
+	crcBundleMetadata, err := getBundleMetadataFromDriver(host.Driver)
 	if err != nil {
 		return consoleURLError("Error loading bundle metadata", err)
 	}

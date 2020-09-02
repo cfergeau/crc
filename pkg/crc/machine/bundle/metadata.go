@@ -50,11 +50,16 @@ type CrcBundleInfo struct {
 		} `json:"diskImages"`
 	} `json:"storage"`
 	cachedPath string
+	bundleName string
 }
 
 func getCachedBundlePath(bundleName string) string {
 	path := strings.TrimSuffix(bundleName, ".crcbundle")
 	return filepath.Join(constants.MachineCacheDir, path)
+}
+
+func (bundle *CrcBundleInfo) GetBundleName() string {
+	return bundle.bundleName
 }
 
 func (bundle *CrcBundleInfo) isCached() bool {
@@ -79,6 +84,7 @@ func (bundle *CrcBundleInfo) readBundleInfo() error {
 
 func GetCachedBundleInfo(bundleName string) (*CrcBundleInfo, error) {
 	var bundleInfo CrcBundleInfo
+	bundleInfo.bundleName = bundleName
 	bundleInfo.cachedPath = getCachedBundlePath(bundleName)
 	if !bundleInfo.isCached() {
 		return nil, fmt.Errorf("Could not find cached bundle info")
