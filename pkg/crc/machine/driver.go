@@ -1,6 +1,7 @@
 package machine
 
 import (
+	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/crc/pkg/crc/machine/config"
 	libmachine "github.com/code-ready/machine/libmachine/drivers"
 	"github.com/code-ready/machine/libmachine/host"
@@ -19,6 +20,7 @@ func updateDriverValue(host *host.Host, setDriverValue valueSetter) error {
 }
 
 func setMemory(host *host.Host, memorySize int) error {
+	logging.Infof("setMemory: %d", memorySize)
 	memorySetter := func(driver *libmachine.VMDriver) {
 		driver.Memory = memorySize
 	}
