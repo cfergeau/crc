@@ -2,6 +2,7 @@ package errors
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 	"time"
 
@@ -12,6 +13,22 @@ type MultiError struct {
 	Errors []error
 }
 
+type errorWithCount struct {
+	errorCount int
+	err        error
+}
+
+func (err *errorWithCount) Error() string {
+	if err.errorCount == 1 {
+		return err.err.Error()
+	}
+	return fmt.Sprintf("%s (x%d)", err.err.Error(), err.errorCount)
+}
+
+func equalErr(err1, err2 error) bool {
+	return err1.Error() == err2.Error()
+}
+
 func (m MultiError) Error() string {
 	if len(m.Errors) == 0 {
 		return ""
@@ -20,35 +37,33 @@ func (m MultiError) Error() string {
 		return m.Errors[0].Error()
 	}
 
-	var aggregatedErrors []string
+	var aggregatedErrors []error
 
 	count := 1
-	current := m.Errors[0].Error()
+	current := m.Errors[0]
 	for i := 1; i < len(m.Errors); i++ {
-		if m.Errors[i].Error() == current {
+		if equalErr(m.Errors[i], current) {
 			count++
 			continue
 		}
-		aggregatedErrors = append(aggregatedErrors, errorWithCount(current, count))
+		aggregatedErrors = append(aggregatedErrors, &errorWithCount{errorCount: count, err: current})
 		count = 1
-		current = m.Errors[i].Error()
+		current = m.Errors[i]
 	}
-	aggregatedErrors = append(aggregatedErrors, errorWithCount(current, count))
+	aggregatedErrors = append(aggregatedErrors, &errorWithCount{errorCount: count, err: current})
 
-	return strings.Join(aggregatedErrors, "\n")
+	var strBuilder strings.Builder
+	for _, err := range aggregatedErrors {
+		strBuilder.WriteString(err.Error())
+		strBuilder.WriteString("\n")
+	}
+	return strBuilder.String()
 }
 
 func (m *MultiError) Collect(err error) {
 	if err != nil {
 		m.Errors = append(m.Errors, err)
 	}
-}
-
-func errorWithCount(current string, count int) string {
-	if count == 1 {
-		return current
-	}
-	return fmt.Sprintf("%s (x%d)", current, count)
 }
 
 // RetriableError is an error that can be tried again
