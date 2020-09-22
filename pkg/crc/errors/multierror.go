@@ -26,6 +26,9 @@ func (err *errorWithCount) Error() string {
 }
 
 func equalErr(err1, err2 error) bool {
+	if reflect.TypeOf(err1) != reflect.TypeOf(err2) {
+		return false
+	}
 	return err1.Error() == err2.Error()
 }
 
