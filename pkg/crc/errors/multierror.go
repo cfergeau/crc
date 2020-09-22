@@ -40,7 +40,7 @@ func equalErr(err1, err2 error) bool {
 	return err1.Error() == err2.Error()
 }
 
-func (m MultiError) Error() string {
+func (m *MultiError) Error() string {
 	if len(m.Errors) == 0 {
 		return ""
 	}
@@ -100,11 +100,11 @@ func RetryAfter(attempts int, callback func() error, d time.Duration) error {
 		m.Collect(err)
 		if _, ok := err.(*RetriableError); !ok {
 			logging.Debugf("non-retriable error: %v", err)
-			return m
+			return &m
 		}
 		logging.Debugf("error: %v - sleeping %s", err, d)
 		time.Sleep(d)
 	}
 	logging.Debugf("RetryAfter timeout after %d tries", attempts)
-	return m
+	return &m
 }
