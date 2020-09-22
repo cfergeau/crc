@@ -25,6 +25,14 @@ func (err *errorWithCount) Error() string {
 	return fmt.Sprintf("%s (x%d)", err.err.Error(), err.errorCount)
 }
 
+func (m *MultiError) ErrorOrNil() error {
+	if len(m.Errors) != 0 {
+		return m
+	}
+
+	return nil
+}
+
 func equalErr(err1, err2 error) bool {
 	if reflect.TypeOf(err1) != reflect.TypeOf(err2) {
 		return false
