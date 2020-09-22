@@ -10,7 +10,7 @@ import (
 )
 
 type MultiError struct {
-	Errors []error
+	errors []error
 }
 
 type errorWithCount struct {
@@ -26,7 +26,7 @@ func (err *errorWithCount) Error() string {
 }
 
 func (m *MultiError) ErrorOrNil() error {
-	if len(m.Errors) != 0 {
+	if len(m.errors) != 0 {
 		return m
 	}
 
@@ -41,25 +41,25 @@ func equalErr(err1, err2 error) bool {
 }
 
 func (m *MultiError) Error() string {
-	if len(m.Errors) == 0 {
+	if len(m.errors) == 0 {
 		return ""
 	}
-	if len(m.Errors) == 1 {
-		return m.Errors[0].Error()
+	if len(m.errors) == 1 {
+		return m.errors[0].Error()
 	}
 
 	var aggregatedErrors []error
 
 	count := 1
-	current := m.Errors[0]
-	for i := 1; i < len(m.Errors); i++ {
-		if equalErr(m.Errors[i], current) {
+	current := m.errors[0]
+	for i := 1; i < len(m.errors); i++ {
+		if equalErr(m.errors[i], current) {
 			count++
 			continue
 		}
 		aggregatedErrors = append(aggregatedErrors, &errorWithCount{errorCount: count, err: current})
 		count = 1
-		current = m.Errors[i]
+		current = m.errors[i]
 	}
 	aggregatedErrors = append(aggregatedErrors, &errorWithCount{errorCount: count, err: current})
 
@@ -73,7 +73,7 @@ func (m *MultiError) Error() string {
 
 func (m *MultiError) Collect(err error) {
 	if err != nil {
-		m.Errors = append(m.Errors, err)
+		m.errors = append(m.errors, err)
 	}
 }
 

@@ -51,22 +51,17 @@ func TestRetryAfterSuccessAfterFailures(t *testing.T) {
 }
 
 func TestMultiErrorString(t *testing.T) {
-	assert.Equal(t, "Temporary Error: No Pending CSR (x4)", MultiError{
-		Errors: []error{
-			errors.New("Temporary Error: No Pending CSR"),
-			errors.New("Temporary Error: No Pending CSR"),
-			errors.New("Temporary Error: No Pending CSR"),
-			errors.New("Temporary Error: No Pending CSR"),
-		},
-	}.Error())
+	var multiError MultiError
+	for i := 0; i < 4; i++ {
+		multiError.Collect(errors.New("Temporary Error: No Pending CSR"))
+	}
+	assert.Equal(t, "Temporary Error: No Pending CSR (x4)", multiError.Error())
 
-	assert.Equal(t, "No Pending CSR (x2)\nConnection refused (x2)\nNo Pending CSR", MultiError{
-		Errors: []error{
-			errors.New("No Pending CSR"),
-			errors.New("No Pending CSR"),
-			errors.New("Connection refused"),
-			errors.New("Connection refused"),
-			errors.New("No Pending CSR"),
-		},
-	}.Error())
+	multiError = MultiError{}
+	multiError.Collect(errors.New("No Pending CSR"))
+	multiError.Collect(errors.New("No Pending CSR"))
+	multiError.Collect(errors.New("Connection refused"))
+	multiError.Collect(errors.New("Connection refused"))
+	multiError.Collect(errors.New("No Pending CSR"))
+	assert.Equal(t, "No Pending CSR (x2)\nConnection refused (x2)\nNo Pending CSR", multiError.Error())
 }
