@@ -32,5 +32,6 @@ func updateDriverConfig(host *host.Host, driver *machineHyperkit.Driver) error {
 	if err != nil {
 		return err
 	}
+
 	return host.UpdateConfig(driverData)
 }

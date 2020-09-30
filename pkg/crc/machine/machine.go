@@ -90,7 +90,6 @@ func getBundleMetadataFromDriver(driver drivers.Driver) (string, *bundle.CrcBund
 }
 
 func createLibMachineClient(debug bool) (*libmachine.Client, func(), error) {
-	logging.Warnf("createLibMachineClient: debug %t", debug)
 	err := setMachineLogging(debug)
 	if err != nil {
 		return nil, func() {
@@ -205,6 +204,7 @@ func (client *client) Start(startConfig StartConfig) (*StartResult, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "Error loading machine")
 		}
+
 		var bundleName string
 		bundleName, crcBundleMetadata, err = getBundleMetadataFromDriver(host.Driver)
 		if err != nil {

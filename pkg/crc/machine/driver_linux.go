@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"github.com/code-ready/crc/pkg/crc/constants"
-	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/crc/pkg/crc/machine/config"
 	"github.com/code-ready/crc/pkg/crc/machine/libvirt"
 	machineLibvirt "github.com/code-ready/machine/drivers/libvirt"
@@ -26,26 +25,17 @@ func newHost(api libmachine.API, machineConfig config.MachineConfig) (*host.Host
  */
 func loadDriverConfig(host *host.Host) (*machineLibvirt.Driver, error) {
 	var libvirtDriver machineLibvirt.Driver
-	logging.Infof("> loadDriverConfig")
-	logging.Infof("RawDriver: %s", host.RawDriver)
 	err := json.Unmarshal(host.RawDriver, &libvirtDriver)
 
 	return &libvirtDriver, err
 }
 
 func updateDriverConfig(host *host.Host, driver *machineLibvirt.Driver) error {
-	logging.Infof("> updateDriverConfig")
 	driverData, err := json.Marshal(driver)
 	if err != nil {
-		logging.Infof("E updateDriverConfig: %v", err)
 		return err
 	}
-
-	logging.Infof("= updateDriverConfig %s", string(driverData))
-	err = host.UpdateConfig(driverData)
-
-	logging.Infof("< updateDriverConfig")
-	return err
+	return host.UpdateConfig(driverData)
 }
 
 /*
