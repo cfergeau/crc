@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"os/user"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"text/template"
 
@@ -43,16 +42,14 @@ dns=dnsmasq
 
 func checkVirtualizationEnabled() error {
 	logging.Debug("Checking if the vmx/svm flags are present in /proc/cpuinfo")
+
 	// Check if the cpu flags vmx or svm is present
-	flags, err := getCPUFlags()
+	vmxOrSvm, err := getVmxOrSvmFeatureFlag()
 	if err != nil {
 		return err
 	}
 
-	re := regexp.MustCompile(`(vmx|svm)`)
-
-	cputype := re.FindString(flags)
-	if cputype == "" {
+	if vmxOrSvm == featureFlagNone {
 		return fmt.Errorf("Virtualization is not available for your CPU")
 	}
 	logging.Debug("CPU virtualization flags are good")
@@ -75,27 +72,28 @@ func checkKvmEnabled() error {
 
 func fixKvmEnabled() error {
 	logging.Debug("Trying to load kvm module")
-	flags, err := getCPUFlags()
+
+	vmxOrSvm, err := getVmxOrSvmFeatureFlag()
 	if err != nil {
 		return err
 	}
 
-	switch {
-	case strings.Contains(flags, "vmx"):
-		stdOut, stdErr, err := crcos.RunWithPrivilege("Load kvm_intel kernel module", "modprobe", "kvm_intel")
-		if err != nil {
-			return fmt.Errorf("Failed to load kvm intel module: %s %v: %s", stdOut, err, stdErr)
-		}
-	case strings.Contains(flags, "svm"):
-		stdOut, stdErr, err := crcos.RunWithPrivilege("Load kvm_amd kernel module", "modprobe", "kvm_amd")
-		if err != nil {
-			return fmt.Errorf("Failed to load kvm amd module: %s %v: %s", stdOut, err, stdErr)
-		}
+	moduleName := ""
+	switch vmxOrSvm {
+	case featureFlagVmx:
+		moduleName = "kvm_intel"
+	case featureFlagSvm:
+		moduleName = "kvm_amd"
 	default:
-		logging.Debug("Unable to detect processor details")
+		return fmt.Errorf("Unable to detect processor details")
 	}
 
-	logging.Debug("kvm module loaded")
+	stdOut, stdErr, err := crcos.RunWithPrivilege(fmt.Sprintf("Load '%s' kernel module", moduleName), "modprobe", moduleName)
+	if err != nil {
+		return fmt.Errorf("Failed to load '%s' module: %s %v: %s", moduleName, stdOut, err, stdErr)
+	}
+
+	logging.Debugf("%s module loaded", moduleName)
 	return nil
 }
 
@@ -111,6 +109,33 @@ func getLibvirtCapabilities() (*libvirtxml.Caps, error) {
 	}
 
 	return caps, nil
+}
+
+type featureFlagEnum int
+
+const (
+	featureFlagNone featureFlagEnum = iota
+	featureFlagVmx
+	featureFlagSvm
+)
+
+func getVmxOrSvmFeatureFlag() (featureFlagEnum, error) {
+	caps, err := getLibvirtCapabilities()
+	if err != nil {
+		return featureFlagNone, err
+	}
+
+	// Check if the cpu flags vmx or svm is present
+	for _, flag := range caps.Host.CPU.FeatureFlags {
+		switch flag.Name {
+		case "vmx":
+			return featureFlagVmx, nil
+		case "svm":
+			return featureFlagSvm, nil
+		}
+	}
+
+	return featureFlagNone, nil
 }
 
 func checkLibvirtInstalled() error {
@@ -640,20 +665,4 @@ func checkNetworkManagerIsRunning() error {
 
 func fixNetworkManagerIsRunning() error {
 	return fmt.Errorf("NetworkManager is required. Please make sure it is installed and running manually")
-}
-
-func getCPUFlags() (string, error) {
-	// Check if the cpu flags vmx or svm is present
-	out, err := ioutil.ReadFile("/proc/cpuinfo")
-	if err != nil {
-		logging.Debugf("Failed to read /proc/cpuinfo: %v", err)
-		return "", fmt.Errorf("Failed to read /proc/cpuinfo")
-	}
-	re := regexp.MustCompile(`flags.*:.*`)
-
-	flags := re.FindString(string(out))
-	if flags == "" {
-		return "", fmt.Errorf("Could not find cpu flags from /proc/cpuinfo")
-	}
-	return flags, nil
 }

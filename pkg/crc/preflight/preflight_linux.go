@@ -2,6 +2,13 @@ package preflight
 
 var libvirtPreflightChecks = [...]Check{
 	{
+		configKeySuffix:  "check-libvirt-installed",
+		checkDescription: "Checking if libvirt is installed",
+		check:            checkLibvirtInstalled,
+		fixDescription:   "Installing libvirt service and dependencies",
+		fix:              fixLibvirtInstalled,
+	},
+	{
 		configKeySuffix:  "check-virt-enabled",
 		checkDescription: "Checking if Virtualization is enabled",
 		check:            checkVirtualizationEnabled,
@@ -14,13 +21,6 @@ var libvirtPreflightChecks = [...]Check{
 		check:            checkKvmEnabled,
 		fixDescription:   "Setting up KVM",
 		fix:              fixKvmEnabled,
-	},
-	{
-		configKeySuffix:  "check-libvirt-installed",
-		checkDescription: "Checking if libvirt is installed",
-		check:            checkLibvirtInstalled,
-		fixDescription:   "Installing libvirt service and dependencies",
-		fix:              fixLibvirtInstalled,
 	},
 	{
 		configKeySuffix:  "check-user-in-libvirt-group",
