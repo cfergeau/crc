@@ -13,7 +13,7 @@ type StartConfig struct {
 	// Hypervisor
 	Memory   int // Memory size in MiB
 	CPUs     int
-	DiskSize int // Disk size in GiB
+	DiskSize int // Disk size in GB
 
 	// Nameserver
 	NameServer string

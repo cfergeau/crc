@@ -34,9 +34,9 @@ func setVcpus(host *host.Host, vcpus int) error {
 	return updateDriverValue(host, vcpuSetter)
 }
 
-func setDiskSize(host *host.Host, diskSizeGiB int) error {
+func setDiskSize(host *host.Host, diskSizeGB int) error {
 	diskSizeSetter := func(driver *libmachine.VMDriver) {
-		driver.DiskCapacity = config.ConvertGiBToBytes(diskSizeGiB)
+		driver.DiskCapacity = config.ConvertGBToBytes(diskSizeGB)
 	}
 
 	return updateDriverValue(host, diskSizeSetter)

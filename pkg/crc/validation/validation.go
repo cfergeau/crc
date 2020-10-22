@@ -33,7 +33,7 @@ func ValidateMemory(value int) error {
 
 func ValidateDiskSize(value int) error {
 	if value < constants.DefaultDiskSize {
-		return fmt.Errorf("requires disk size in GiB >= %d", constants.DefaultDiskSize)
+		return fmt.Errorf("requires disk size in GB >= %d", constants.DefaultDiskSize)
 	}
 	return nil
 }
