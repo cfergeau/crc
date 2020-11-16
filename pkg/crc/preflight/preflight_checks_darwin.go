@@ -190,7 +190,7 @@ func stopCRCHyperkitProcess() error {
 	if err != nil {
 		return fmt.Errorf("Could not find 'pgrep'. %w", err)
 	}
-	if _, _, err := crcos.RunWithDefaultLocale(pgrepPath, "-f", filepath.Join(constants.BinDir(), "hyperkit")); err != nil {
+	if _, err := crcos.RunWithDefaultLocale(pgrepPath, "-f", filepath.Join(constants.BinDir(), "hyperkit")); err != nil {
 		var exitErr *exec.ExitError
 		if errors.As(err, &exitErr) {
 			/* 1: no processes matched */
@@ -207,7 +207,7 @@ func stopCRCHyperkitProcess() error {
 	if err != nil {
 		return fmt.Errorf("Could not find 'pkill'. %w", err)
 	}
-	if _, _, err := crcos.RunWithDefaultLocale(pkillPath, "-SIGKILL", "-f", filepath.Join(constants.BinDir(), "hyperkit")); err != nil {
+	if _, err := crcos.RunWithDefaultLocale(pkillPath, "-SIGKILL", "-f", filepath.Join(constants.BinDir(), "hyperkit")); err != nil {
 		return fmt.Errorf("Failed to kill 'hyperkit' process. %w", err)
 	}
 	return nil

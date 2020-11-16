@@ -125,7 +125,7 @@ func checkVsock() error {
 	if err != nil {
 		return err
 	}
-	getcap, _, err := crcos.RunWithDefaultLocale("getcap", executable)
+	getcap, err := crcos.RunWithDefaultLocale("getcap", executable)
 	if err != nil {
 		return err
 	}

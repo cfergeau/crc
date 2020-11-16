@@ -12,7 +12,7 @@ func traits() analytics.Traits {
 	base := analytics.NewTraits().
 		Set("os", runtime.GOOS)
 
-	version, _, err := crcos.RunWithDefaultLocale("sw_vers", "-productVersion")
+	version, err := crcos.RunWithDefaultLocale("sw_vers", "-productVersion")
 	if err != nil {
 		return base
 	}
