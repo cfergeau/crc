@@ -24,7 +24,7 @@ const (
 	resolverFile = "/etc/resolver/testing"
 )
 
-func checkM1CPU() error {
+func checkM1CPU(_ options) error {
 	if strings.HasPrefix(cpuid.CPU.BrandName, "VirtualApple") {
 		logging.Debugf("Running with an emulated x86_64 CPU")
 		return fmt.Errorf("CodeReady Containers is unsupported on Apple M1 hardware")
@@ -33,99 +33,89 @@ func checkM1CPU() error {
 	return nil
 }
 
-func checkHyperKitInstalled(networkMode network.Mode) func() error {
-	return func() error {
-		if version.IsMacosInstallPathSet() {
-			return nil
-		}
-
-		h := cache.NewHyperKitCache()
-		if !h.IsCached() {
-			return fmt.Errorf("%s executable is not cached", h.GetExecutableName())
-		}
-		hyperkitPath := h.GetExecutablePath()
-		err := unix.Access(hyperkitPath, unix.X_OK)
-		if err != nil {
-			return fmt.Errorf("%s not executable", hyperkitPath)
-		}
-		if err := h.CheckVersion(); err != nil {
-			return err
-		}
-		if networkMode == network.UserNetworkingMode {
-			return nil
-		}
-		return checkSuid(hyperkitPath)
+func checkHyperKitInstalled(opts options) error {
+	if version.IsMacosInstallPathSet() {
+		return nil
 	}
+
+	h := cache.NewHyperKitCache()
+	if !h.IsCached() {
+		return fmt.Errorf("%s executable is not cached", h.GetExecutableName())
+	}
+	hyperkitPath := h.GetExecutablePath()
+	err := unix.Access(hyperkitPath, unix.X_OK)
+	if err != nil {
+		return fmt.Errorf("%s not executable", hyperkitPath)
+	}
+	if err := h.CheckVersion(); err != nil {
+		return err
+	}
+	if opts.getNetworkMode() == network.UserNetworkingMode {
+		return nil
+	}
+	return checkSuid(hyperkitPath)
 }
 
-func fixHyperKitInstallation(networkMode network.Mode) func() error {
-	return func() error {
-		if version.IsMacosInstallPathSet() {
-			return nil
-		}
-
-		h := cache.NewHyperKitCache()
-
-		logging.Debugf("Installing %s", h.GetExecutableName())
-
-		if err := h.EnsureIsCached(); err != nil {
-			return fmt.Errorf("Unable to download %s : %v", h.GetExecutableName(), err)
-		}
-		if networkMode == network.UserNetworkingMode {
-			return nil
-		}
-		return setSuid(h.GetExecutablePath())
+func fixHyperKitInstallation(opts options) error {
+	if version.IsMacosInstallPathSet() {
+		return nil
 	}
+	h := cache.NewHyperKitCache()
+
+	logging.Debugf("Installing %s", h.GetExecutableName())
+
+	if err := h.EnsureIsCached(); err != nil {
+		return fmt.Errorf("Unable to download %s : %v", h.GetExecutableName(), err)
+	}
+	if opts.getNetworkMode() == network.UserNetworkingMode {
+		return nil
+	}
+	return setSuid(h.GetExecutablePath())
 }
 
-func checkMachineDriverHyperKitInstalled(networkMode network.Mode) func() error {
-	return func() error {
-		if version.IsMacosInstallPathSet() {
-			return nil
-		}
-
-		hyperkitDriver := cache.NewMachineDriverHyperKitCache()
-
-		logging.Debugf("Checking if %s is installed", hyperkitDriver.GetExecutableName())
-		if !hyperkitDriver.IsCached() {
-			return fmt.Errorf("%s executable is not cached", hyperkitDriver.GetExecutableName())
-		}
-
-		if err := hyperkitDriver.CheckVersion(); err != nil {
-			return err
-		}
-		if networkMode == network.UserNetworkingMode {
-			return nil
-		}
-		return checkSuid(hyperkitDriver.GetExecutablePath())
+func checkMachineDriverHyperKitInstalled(opts options) error {
+	if version.IsMacosInstallPathSet() {
+		return nil
 	}
+
+	hyperkitDriver := cache.NewMachineDriverHyperKitCache()
+
+	logging.Debugf("Checking if %s is installed", hyperkitDriver.GetExecutableName())
+	if !hyperkitDriver.IsCached() {
+		return fmt.Errorf("%s executable is not cached", hyperkitDriver.GetExecutableName())
+	}
+
+	if err := hyperkitDriver.CheckVersion(); err != nil {
+		return err
+	}
+	if opts.getNetworkMode() == network.UserNetworkingMode {
+		return nil
+	}
+	return checkSuid(hyperkitDriver.GetExecutablePath())
 }
 
-func fixMachineDriverHyperKitInstalled(networkMode network.Mode) func() error {
-	return func() error {
-		if version.IsMacosInstallPathSet() {
-			return nil
-		}
-
-		hyperkitDriver := cache.NewMachineDriverHyperKitCache()
-
-		logging.Debugf("Installing %s", hyperkitDriver.GetExecutableName())
-
-		if err := hyperkitDriver.EnsureIsCached(); err != nil {
-			return fmt.Errorf("Unable to download %s : %v", hyperkitDriver.GetExecutableName(), err)
-		}
-		if networkMode == network.UserNetworkingMode {
-			return nil
-		}
-		return setSuid(hyperkitDriver.GetExecutablePath())
+func fixMachineDriverHyperKitInstalled(opts options) error {
+	if version.IsMacosInstallPathSet() {
+		return nil
 	}
+	hyperkitDriver := cache.NewMachineDriverHyperKitCache()
+
+	logging.Debugf("Installing %s", hyperkitDriver.GetExecutableName())
+
+	if err := hyperkitDriver.EnsureIsCached(); err != nil {
+		return fmt.Errorf("Unable to download %s : %v", hyperkitDriver.GetExecutableName(), err)
+	}
+	if opts.getNetworkMode() == network.UserNetworkingMode {
+		return nil
+	}
+	return setSuid(hyperkitDriver.GetExecutablePath())
 }
 
-func checkResolverFilePermissions() error {
+func checkResolverFilePermissions(_ options) error {
 	return isUserHaveFileWritePermission(resolverFile)
 }
 
-func fixResolverFilePermissions() error {
+func fixResolverFilePermissions(_ options) error {
 	// Check if resolver directory available or not
 	if _, err := os.Stat(resolverDir); os.IsNotExist(err) {
 		logging.Debugf("Creating %s directory", resolverDir)
@@ -143,7 +133,7 @@ func fixResolverFilePermissions() error {
 	return addFileWritePermissionToUser(resolverFile)
 }
 
-func removeResolverFile() error {
+func removeResolverFile(_ options) error {
 	// Check if the resolver file exist or not
 	if _, err := os.Stat(resolverFile); !os.IsNotExist(err) {
 		logging.Debugf("Removing %s file", resolverFile)
@@ -185,7 +175,7 @@ func addFileWritePermissionToUser(filename string) error {
 	return nil
 }
 
-func stopCRCHyperkitProcess() error {
+func stopCRCHyperkitProcess(_ options) error {
 	pgrepPath, err := exec.LookPath("pgrep")
 	if err != nil {
 		return fmt.Errorf("Could not find 'pgrep'. %w", err)

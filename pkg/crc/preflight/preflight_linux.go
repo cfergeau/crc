@@ -40,7 +40,7 @@ func libvirtPreflightChecks(distro *linux.OsRelease) []Check {
 			checkDescription: "Checking if libvirt is installed",
 			check:            checkLibvirtInstalled,
 			fixDescription:   "Installing libvirt service and dependencies",
-			fix:              fixLibvirtInstalled(distro),
+			fix:              fixLibvirtInstalled,
 
 			labels: labels{Os: Linux},
 		},
@@ -56,7 +56,7 @@ func libvirtPreflightChecks(distro *linux.OsRelease) []Check {
 		{
 			configKeySuffix:  "check-libvirt-group-active",
 			checkDescription: "Checking if active user/process is currently part of the libvirt group",
-			check:            checkCurrentGroups(distro),
+			check:            checkCurrentGroups,
 			fixDescription:   "You need to logout, re-login, and run crc setup again before the user is effectively a member of the 'libvirt' group.",
 			flags:            NoFix,
 
@@ -151,7 +151,7 @@ const (
 	vsockModuleAutoLoadConfPath  = "/etc/modules-load.d/vhost_vsock.conf"
 )
 
-func checkVsock() error {
+func checkVsock(_ options) error {
 	executable, err := os.Executable()
 	if err != nil {
 		return err
@@ -178,7 +178,7 @@ func checkVsock() error {
 	return nil
 }
 
-func fixVsock() error {
+func fixVsock(_ options) error {
 	executable, err := os.Executable()
 	if err != nil {
 		return err
@@ -228,7 +228,7 @@ func fixVsock() error {
 	return nil
 }
 
-func removeVsockCrcSettings() error {
+func removeVsockCrcSettings(_ options) error {
 	var mErr crcErrors.MultiError
 	err := crcos.RemoveFileAsRoot(fmt.Sprintf("Removing udev rule in %s", vsockUdevSystemRulesPath), vsockUdevSystemRulesPath)
 	if err != nil {
@@ -284,18 +284,18 @@ func (filter preflightFilter) SetDistro(distro *linux.OsRelease) {
 // - matching the networking daemon in use (NetworkManager or systemd-resolved) regardless of user/system networking
 // - and we also want the user networking checks
 func getAllPreflightChecks() []Check {
-	usingSystemdResolved := checkSystemdResolvedIsRunning()
+	usingSystemdResolved := (checkSystemdServiceRunning("systemd-resolved.service") == nil)
 	filter := newFilter()
-	filter.SetSystemdResolved(usingSystemdResolved == nil)
+	filter.SetSystemdResolved(usingSystemdResolved)
 	filter.SetDistro(distro())
 
 	return filter.Apply(getChecks(distro()))
 }
 
 func getPreflightChecks(_ bool, _ bool, networkMode network.Mode) []Check {
-	usingSystemdResolved := checkSystemdResolvedIsRunning()
+	usingSystemdResolved := (checkSystemdServiceRunning("systemd-resolved.service") == nil)
 
-	return getPreflightChecksForDistro(distro(), networkMode, usingSystemdResolved == nil)
+	return getPreflightChecksForDistro(distro(), networkMode, usingSystemdResolved)
 }
 
 func getPreflightChecksForDistro(distro *linux.OsRelease, networkMode network.Mode, usingSystemdResolved bool) []Check {

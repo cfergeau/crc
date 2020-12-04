@@ -16,7 +16,7 @@ import (
 
 var daemonBatchFileShortcutPath = filepath.Join(constants.StartupFolder, constants.DaemonBatchFileShortcutName)
 
-func checkIfDaemonInstalled() error {
+func checkIfDaemonInstalled(_ options) error {
 	if os.FileExists(constants.DaemonBatchFilePath) || os.FileExists(constants.DaemonPSScriptPath) {
 		return fmt.Errorf("Daemon should not be installed")
 	}
@@ -26,7 +26,7 @@ func checkIfDaemonInstalled() error {
 	return nil
 }
 
-func stopTray() error {
+func stopTray(_ options) error {
 	/* we changed the name of the tray executable to crc-tray from tray-windows
 	 * this tries to stop the old tray process, can be removed after a  few releases
 	 */
@@ -40,7 +40,7 @@ func stopTray() error {
 	return nil
 }
 
-func removeDaemon() error {
+func removeDaemon(_ options) error {
 	_ = stopDaemon()
 	var mErr errors.MultiError
 	if err := os.RemoveFileIfExists(constants.DaemonBatchFilePath); err != nil {
@@ -78,21 +78,21 @@ func stopDaemon() error {
 	return nil
 }
 
-func checkTrayExecutableExists() error {
-	if os.FileExists(constants.TrayExecutablePath) && checkTrayVersion() {
+func checkTrayExecutableExists(opts options) error {
+	if os.FileExists(constants.TrayExecutablePath) && checkTrayVersion(opts) {
 		return nil
 	}
 	return fmt.Errorf("Tray executable does not exists")
 }
 
-func fixTrayExecutableExists() error {
+func fixTrayExecutableExists(_ options) error {
 	/* we changed the name of the tray executable to crc-tray.exe from tray-windows.exe
 	 * this tries to remove the old tray folder, can be removed after a  few releases
 	 */
 	return goos.RemoveAll(filepath.Join(constants.CrcBinDir, "tray-windows"))
 }
 
-func checkTrayVersion() bool {
+func checkTrayVersion(_ options) bool {
 	cmd := fmt.Sprintf(`(Get-Item %s).VersionInfo.FileVersion`, constants.TrayExecutablePath)
 	stdOut, _, err := powershell.Execute(cmd)
 	if err != nil {
@@ -103,7 +103,7 @@ func checkTrayVersion() bool {
 	return strings.TrimSpace(stdOut) == version.GetCRCWindowsTrayVersion()
 }
 
-func checkIfTrayRunning() error {
+func checkIfTrayRunning(_ options) error {
 	cmd := fmt.Sprintf("Get-Process -Name %s",
 		strings.TrimSuffix(constants.TrayExecutableName, filepath.Ext(constants.TrayExecutableName)))
 
@@ -117,7 +117,7 @@ func checkIfTrayRunning() error {
 	return nil
 }
 
-func startTray() error {
+func startTray(_ options) error {
 	cmd := fmt.Sprintf(`Start-Process -FilePath "%s"`, constants.TrayExecutablePath)
 	if _, _, err := powershell.Execute(cmd); err != nil {
 		return fmt.Errorf("Failed to start tray process: %w", err)

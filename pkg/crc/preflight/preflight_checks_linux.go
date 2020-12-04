@@ -22,14 +22,38 @@ import (
 	crcos "github.com/code-ready/crc/pkg/os"
 	"github.com/code-ready/crc/pkg/os/linux"
 	libvirtxml "github.com/libvirt/libvirt-go-xml"
+
+	"github.com/code-ready/crc/pkg/crc/config"
+	"github.com/code-ready/crc/pkg/crc/network"
 )
+
+type linuxOptions struct {
+	*commonOptions
+	distro *linux.OsRelease
+}
+
+func optionsNew(config config.Storage, networkMode network.Mode) options {
+	return &linuxOptions{
+		commonOptions: commonOptionsNew(config, networkMode).(*commonOptions),
+		distro:        distro(),
+	}
+}
+
+func getDistro(opts options) (*linux.OsRelease, error) {
+	linuxOptions, ok := opts.(*linuxOptions)
+	if !ok {
+		return nil, fmt.Errorf("Unexpected preflight options")
+	}
+
+	return linuxOptions.distro, nil
+}
 
 const (
 	// This is defined in https://github.com/code-ready/machine-driver-libvirt/blob/master/go.mod#L5
 	minSupportedLibvirtVersion = "3.4.0"
 )
 
-func checkRunningInsideWSL2() error {
+func checkRunningInsideWSL2(_ options) error {
 	version, err := ioutil.ReadFile("/proc/version")
 	if err != nil {
 		return err
@@ -43,7 +67,7 @@ func checkRunningInsideWSL2() error {
 	return nil
 }
 
-func checkVirtualizationEnabled() error {
+func checkVirtualizationEnabled(_ options) error {
 	logging.Debug("Checking if the vmx/svm flags are present in /proc/cpuinfo")
 	// Check if the cpu flags vmx or svm is present
 	flags, err := getCPUFlags()
@@ -61,11 +85,11 @@ func checkVirtualizationEnabled() error {
 	return nil
 }
 
-func fixVirtualizationEnabled() error {
+func fixVirtualizationEnabled(_ options) error {
 	return fmt.Errorf("You need to enable virtualization in BIOS")
 }
 
-func checkKvmEnabled() error {
+func checkKvmEnabled(_ options) error {
 	logging.Debug("Checking if /dev/kvm exists")
 	// Check if /dev/kvm exists
 	if _, err := os.Stat("/dev/kvm"); os.IsNotExist(err) {
@@ -75,7 +99,7 @@ func checkKvmEnabled() error {
 	return nil
 }
 
-func fixKvmEnabled() error {
+func fixKvmEnabled(_ options) error {
 	logging.Debug("Trying to load kvm module")
 	flags, err := getCPUFlags()
 	if err != nil {
@@ -118,7 +142,7 @@ func getLibvirtCapabilities() (*libvirtxml.Caps, error) {
 	return caps, nil
 }
 
-func checkLibvirtInstalled() error {
+func checkLibvirtInstalled(_ options) error {
 	logging.Debug("Checking if 'virsh' is available")
 	path, err := exec.LookPath("virsh")
 	if err != nil {
@@ -147,16 +171,18 @@ func checkLibvirtInstalled() error {
 	return nil
 }
 
-func fixLibvirtInstalled(distro *linux.OsRelease) func() error {
-	return func() error {
-		logging.Debug("Trying to install libvirt")
-		stdOut, stdErr, err := crcos.RunPrivileged("Installing virtualization packages", "/bin/sh", "-c", installLibvirtCommand(distro))
-		if err != nil {
-			return fmt.Errorf("Could not install required packages: %s %v: %s", stdOut, err, stdErr)
-		}
-		logging.Debug("libvirt was successfully installed")
-		return nil
+func fixLibvirtInstalled(opts options) error {
+	logging.Debug("Trying to install libvirt")
+	distro, err := getDistro(opts)
+	if err != nil {
+		return err
 	}
+	stdOut, stdErr, err := crcos.RunPrivileged("Installing virtualization packages", "/bin/sh", "-c", installLibvirtCommand(distro))
+	if err != nil {
+		return fmt.Errorf("Could not install required packages: %s %v: %s", stdOut, err, stdErr)
+	}
+	logging.Debug("libvirt was successfully installed")
+	return nil
 }
 
 func installLibvirtCommand(distro *linux.OsRelease) string {
@@ -172,7 +198,7 @@ func installLibvirtCommand(distro *linux.OsRelease) string {
 	}
 }
 
-func checkLibvirtVersion() error {
+func checkLibvirtVersion(_ options) error {
 	logging.Debugf("Checking if libvirt version is >=%s", minSupportedLibvirtVersion)
 	stdOut, _, err := crcos.RunWithDefaultLocale("virsh", "-v")
 	if err != nil {
@@ -194,7 +220,7 @@ func checkLibvirtVersion() error {
 	return nil
 }
 
-func checkUserPartOfLibvirtGroup() error {
+func checkUserPartOfLibvirtGroup(_ options) error {
 	logging.Debug("Checking if current user is part of the libvirt group")
 
 	currentUser, err := user.Current()
@@ -221,7 +247,7 @@ func checkUserPartOfLibvirtGroup() error {
 	return fmt.Errorf("%s is not part of the libvirt group", currentUser.Username)
 }
 
-func fixUserPartOfLibvirtGroup() error {
+func fixUserPartOfLibvirtGroup(_ options) error {
 	logging.Debug("Adding current user to the libvirt group")
 	currentUser, err := user.Current()
 	if err != nil {
@@ -237,33 +263,35 @@ func fixUserPartOfLibvirtGroup() error {
 	return err
 }
 
-func checkCurrentGroups(distro *linux.OsRelease) func() error {
-	return func() error {
-		if !distroIsLike(distro, linux.Ubuntu) {
+func checkCurrentGroups(opts options) error {
+	distro, err := getDistro(opts)
+	if err != nil {
+		return err
+	}
+	if !distroIsLike(distro, linux.Ubuntu) {
+		return nil
+	}
+
+	// After adding the user to the libvirt group, they need to relogin for the new group to be used by the currrent shell
+	gids, err := os.Getgroups()
+	if err != nil {
+		return err
+	}
+	for _, gid := range gids {
+		group, err := user.LookupGroupId(fmt.Sprintf("%d", gid))
+		if err != nil {
+			logging.Debugf("Failed to lookup group id %d: %v", gid, err)
+			continue
+		}
+		if group.Name == "libvirt" {
+			logging.Debug("libvirt group is active for the current user/process")
 			return nil
 		}
-
-		// After adding the user to the libvirt group, they need to relogin for the new group to be used by the currrent shell
-		gids, err := os.Getgroups()
-		if err != nil {
-			return err
-		}
-		for _, gid := range gids {
-			group, err := user.LookupGroupId(fmt.Sprintf("%d", gid))
-			if err != nil {
-				logging.Debugf("Failed to lookup group id %d: %v", gid, err)
-				continue
-			}
-			if group.Name == "libvirt" {
-				logging.Debug("libvirt group is active for the current user/process")
-				return nil
-			}
-		}
-		return fmt.Errorf("User in the currently active process is not part of the libvirt group")
 	}
+	return fmt.Errorf("User in the currently active process is not part of the libvirt group")
 }
 
-func checkLibvirtServiceRunning() error {
+func checkLibvirtServiceRunning(_ options) error {
 	logging.Debug("Checking if libvirtd service is running")
 	sd := systemd.NewHostSystemdCommander()
 
@@ -289,7 +317,7 @@ func checkLibvirtServiceRunning() error {
 	return fmt.Errorf("found no active libvirtd systemd unit")
 }
 
-func fixLibvirtServiceRunning() error {
+func fixLibvirtServiceRunning(_ options) error {
 	logging.Debug("Starting libvirtd.service")
 	sd := systemd.NewHostSystemdCommander()
 	/* split libvirt daemon is a bit tricky to startup properly as we'd
@@ -304,7 +332,7 @@ func fixLibvirtServiceRunning() error {
 	return nil
 }
 
-func checkMachineDriverLibvirtInstalled() error {
+func checkMachineDriverLibvirtInstalled(_ options) error {
 	machineDriverLibvirt := cache.NewMachineDriverLibvirtCache()
 
 	logging.Debugf("Checking if %s is installed", machineDriverLibvirt.GetExecutableName())
@@ -319,7 +347,7 @@ func checkMachineDriverLibvirtInstalled() error {
 	return nil
 }
 
-func fixMachineDriverLibvirtInstalled() error {
+func fixMachineDriverLibvirtInstalled(_ options) error {
 	machineDriverLibvirt := cache.NewMachineDriverLibvirtCache()
 
 	logging.Debugf("Installing %s", machineDriverLibvirt.GetExecutableName())
@@ -331,7 +359,7 @@ func fixMachineDriverLibvirtInstalled() error {
 	return nil
 }
 
-func checkLibvirtCrcNetworkAvailable() error {
+func checkLibvirtCrcNetworkAvailable(_ options) error {
 	logging.Debug("Checking if libvirt 'crc' network exists")
 	_, _, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-info", "crc")
 	if err != nil {
@@ -360,7 +388,7 @@ func getLibvirtNetworkXML() (string, error) {
 	return netXMLDef.String(), nil
 }
 
-func fixLibvirtCrcNetworkAvailable() error {
+func fixLibvirtCrcNetworkAvailable(_ options) error {
 	logging.Debug("Creating libvirt 'crc' network")
 
 	netXMLDef, err := getLibvirtNetworkXML()
@@ -389,7 +417,7 @@ func fixLibvirtCrcNetworkAvailable() error {
 	return nil
 }
 
-func removeLibvirtCrcNetwork() error {
+func removeLibvirtCrcNetwork(_ options) error {
 	logging.Debug("Removing libvirt 'crc' network")
 	_, _, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-info", libvirt.DefaultNetwork)
 	if err != nil {
@@ -412,7 +440,7 @@ func removeLibvirtCrcNetwork() error {
 	return nil
 }
 
-func removeCrcVM() error {
+func removeCrcVM(_ options) error {
 	stdout, _, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "domstate", constants.DefaultName)
 	if err != nil {
 		//  User may have run `crc delete` before `crc cleanup`
@@ -469,7 +497,7 @@ func checkLibvirtCrcNetworkDefinition() error {
 	return nil
 }
 
-func checkLibvirtCrcNetworkActive() error {
+func checkLibvirtCrcNetworkActive(_ options) error {
 	logging.Debug("Checking if libvirt 'crc' network is active")
 	stdOut, _, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-info", "crc")
 	if err != nil {
@@ -487,7 +515,7 @@ func checkLibvirtCrcNetworkActive() error {
 	return fmt.Errorf("Libvirt crc network is not active")
 }
 
-func fixLibvirtCrcNetworkActive() error {
+func fixLibvirtCrcNetworkActive(_ options) error {
 	logging.Debug("Starting libvirt 'crc' network")
 	stdOut, stdErr, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "net-start", "crc")
 	if err != nil {

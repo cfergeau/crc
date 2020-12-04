@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/code-ready/crc/pkg/crc/config"
+	"github.com/code-ready/crc/pkg/crc/network"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -13,7 +15,8 @@ func TestCheckPreflight(t *testing.T) {
 	cfg := config.New(config.NewEmptyInMemoryStorage())
 	doRegisterSettings(cfg, []Check{*check})
 
-	assert.NoError(t, doPreflightChecks(cfg, []Check{*check}))
+	opts := optionsNew(cfg, network.UserNetworkingMode)
+	assert.NoError(t, doPreflightChecks(opts, []Check{*check}))
 	assert.True(t, calls.checked)
 	assert.False(t, calls.fixed)
 }
@@ -25,7 +28,8 @@ func TestSkipPreflight(t *testing.T) {
 	_, err := cfg.Set("skip-sample", true)
 	assert.NoError(t, err)
 
-	assert.NoError(t, doPreflightChecks(cfg, []Check{*check}))
+	opts := optionsNew(cfg, network.UserNetworkingMode)
+	assert.NoError(t, doPreflightChecks(opts, []Check{*check}))
 	assert.False(t, calls.checked)
 }
 
@@ -34,7 +38,8 @@ func TestFixPreflight(t *testing.T) {
 	cfg := config.New(config.NewEmptyInMemoryStorage())
 	doRegisterSettings(cfg, []Check{*check})
 
-	assert.NoError(t, doFixPreflightChecks(cfg, []Check{*check}, false))
+	opts := optionsNew(cfg, network.UserNetworkingMode)
+	assert.NoError(t, doFixPreflightChecks(opts, []Check{*check}, false))
 	assert.True(t, calls.checked)
 	assert.True(t, calls.fixed)
 }
@@ -44,7 +49,8 @@ func TestFixPreflightCheckOnly(t *testing.T) {
 	cfg := config.New(config.NewEmptyInMemoryStorage())
 	doRegisterSettings(cfg, []Check{*check})
 
-	assert.Error(t, doFixPreflightChecks(cfg, []Check{*check}, true))
+	opts := optionsNew(cfg, network.UserNetworkingMode)
+	assert.Error(t, doFixPreflightChecks(opts, []Check{*check}, true))
 	assert.True(t, calls.checked)
 	assert.False(t, calls.fixed)
 }
@@ -54,12 +60,12 @@ func sampleCheck(checkErr, fixErr error) (*Check, *status) {
 	return &Check{
 		configKeySuffix:  "sample",
 		checkDescription: "Sample check",
-		check: func() error {
+		check: func(_ options) error {
 			status.checked = true
 			return checkErr
 		},
 		fixDescription: "sample fix",
-		fix: func() error {
+		fix: func(_ options) error {
 			status.fixed = true
 			return fixErr
 		},

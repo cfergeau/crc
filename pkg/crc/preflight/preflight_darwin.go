@@ -3,6 +3,7 @@ package preflight
 import (
 	"fmt"
 
+	"github.com/code-ready/crc/pkg/crc/config"
 	"github.com/code-ready/crc/pkg/crc/network"
 	"github.com/code-ready/crc/pkg/crc/version"
 )
@@ -22,18 +23,18 @@ func hyperkitPreflightChecks(networkMode network.Mode) []Check {
 		{
 			configKeySuffix:  "check-hyperkit-installed",
 			checkDescription: "Checking if HyperKit is installed",
-			check:            checkHyperKitInstalled(networkMode),
+			check:            checkHyperKitInstalled,
 			fixDescription:   "Setting up virtualization with HyperKit",
-			fix:              fixHyperKitInstallation(networkMode),
+			fix:              fixHyperKitInstallation,
 
 			labels: labels{Os: Darwin},
 		},
 		{
 			configKeySuffix:  "check-hyperkit-driver",
 			checkDescription: "Checking if crc-driver-hyperkit is installed",
-			check:            checkMachineDriverHyperKitInstalled(networkMode),
+			check:            checkMachineDriverHyperKitInstalled,
 			fixDescription:   "Installing crc-machine-hyperkit",
-			fix:              fixMachineDriverHyperKitInstalled(networkMode),
+			fix:              fixMachineDriverHyperKitInstalled,
 
 			labels: labels{Os: Darwin},
 		},
@@ -150,4 +151,8 @@ func getPreflightChecks(_ bool, trayAutostart bool, mode network.Mode) []Check {
 	filter.SetTray(trayAutostart)
 
 	return filter.Apply(getChecks(mode))
+}
+
+func optionsNew(config config.Storage, networkMode network.Mode) options {
+	return commonOptionsNew(config, networkMode)
 }

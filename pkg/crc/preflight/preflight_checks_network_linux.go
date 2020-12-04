@@ -162,8 +162,8 @@ func fixNetworkManagerConfigFile(path string, content string, perms os.FileMode)
 	return nil
 }
 
-func removeNetworkManagerConfigFile(path string) error {
-	if err := checkNetworkManagerInstalled(); err != nil {
+func removeNetworkManagerConfigFile(opts options, path string) error {
+	if err := checkNetworkManagerInstalled(opts); err != nil {
 		// When NetworkManager is not installed, its config files won't exist
 		return nil
 	}
@@ -186,7 +186,7 @@ func removeNetworkManagerConfigFile(path string) error {
 	return nil
 }
 
-func checkCrcDnsmasqConfigFile() error {
+func checkCrcDnsmasqConfigFile(_ options) error {
 	logging.Debug("Checking dnsmasq configuration")
 	err := crcos.FileContentMatches(crcDnsmasqConfigPath, []byte(crcDnsmasqConfig))
 	if err != nil {
@@ -196,7 +196,7 @@ func checkCrcDnsmasqConfigFile() error {
 	return nil
 }
 
-func fixCrcDnsmasqConfigFile() error {
+func fixCrcDnsmasqConfigFile(_ options) error {
 	logging.Debug("Fixing dnsmasq configuration")
 	err := fixNetworkManagerConfigFile(crcDnsmasqConfigPath, crcDnsmasqConfig, 0644)
 	if err != nil {
@@ -207,11 +207,11 @@ func fixCrcDnsmasqConfigFile() error {
 	return nil
 }
 
-func removeCrcDnsmasqConfigFile() error {
-	return removeNetworkManagerConfigFile(crcDnsmasqConfigPath)
+func removeCrcDnsmasqConfigFile(opts options) error {
+	return removeNetworkManagerConfigFile(opts, crcDnsmasqConfigPath)
 }
 
-func checkCrcNetworkManagerConfig() error {
+func checkCrcNetworkManagerConfig(_ options) error {
 	logging.Debug("Checking NetworkManager configuration")
 	err := crcos.FileContentMatches(crcNetworkManagerConfigPath, []byte(crcNetworkManagerConfig))
 	if err != nil {
@@ -221,7 +221,7 @@ func checkCrcNetworkManagerConfig() error {
 	return nil
 }
 
-func fixCrcNetworkManagerConfig() error {
+func fixCrcNetworkManagerConfig(_ options) error {
 	logging.Debug("Fixing NetworkManager configuration")
 	err := fixNetworkManagerConfigFile(crcNetworkManagerConfigPath, crcNetworkManagerConfig, 0644)
 	if err != nil {
@@ -231,11 +231,11 @@ func fixCrcNetworkManagerConfig() error {
 	return nil
 }
 
-func removeCrcNetworkManagerConfig() error {
-	return removeNetworkManagerConfigFile(crcNetworkManagerConfigPath)
+func removeCrcNetworkManagerConfig(opts options) error {
+	return removeNetworkManagerConfigFile(opts, crcNetworkManagerConfigPath)
 }
 
-func checkSystemdNetworkdIsNotRunning() error {
+func checkSystemdNetworkdIsNotRunning(_ options) error {
 	err := checkSystemdServiceRunning("systemd-networkd.service")
 	if err == nil {
 		return fmt.Errorf("systemd-networkd.service is running")
@@ -245,7 +245,7 @@ func checkSystemdNetworkdIsNotRunning() error {
 	return nil
 }
 
-func checkNetworkManagerInstalled() error {
+func checkNetworkManagerInstalled(_ options) error {
 	logging.Debug("Checking if 'nmcli' is available")
 	path, err := exec.LookPath("nmcli")
 	if err != nil {
@@ -269,15 +269,15 @@ func checkSystemdServiceRunning(service string) error {
 	return nil
 }
 
-func checkNetworkManagerIsRunning() error {
+func checkNetworkManagerIsRunning(_ options) error {
 	return checkSystemdServiceRunning("NetworkManager.service")
 }
 
-func checkSystemdResolvedIsRunning() error {
+func checkSystemdResolvedIsRunning(_ options) error {
 	return checkSystemdServiceRunning("systemd-resolved.service")
 }
 
-func checkCrcNetworkManagerDispatcherFile() error {
+func checkCrcNetworkManagerDispatcherFile(_ options) error {
 	logging.Debug("Checking NetworkManager dispatcher file for crc network")
 	err := crcos.FileContentMatches(crcNetworkManagerDispatcherPath, []byte(crcNetworkManagerDispatcherConfig))
 	if err != nil {
@@ -287,11 +287,11 @@ func checkCrcNetworkManagerDispatcherFile() error {
 	return nil
 }
 
-func fixCrcNetworkManagerDispatcherFile() error {
+func fixCrcNetworkManagerDispatcherFile(opts options) error {
 	logging.Debug("Fixing NetworkManager dispatcher configuration")
 
 	// Remove dispatcher script which was used in crc 1.20 - it's been moved to a new location
-	_ = removeNetworkManagerConfigFile(crcNetworkManagerOldDispatcherPath)
+	_ = removeNetworkManagerConfigFile(opts, crcNetworkManagerOldDispatcherPath)
 
 	err := fixNetworkManagerConfigFile(crcNetworkManagerDispatcherPath, crcNetworkManagerDispatcherConfig, 0755)
 	if err != nil {
@@ -302,14 +302,14 @@ func fixCrcNetworkManagerDispatcherFile() error {
 	return nil
 }
 
-func removeCrcNetworkManagerDispatcherFile() error {
+func removeCrcNetworkManagerDispatcherFile(opts options) error {
 	// Remove dispatcher script which was used in crc 1.20 - it's been moved to a new location
-	_ = removeNetworkManagerConfigFile(crcNetworkManagerOldDispatcherPath)
+	_ = removeNetworkManagerConfigFile(opts, crcNetworkManagerOldDispatcherPath)
 
-	return removeNetworkManagerConfigFile(crcNetworkManagerDispatcherPath)
+	return removeNetworkManagerConfigFile(opts, crcNetworkManagerDispatcherPath)
 }
 
-func checkCrcDnsmasqAndNetworkManagerConfigFile() error {
+func checkCrcDnsmasqAndNetworkManagerConfigFile(_ options) error {
 	// IF check return nil, which means file
 	if _, err := os.Stat(crcDnsmasqConfigPath); !os.IsNotExist(err) {
 		return fmt.Errorf("%s file exists", crcDnsmasqConfigPath)
@@ -320,13 +320,13 @@ func checkCrcDnsmasqAndNetworkManagerConfigFile() error {
 	return nil
 }
 
-func fixCrcDnsmasqAndNetworkManagerConfigFile() error {
+func fixCrcDnsmasqAndNetworkManagerConfigFile(opts options) error {
 	// In case user upgrades from f-32 to f-33 the dnsmasq config for NM still
 	// exists and needs to be removed.
-	if err := removeCrcNetworkManagerConfig(); err != nil {
+	if err := removeCrcNetworkManagerConfig(opts); err != nil {
 		logging.Debugf("%s: not present.", crcNetworkManagerConfigPath)
 	}
-	if err := removeCrcDnsmasqConfigFile(); err != nil {
+	if err := removeCrcDnsmasqConfigFile(opts); err != nil {
 		logging.Debugf("%s: not present.", crcDnsmasqConfigPath)
 	}
 	return nil

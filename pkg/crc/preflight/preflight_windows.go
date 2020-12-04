@@ -13,6 +13,8 @@ import (
 	"github.com/code-ready/crc/pkg/crc/network"
 	"github.com/code-ready/crc/pkg/crc/version"
 	"github.com/code-ready/crc/pkg/os/windows/powershell"
+
+	"github.com/code-ready/crc/pkg/crc/config"
 )
 
 var hypervPreflightChecks = []Check{
@@ -55,12 +57,12 @@ var hypervPreflightChecks = []Check{
 	{
 		configKeySuffix:  "check-crc-users-group-exists",
 		checkDescription: "Checking if crc-users group exists",
-		check: func() error {
+		check: func(_ options) error {
 			_, _, err := powershell.Execute("Get-LocalGroup -Name crc-users")
 			return err
 		},
 		fixDescription: "Creating crc-users group",
-		fix: func() error {
+		fix: func(_ options) error {
 			_, _, err := powershell.ExecuteAsAdmin("create crc-users group", "New-LocalGroup -Name crc-users")
 			return err
 		},
@@ -69,20 +71,21 @@ var hypervPreflightChecks = []Check{
 	{
 		configKeySuffix:  "check-user-in-hyperv-group",
 		checkDescription: "Checking if current user is in Hyper-V group and crc-users group",
-		check: func() error {
-			if err := adminHelperGroup.check(); err != nil {
+		check: func(opts options) error {
+			if err := adminHelperGroup.check(opts); err != nil {
 				return err
 			}
-			return hypervGroup.check()
+			return hypervGroup.check(opts)
 		},
 		fixDescription: "Adding current user to group",
-		fix: func() error {
+		fix: func(opts options) error {
 			m := crcerrors.MultiError{}
-			if err := adminHelperGroup.check(); err != nil {
-				m.Collect(adminHelperGroup.fix())
+			if err := adminHelperGroup.check(opts); err != nil {
+				m.Collect(adminHelperGroup.fix(opts))
+
 			}
-			if err := hypervGroup.check(); err != nil {
-				m.Collect(hypervGroup.fix())
+			if err := hypervGroup.check(opts); err != nil {
+				m.Collect(hypervGroup.fix(opts))
 			}
 			if len(m.Errors) == 0 {
 				return nil
@@ -182,11 +185,11 @@ var vsockChecks = []Check{
 var errReboot = errors.New("Please reboot your system and run 'crc setup' to complete the setup process")
 
 var adminHelperGroup = Check{
-	check: func() error {
+	check: func(_ options) error {
 		_, _, err := powershell.Execute(fmt.Sprintf("Get-LocalGroupMember -Name crc-users -Member '%s'", os.Getenv("USERNAME")))
 		return err
 	},
-	fix: func() error {
+	fix: func(_ options) error {
 		_, _, err := powershell.ExecuteAsAdmin("adding current user to crc-users group", fmt.Sprintf("Add-LocalGroupMember -Group crc-users -Member '%s'", os.Getenv("USERNAME")))
 		if err != nil {
 			return err
@@ -204,7 +207,7 @@ var adminHelperChecks = []Check{
 	{
 		configKeySuffix:  "check-admin-helper-daemon-installed",
 		checkDescription: "Checking if admin-helper daemon is installed",
-		check: func() error {
+		check: func(_ options) error {
 			version, err := adminhelper.Client().Version()
 			if err != nil {
 				return err
@@ -216,18 +219,22 @@ var adminHelperChecks = []Check{
 			return nil
 		},
 		fixDescription: "Installing admin-helper daemon",
-		fix: func() error {
+		fix: func(_ options) error {
 			_, _, err := powershell.ExecuteAsAdmin("install admin-helper daemon", fmt.Sprintf("& '%s' uninstall-daemon; & '%s' install-daemon", adminhelper.BinPath, adminhelper.BinPath))
 			return err
 		},
 		cleanupDescription: "Uninstalling admin-helper daemon",
-		cleanup: func() error {
+		cleanup: func(_ options) error {
 			_, _, err := powershell.ExecuteAsAdmin("uninstall admin-helper daemon", fmt.Sprintf("& '%s' uninstall-daemon", adminhelper.BinPath))
 			return err
 		},
 		labels: labels{Os: Windows},
 	},
 	cleanUpHostsFile,
+}
+
+func optionsNew(config config.Storage, networkMode network.Mode) options {
+	return commonOptionsNew(config, networkMode)
 }
 
 const (
@@ -238,7 +245,7 @@ const (
 	registryValue = "gvisor-tap-vsock"
 )
 
-func checkVsock() error {
+func checkVsock(_ options) error {
 	stdout, _, err := powershell.Execute(fmt.Sprintf(`Get-Item -Path "%s\%s"`, registryDirectory, registryKey))
 	if err != nil {
 		return err
@@ -249,7 +256,7 @@ func checkVsock() error {
 	return nil
 }
 
-func fixVsock() error {
+func fixVsock(_ options) error {
 	cmds := []string{
 		fmt.Sprintf(`$service = New-Item -Path "%s" -Name "%s"`, registryDirectory, registryKey),
 		fmt.Sprintf(`$service.SetValue("ElementName", "%v")`, registryValue),

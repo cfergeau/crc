@@ -25,7 +25,7 @@ var nonWinPreflightChecks = []Check{
 	},
 }
 
-func checkIfRunningAsNormalUser() error {
+func checkIfRunningAsNormalUser(_ options) error {
 	if os.Geteuid() != 0 {
 		return nil
 	}

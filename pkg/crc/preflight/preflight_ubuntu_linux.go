@@ -37,8 +37,8 @@ type reader func(filename string) ([]byte, error)
 type writer func(reason, content, filepath string, mode os.FileMode) error
 
 // Verify the line is present in AppArmor template
-func checkAppArmorExceptionIsPresent(reader reader) func() error {
-	return func() error {
+func checkAppArmorExceptionIsPresent(reader reader) func(_ options) error {
+	return func(_ options) error {
 		template, err := reader(appArmorTemplate)
 		if err != nil {
 			return err
@@ -51,18 +51,18 @@ func checkAppArmorExceptionIsPresent(reader reader) func() error {
 }
 
 // Add the exception `cacheDir/*/crc.qcow2 rk` in AppArmor template
-func addAppArmorExceptionForQcowDisks(reader reader, writer writer) func() error {
+func addAppArmorExceptionForQcowDisks(reader reader, writer writer) func(_ options) error {
 	return replaceInAppArmorTemplate(reader, writer, appArmorHeader, expectedLines())
 }
 
 // Eventually remove the exception in AppArmor template
-func removeAppArmorExceptionForQcowDisks(reader reader, writer writer) func() error {
+func removeAppArmorExceptionForQcowDisks(reader reader, writer writer) func(_ options) error {
 	return replaceInAppArmorTemplate(reader, writer, expectedLines(), appArmorHeader)
 }
 
 // Search for the string `before` in the AppArmor template and replace it with `after` string.
-func replaceInAppArmorTemplate(reader reader, writer writer, before string, after string) func() error {
-	return func() error {
+func replaceInAppArmorTemplate(reader reader, writer writer, before string, after string) func(_ options) error {
+	return func(_ options) error {
 		template, err := reader(appArmorTemplate)
 		if err != nil {
 			return err

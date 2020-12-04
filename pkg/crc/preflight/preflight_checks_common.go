@@ -61,7 +61,7 @@ var genericPreflightChecks = []Check{
 	{
 		configKeySuffix:  "check-ram",
 		checkDescription: "Checking minimum RAM requirements",
-		check: func() error {
+		check: func(_ options) error {
 			return validation.ValidateEnoughMemory(constants.DefaultMemory)
 		},
 		fixDescription: fmt.Sprintf("crc requires at least %s to run", units.HumanSize(float64(constants.DefaultMemory*1024*1024))),
@@ -85,7 +85,7 @@ var genericPreflightChecks = []Check{
 	},
 	{
 		cleanupDescription: "Removing pull secret from the keyring",
-		cleanup:            cluster.ForgetPullSecret,
+		cleanup:            cleanupPullSecret,
 		flags:              CleanUpOnly,
 
 		labels: None,
@@ -100,7 +100,7 @@ var cleanUpHostsFile = Check{
 	labels: None,
 }
 
-func checkSupportedCPUArch() error {
+func checkSupportedCPUArch(_ options) error {
 	if runtime.GOARCH != "amd64" {
 		logging.Debugf("GOARCH is %s", runtime.GOARCH)
 		return fmt.Errorf("CodeReady Containers can only run on x86_64 CPUs")
@@ -108,7 +108,11 @@ func checkSupportedCPUArch() error {
 	return nil
 }
 
-func checkBundleExtracted() error {
+func cleanupPullSecret(_ options) error {
+	return cluster.ForgetPullSecret()
+}
+
+func checkBundleExtracted(_ options) error {
 	if !constants.IsRelease() {
 		logging.Debugf("Development build, skipping check")
 		return nil
@@ -122,7 +126,7 @@ func checkBundleExtracted() error {
 	return nil
 }
 
-func fixBundleExtracted() error {
+func fixBundleExtracted(_ options) error {
 	// Should be removed after 1.19 release
 	// This check will ensure correct mode for `~/.crc/cache` directory
 	// in case it exists.
@@ -158,7 +162,7 @@ func fixBundleExtracted() error {
 }
 
 // Check if helper executable is cached or not
-func checkAdminHelperExecutableCached() error {
+func checkAdminHelperExecutableCached(_ options) error {
 	if version.IsMacosInstallPathSet() || version.IsMsiBuild() {
 		return nil
 	}
@@ -174,7 +178,7 @@ func checkAdminHelperExecutableCached() error {
 	return checkSuid(helper.GetExecutablePath())
 }
 
-func fixAdminHelperExecutableCached() error {
+func fixAdminHelperExecutableCached(_ options) error {
 	if version.IsMacosInstallPathSet() || version.IsMsiBuild() {
 		return nil
 	}
@@ -190,7 +194,7 @@ func fixAdminHelperExecutableCached() error {
 var oldAdminHelpers = []string{"admin-helper-linux", "admin-helper-darwin", "admin-helper-windows.exe"}
 
 /* These 2 checks can be removed after a few releases */
-func checkOldAdminHelperExecutableCached() error {
+func checkOldAdminHelperExecutableCached(_ options) error {
 	logging.Debugf("Checking if an older admin-helper executable is installed")
 	for _, oldExecutable := range oldAdminHelpers {
 		oldPath := filepath.Join(constants.CrcBinDir, oldExecutable)
@@ -204,7 +208,7 @@ func checkOldAdminHelperExecutableCached() error {
 	return nil
 }
 
-func fixOldAdminHelperExecutableCached() error {
+func fixOldAdminHelperExecutableCached(_ options) error {
 	logging.Debugf("Removing older admin-helper executable")
 	for _, oldExecutable := range oldAdminHelpers {
 		oldPath := filepath.Join(constants.CrcBinDir, oldExecutable)
@@ -221,7 +225,7 @@ func fixOldAdminHelperExecutableCached() error {
 	return nil
 }
 
-func removeCRCMachinesDir() error {
+func removeCRCMachinesDir(_ options) error {
 	logging.Debug("Deleting machines directory")
 	if err := os.RemoveAll(constants.MachineInstanceDir); err != nil {
 		return fmt.Errorf("Failed to delete crc machines directory: %w", err)
@@ -229,7 +233,7 @@ func removeCRCMachinesDir() error {
 	return nil
 }
 
-func removeOldLogs() error {
+func removeOldLogs(_ options) error {
 	logFiles, err := filepath.Glob(filepath.Join(constants.CrcBaseDir, "*.log_*"))
 	if err != nil {
 		return fmt.Errorf("Failed to get old logs: %w", err)
@@ -243,7 +247,7 @@ func removeOldLogs() error {
 	return nil
 }
 
-func removeHostsFileEntry() error {
+func removeHostsFileEntry(_ options) error {
 	err := adminhelper.CleanHostsFile()
 	if errors.Is(err, os.ErrNotExist) {
 		return nil
