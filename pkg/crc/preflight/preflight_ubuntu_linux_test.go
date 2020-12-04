@@ -25,18 +25,18 @@ profile LIBVIRT_TEMPLATE flags=(attach_disconnected) {
 )
 
 func TestCheckAppArmor(t *testing.T) {
-	assert.EqualError(t, checkAppArmorExceptionIsPresent(mockReader(source))(), "AppArmor profile not configured")
-	assert.NoError(t, checkAppArmorExceptionIsPresent(mockReader(expected))())
+	assert.EqualError(t, checkAppArmorExceptionIsPresent(mockReader(source))(&commonOptions{}), "AppArmor profile not configured")
+	assert.NoError(t, checkAppArmorExceptionIsPresent(mockReader(expected))(&commonOptions{}))
 }
 
 func TestFixAppArmor(t *testing.T) {
-	assert.NoError(t, addAppArmorExceptionForQcowDisks(mockReader(source), writerVerifier(expected))())
-	assert.EqualError(t, addAppArmorExceptionForQcowDisks(mockReader("invalid"), writerVerifier(expected))(),
+	assert.NoError(t, addAppArmorExceptionForQcowDisks(mockReader(source), writerVerifier(expected))(&commonOptions{}))
+	assert.EqualError(t, addAppArmorExceptionForQcowDisks(mockReader("invalid"), writerVerifier(expected))(&commonOptions{}),
 		"unexpected AppArmor template file /etc/apparmor.d/libvirt/TEMPLATE.qemu, cannot configure it automatically")
 }
 
 func TestCleanupAppArmor(t *testing.T) {
-	assert.NoError(t, removeAppArmorExceptionForQcowDisks(mockReader(expected), writerVerifier(source))())
+	assert.NoError(t, removeAppArmorExceptionForQcowDisks(mockReader(expected), writerVerifier(source))(&commonOptions{}))
 }
 
 func writerVerifier(expected string) func(reason string, content string, filepath string, mode os.FileMode) error {

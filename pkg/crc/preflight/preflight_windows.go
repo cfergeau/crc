@@ -50,7 +50,7 @@ var hypervPreflightChecks = []Check{
 	{
 		configKeySuffix:  "check-crc-users-group-exists",
 		checkDescription: "Checking if crc-users group exists",
-		check: func() error {
+		check: func(_ options) error {
 			if _, _, err := powershell.Execute("Get-LocalGroup -Name crc-users"); err != nil {
 				return fmt.Errorf("'crc-users' group does not exist: %v", err)
 			}
@@ -121,6 +121,10 @@ func username() string {
 	return os.Getenv("USERNAME")
 }
 
+func optionsNew(networkMode network.Mode, bundlePath string, preset preset.Preset) options {
+	return commonOptionsNew(networkMode, bundlePath, preset)
+}
+
 const (
 	// This key is required to activate the vsock communication
 	registryDirectory = `HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Virtualization\GuestCommunicationServices`
@@ -129,7 +133,7 @@ const (
 	registryValue = "gvisor-tap-vsock"
 )
 
-func checkVsock() error {
+func checkVsock(_ options) error {
 	stdout, _, err := powershell.Execute(fmt.Sprintf(`Get-Item -Path "%s\%s"`, registryDirectory, registryKey))
 	if err != nil {
 		return err

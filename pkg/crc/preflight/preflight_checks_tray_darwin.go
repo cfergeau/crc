@@ -35,7 +35,7 @@ func getTrayConfig() (*launchd.AgentConfig, error) {
 	return &trayConfig, nil
 }
 
-func checkIfTrayPlistFileExists() error {
+func checkIfTrayPlistFileExists(_ options) error {
 	trayConfig, err := getTrayConfig()
 	if err != nil {
 		return err
@@ -43,7 +43,7 @@ func checkIfTrayPlistFileExists() error {
 	return launchd.CheckPlist(*trayConfig)
 }
 
-func fixTrayPlistFileExists() error {
+func fixTrayPlistFileExists(_ options) error {
 	trayConfig, err := getTrayConfig()
 	if err != nil {
 		return err
@@ -51,11 +51,11 @@ func fixTrayPlistFileExists() error {
 	return fixPlistFileExists(*trayConfig)
 }
 
-func removeTrayPlistFile() error {
+func removeTrayPlistFile(_ options) error {
 	return launchd.RemovePlist(trayAgentLabel)
 }
 
-func checkIfDaemonAgentRunning() error {
+func checkIfDaemonAgentRunning(_ options) error {
 	if launchd.PlistExists(daemonAgentLabel) {
 		return errors.New("crc daemon plist should not exist anymore")
 	}
@@ -65,20 +65,20 @@ func checkIfDaemonAgentRunning() error {
 	return nil
 }
 
-func unLoadDaemonAgent() error {
+func unLoadDaemonAgent(_ options) error {
 	_ = launchd.UnloadPlist(daemonAgentLabel)
 	_ = launchd.RemovePlist(daemonAgentLabel)
 	return nil
 }
 
-func checkIfTrayAgentRunning() error {
+func checkIfTrayAgentRunning(_ options) error {
 	if !launchd.AgentRunning(trayAgentLabel) {
 		return fmt.Errorf("Tray is not running")
 	}
 	return checkIfDaemonRunning()
 }
 
-func fixTrayAgentRunning() error {
+func fixTrayAgentRunning(_ options) error {
 	logging.Debug("Starting tray agent")
 	if err := launchd.LoadPlist(trayAgentLabel); err != nil {
 		return err
@@ -86,7 +86,7 @@ func fixTrayAgentRunning() error {
 	return launchd.StartAgent(trayAgentLabel)
 }
 
-func unLoadTrayAgent() error {
+func unLoadTrayAgent(_ options) error {
 	return launchd.UnloadPlist(trayAgentLabel)
 }
 

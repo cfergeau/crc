@@ -19,7 +19,7 @@ const (
 	minimumWindowsReleaseID = 1709
 )
 
-func checkVersionOfWindowsUpdate() error {
+func checkVersionOfWindowsUpdate(_ options) error {
 	windowsReleaseID := `(Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name ReleaseId).ReleaseId`
 
 	stdOut, _, err := powershell.Execute(windowsReleaseID)
@@ -40,7 +40,7 @@ func checkVersionOfWindowsUpdate() error {
 	return nil
 }
 
-func checkWindowsEdition() error {
+func checkWindowsEdition(_ options) error {
 	windowsEditionCmd := `(Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion").EditionID`
 
 	stdOut, _, err := powershell.Execute(windowsEditionCmd)
@@ -59,7 +59,7 @@ func checkWindowsEdition() error {
 	return nil
 }
 
-func checkHyperVInstalled() error {
+func checkHyperVInstalled(_ options) error {
 	// check to see if a hypervisor is present. if hyper-v is installed and enabled,
 	checkHypervisorPresent := `@(Get-Wmiobject Win32_ComputerSystem).HypervisorPresent`
 	stdOut, _, err := powershell.Execute(checkHypervisorPresent)
@@ -84,7 +84,7 @@ func checkHyperVInstalled() error {
 	return nil
 }
 
-func checkHyperVServiceRunning() error {
+func checkHyperVServiceRunning(_ options) error {
 	// Check if Hyper-V's Virtual Machine Management Service is running
 	checkVmmsRunning := `@(Get-Service vmms).Status`
 	stdOut, _, err := powershell.Execute(checkVmmsRunning)
@@ -99,7 +99,7 @@ func checkHyperVServiceRunning() error {
 	return nil
 }
 
-func checkIfUserPartOfHyperVAdmins() error {
+func checkIfUserPartOfHyperVAdmins(_ options) error {
 	// https://support.microsoft.com/en-us/help/243330/well-known-security-identifiers-in-windows-operating-systems
 	// BUILTIN\Hyper-V Administrators => S-1-5-32-578
 
@@ -118,7 +118,7 @@ func checkIfUserPartOfHyperVAdmins() error {
 	return nil
 }
 
-func fixUserPartOfHyperVAdmins() error {
+func fixUserPartOfHyperVAdmins(_ options) error {
 	outGroupName, _, err := powershell.Execute(`(New-Object System.Security.Principal.SecurityIdentifier("S-1-5-32-578")).Translate([System.Security.Principal.NTAccount]).Value`)
 	if err != nil {
 		logging.Debug(err.Error())
@@ -133,7 +133,7 @@ func fixUserPartOfHyperVAdmins() error {
 	return errReboot
 }
 
-func checkIfHyperVVirtualSwitchExists() error {
+func checkIfHyperVVirtualSwitchExists(_ options) error {
 	switchName := hyperv.AlternativeNetwork
 
 	// use winnet instead
@@ -146,7 +146,7 @@ func checkIfHyperVVirtualSwitchExists() error {
 	return fmt.Errorf("Virtual Switch not found")
 }
 
-func checkIfRunningAsNormalUser() error {
+func checkIfRunningAsNormalUser(_ options) error {
 	if !powershell.IsAdmin() {
 		return nil
 	}
@@ -154,7 +154,7 @@ func checkIfRunningAsNormalUser() error {
 	return fmt.Errorf("crc should be ran in a shell without administrator rights")
 }
 
-func removeDNSServerAddress() error {
+func removeDNSServerAddress(_ options) error {
 	resetDNSCommand := `Set-DnsClientServerAddress -InterfaceAlias ("vEthernet (crc)") -ResetServerAddresses`
 	if exist, defaultSwitch := winnet.GetDefaultSwitchName(); exist {
 		resetDNSCommand = fmt.Sprintf(`Set-DnsClientServerAddress -InterfaceAlias ("vEthernet (%s)","vEthernet (crc)") -ResetServerAddresses`, defaultSwitch)
@@ -165,7 +165,7 @@ func removeDNSServerAddress() error {
 	return nil
 }
 
-func removeCrcVM() (err error) {
+func removeCrcVM(_ options) (err error) {
 	if _, _, err := powershell.Execute("Get-VM -Name crc"); err != nil {
 		// This means that there is no crc VM exist
 		return nil

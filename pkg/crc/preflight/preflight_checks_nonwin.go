@@ -63,7 +63,7 @@ func genericPreflightChecks(preset crcpreset.Preset) []Check {
 		{
 			configKeySuffix:  "check-ram",
 			checkDescription: "Checking minimum RAM requirements",
-			check: func() error {
+			check: func(_ options) error {
 				return validation.ValidateEnoughMemory(constants.GetDefaultMemory(preset))
 			},
 			fixDescription: fmt.Sprintf("crc requires at least %s to run", units.HumanSize(float64(constants.GetDefaultMemory(preset)*1024*1024))),
@@ -74,7 +74,7 @@ func genericPreflightChecks(preset crcpreset.Preset) []Check {
 	}
 }
 
-func checkIfRunningAsNormalUser() error {
+func checkIfRunningAsNormalUser(_ options) error {
 	if os.Geteuid() != 0 {
 		return nil
 	}
@@ -115,7 +115,7 @@ func checkSuid(path string) error {
 }
 
 // Check if helper executable is cached or not
-func checkAdminHelperExecutableCached() error {
+func checkAdminHelperExecutableCached(_ options) error {
 	if version.IsInstaller() {
 		return nil
 	}
@@ -131,7 +131,7 @@ func checkAdminHelperExecutableCached() error {
 	return checkSuid(helper.GetExecutablePath())
 }
 
-func fixAdminHelperExecutableCached() error {
+func fixAdminHelperExecutableCached(_ options) error {
 	if version.IsInstaller() {
 		return nil
 	}
@@ -147,7 +147,7 @@ func fixAdminHelperExecutableCached() error {
 var oldAdminHelpers = []string{"admin-helper-linux", "admin-helper-darwin"}
 
 /* These 2 checks can be removed after a few releases */
-func checkOldAdminHelperExecutableCached() error {
+func checkOldAdminHelperExecutableCached(_ options) error {
 	logging.Debugf("Checking if an older admin-helper executable is installed")
 	for _, oldExecutable := range oldAdminHelpers {
 		oldPath := filepath.Join(constants.BinDir(), oldExecutable)
@@ -161,7 +161,7 @@ func checkOldAdminHelperExecutableCached() error {
 	return nil
 }
 
-func fixOldAdminHelperExecutableCached() error {
+func fixOldAdminHelperExecutableCached(_ options) error {
 	logging.Debugf("Removing older admin-helper executable")
 	for _, oldExecutable := range oldAdminHelpers {
 		oldPath := filepath.Join(constants.BinDir(), oldExecutable)
@@ -178,7 +178,7 @@ func fixOldAdminHelperExecutableCached() error {
 	return nil
 }
 
-func checkSupportedCPUArch() error {
+func checkSupportedCPUArch(_ options) error {
 	if runtime.GOARCH != "amd64" {
 		logging.Debugf("GOARCH is %s", runtime.GOARCH)
 		return fmt.Errorf("CodeReady Containers can only run on x86_64 CPUs")

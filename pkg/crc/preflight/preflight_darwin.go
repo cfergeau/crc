@@ -163,3 +163,7 @@ func getPreflightChecks(_ bool, trayAutostart bool, mode network.Mode, bundlePat
 
 	return filter.Apply(getChecks(mode, bundlePath, preset))
 }
+
+func optionsNew(networkMode network.Mode, bundlePath string, preset preset.Preset) options {
+	return commonOptionsNew(networkMode, bundlePath, preset)
+}

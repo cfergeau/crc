@@ -45,7 +45,7 @@ var genericCleanupChecks = []Check{
 	},
 	{
 		cleanupDescription: "Removing pull secret from the keyring",
-		cleanup:            cluster.ForgetPullSecret,
+		cleanup:            cleanupPullSecret,
 		flags:              CleanUpOnly,
 
 		labels: None,
@@ -59,8 +59,12 @@ var genericCleanupChecks = []Check{
 	},
 }
 
-func checkBundleExtracted(bundlePath string) func() error {
-	return func() error {
+func cleanupPullSecret(_ options) error {
+	return cluster.ForgetPullSecret()
+}
+
+func checkBundleExtracted(bundlePath string) CheckFunc {
+	return func(_ options) error {
 		logging.Infof("Checking if %s exists", bundlePath)
 		bundleName := filepath.Base(bundlePath)
 		if _, err := bundle.Get(bundleName); err != nil {
@@ -72,7 +76,7 @@ func checkBundleExtracted(bundlePath string) func() error {
 	}
 }
 
-func fixBundleExtracted(bundlePath string, preset preset.Preset) func() error {
+func fixBundleExtracted(bundlePath string, preset preset.Preset) FixFunc {
 	// Should be removed after 1.19 release
 	// This check will ensure correct mode for `~/.crc/cache` directory
 	// in case it exists.
@@ -80,7 +84,7 @@ func fixBundleExtracted(bundlePath string, preset preset.Preset) func() error {
 		logging.Debugf("Error changing %s permissions to 0775", constants.MachineCacheDir)
 	}
 
-	return func() error {
+	return func(_ options) error {
 		bundleDir := filepath.Dir(constants.GetDefaultBundlePath(preset))
 		logging.Debugf("Ensuring directory %s exists", bundleDir)
 		if err := os.MkdirAll(bundleDir, 0775); err != nil {
@@ -113,7 +117,7 @@ func fixBundleExtracted(bundlePath string, preset preset.Preset) func() error {
 	}
 }
 
-func removeHostsFileEntry() error {
+func removeHostsFileEntry(_ options) error {
 	err := adminhelper.CleanHostsFile()
 	if errors.Is(err, os.ErrNotExist) {
 		return nil
@@ -121,7 +125,7 @@ func removeHostsFileEntry() error {
 	return err
 }
 
-func removeCRCMachinesDir() error {
+func removeCRCMachinesDir(_ options) error {
 	logging.Debug("Deleting machines directory")
 	if err := os.RemoveAll(constants.MachineInstanceDir); err != nil {
 		return fmt.Errorf("Failed to delete crc machines directory: %w", err)
@@ -129,7 +133,7 @@ func removeCRCMachinesDir() error {
 	return nil
 }
 
-func removeOldLogs() error {
+func removeOldLogs(_ options) error {
 	logFiles, err := filepath.Glob(filepath.Join(constants.CrcBaseDir, "*.log_*"))
 	if err != nil {
 		return fmt.Errorf("Failed to get old logs: %w", err)

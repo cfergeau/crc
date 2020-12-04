@@ -24,7 +24,7 @@ const (
 	resolverFile = "/etc/resolver/testing"
 )
 
-func checkM1CPU() error {
+func checkM1CPU(_ options) error {
 	if strings.HasPrefix(cpuid.CPU.BrandName, "VirtualApple") {
 		logging.Debugf("Running with an emulated x86_64 CPU")
 		return fmt.Errorf("CodeReady Containers is unsupported on Apple M1 hardware")
@@ -33,8 +33,8 @@ func checkM1CPU() error {
 	return nil
 }
 
-func checkHyperKitInstalled(networkMode network.Mode) func() error {
-	return func() error {
+func checkHyperKitInstalled(networkMode network.Mode) CheckFunc {
+	return func(_ options) error {
 		if version.IsInstaller() {
 			return nil
 		}
@@ -58,8 +58,8 @@ func checkHyperKitInstalled(networkMode network.Mode) func() error {
 	}
 }
 
-func fixHyperKitInstallation(networkMode network.Mode) func() error {
-	return func() error {
+func fixHyperKitInstallation(networkMode network.Mode) FixFunc {
+	return func(_ options) error {
 		if version.IsInstaller() {
 			return nil
 		}
@@ -78,8 +78,8 @@ func fixHyperKitInstallation(networkMode network.Mode) func() error {
 	}
 }
 
-func checkMachineDriverHyperKitInstalled(networkMode network.Mode) func() error {
-	return func() error {
+func checkMachineDriverHyperKitInstalled(networkMode network.Mode) CheckFunc {
+	return func(_ options) error {
 		if version.IsInstaller() {
 			return nil
 		}
@@ -101,8 +101,8 @@ func checkMachineDriverHyperKitInstalled(networkMode network.Mode) func() error 
 	}
 }
 
-func fixMachineDriverHyperKitInstalled(networkMode network.Mode) func() error {
-	return func() error {
+func fixMachineDriverHyperKitInstalled(networkMode network.Mode) FixFunc {
+	return func(_ options) error {
 		if version.IsInstaller() {
 			return nil
 		}
@@ -121,7 +121,7 @@ func fixMachineDriverHyperKitInstalled(networkMode network.Mode) func() error {
 	}
 }
 
-func checkQcowToolInstalled() error {
+func checkQcowToolInstalled(_ options) error {
 	if version.IsInstaller() {
 		return nil
 	}
@@ -136,7 +136,7 @@ func checkQcowToolInstalled() error {
 	return qcowTool.CheckVersion()
 }
 
-func fixQcowToolInstalled() error {
+func fixQcowToolInstalled(_ options) error {
 	if version.IsInstaller() {
 		return nil
 	}
@@ -151,11 +151,11 @@ func fixQcowToolInstalled() error {
 	return nil
 }
 
-func checkResolverFilePermissions() error {
+func checkResolverFilePermissions(_ options) error {
 	return isUserHaveFileWritePermission(resolverFile)
 }
 
-func fixResolverFilePermissions() error {
+func fixResolverFilePermissions(_ options) error {
 	// Check if resolver directory available or not
 	if _, err := os.Stat(resolverDir); os.IsNotExist(err) {
 		logging.Debugf("Creating %s directory", resolverDir)
@@ -173,7 +173,7 @@ func fixResolverFilePermissions() error {
 	return addFileWritePermissionToUser(resolverFile)
 }
 
-func removeResolverFile() error {
+func removeResolverFile(_ options) error {
 	// Check if the resolver file exist or not
 	if _, err := os.Stat(resolverFile); !os.IsNotExist(err) {
 		logging.Debugf("Removing %s file", resolverFile)
@@ -215,7 +215,7 @@ func addFileWritePermissionToUser(filename string) error {
 	return nil
 }
 
-func stopCRCHyperkitProcess() error {
+func stopCRCHyperkitProcess(_ options) error {
 	pgrepPath, err := exec.LookPath("pgrep")
 	if err != nil {
 		return fmt.Errorf("Could not find 'pgrep'. %w", err)

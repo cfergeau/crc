@@ -6,6 +6,8 @@ import (
 	crcConfig "github.com/code-ready/crc/pkg/crc/config"
 	"github.com/code-ready/crc/pkg/crc/errors"
 	"github.com/code-ready/crc/pkg/crc/logging"
+	"github.com/code-ready/crc/pkg/crc/network"
+	"github.com/code-ready/crc/pkg/crc/preset"
 )
 
 type Flags uint32
@@ -18,9 +20,41 @@ const (
 	StartUpOnly
 )
 
-type CheckFunc func() error
-type FixFunc func() error
-type CleanUpFunc func() error
+type commonOptions struct {
+	networkMode network.Mode
+	bundlePath  string
+	preset      preset.Preset
+}
+
+func (opts *commonOptions) getNetworkMode() network.Mode {
+	return opts.networkMode
+}
+
+func (opts *commonOptions) getBundlePath() string {
+	return opts.bundlePath
+}
+
+func (opts *commonOptions) getPreset() preset.Preset {
+	return opts.preset
+}
+
+func commonOptionsNew(networkMode network.Mode, bundlePath string, preset preset.Preset) options {
+	return &commonOptions{
+		networkMode: networkMode,
+		bundlePath:  bundlePath,
+		preset:      preset,
+	}
+}
+
+type options interface {
+	getNetworkMode() network.Mode
+	getBundlePath() string
+	getPreset() preset.Preset
+}
+
+type CheckFunc func(opts options) error
+type FixFunc func(opts options) error
+type CleanUpFunc func(opts options) error
 
 type Check struct {
 	configKeySuffix    string
@@ -49,7 +83,7 @@ func (check *Check) shouldSkip(config crcConfig.Storage) bool {
 	return config.Get(check.getSkipConfigName()).AsBool()
 }
 
-func (check *Check) doCheck(config crcConfig.Storage) error {
+func (check *Check) doCheck(config crcConfig.Storage, opts options) error {
 	if check.checkDescription == "" {
 		panic(fmt.Sprintf("Should not happen, empty description for check '%s'", check.configKeySuffix))
 	} else {
@@ -60,14 +94,14 @@ func (check *Check) doCheck(config crcConfig.Storage) error {
 		return nil
 	}
 
-	err := check.check()
+	err := check.check(opts)
 	if err != nil {
 		logging.Debug(err.Error())
 	}
 	return err
 }
 
-func (check *Check) doFix() error {
+func (check *Check) doFix(opts options) error {
 	if check.fixDescription == "" {
 		panic(fmt.Sprintf("Should not happen, empty description for fix '%s'", check.configKeySuffix))
 	}
@@ -77,50 +111,50 @@ func (check *Check) doFix() error {
 
 	logging.Infof("%s", check.fixDescription)
 
-	return check.fix()
+	return check.fix(opts)
 }
 
-func (check *Check) doCleanUp() error {
+func (check *Check) doCleanUp(opts options) error {
 	if check.cleanupDescription == "" {
 		panic(fmt.Sprintf("Should not happen, empty description for cleanup '%s'", check.configKeySuffix))
 	}
 
 	logging.Infof("%s", check.cleanupDescription)
 
-	return check.cleanup()
+	return check.cleanup(opts)
 }
 
-func doPreflightChecks(config crcConfig.Storage, checks []Check) error {
+func doPreflightChecks(config crcConfig.Storage, opts options, checks []Check) error {
 	for _, check := range checks {
 		if check.flags&SetupOnly == SetupOnly || check.flags&CleanUpOnly == CleanUpOnly {
 			continue
 		}
-		if err := check.doCheck(config); err != nil {
+		if err := check.doCheck(config, opts); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func doFixPreflightChecks(config crcConfig.Storage, checks []Check, checkOnly bool) error {
+func doFixPreflightChecks(config crcConfig.Storage, opts options, checks []Check, checkOnly bool) error {
 	for _, check := range checks {
 		if check.flags&CleanUpOnly == CleanUpOnly || check.flags&StartUpOnly == StartUpOnly {
 			continue
 		}
-		err := check.doCheck(config)
+		err := check.doCheck(config, opts)
 		if err == nil {
 			continue
 		} else if checkOnly {
 			return err
 		}
-		if err = check.doFix(); err != nil {
+		if err = check.doFix(opts); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func doCleanUpPreflightChecks(checks []Check) error {
+func doCleanUpPreflightChecks(opts options, checks []Check) error {
 	var mErr errors.MultiError
 	// Do the cleanup in reverse order to avoid any dependency during cleanup
 	for i := len(checks) - 1; i >= 0; i-- {
@@ -128,7 +162,7 @@ func doCleanUpPreflightChecks(checks []Check) error {
 		if check.cleanup == nil {
 			continue
 		}
-		err := check.doCleanUp()
+		err := check.doCleanUp(opts)
 		if err != nil {
 			// If an error occurs in a cleanup function
 			// we log/collect it and  move to the  next
@@ -155,10 +189,12 @@ func doRegisterSettings(cfg crcConfig.Schema, checks []Check) {
 func StartPreflightChecks(config crcConfig.Storage) error {
 	experimentalFeatures := config.Get(crcConfig.ExperimentalFeatures).AsBool()
 	mode := crcConfig.GetNetworkMode(config)
-	trayAutostart := config.Get(crcConfig.AutostartTray).AsBool()
 	bundlePath := config.Get(crcConfig.Bundle).AsString()
 	preset := crcConfig.GetPreset(config)
-	if err := doPreflightChecks(config, getPreflightChecks(experimentalFeatures, trayAutostart, mode, bundlePath, preset)); err != nil {
+	opts := optionsNew(mode, bundlePath, preset)
+
+	trayAutostart := config.Get(crcConfig.AutostartTray).AsBool()
+	if err := doPreflightChecks(config, opts, getPreflightChecks(experimentalFeatures, trayAutostart, mode, bundlePath, preset)); err != nil {
 		return &errors.PreflightError{Err: err}
 	}
 	return nil
@@ -168,11 +204,13 @@ func StartPreflightChecks(config crcConfig.Storage) error {
 func SetupHost(config crcConfig.Storage, checkOnly bool) error {
 	experimentalFeatures := config.Get(crcConfig.ExperimentalFeatures).AsBool()
 	mode := crcConfig.GetNetworkMode(config)
-	trayAutostart := config.Get(crcConfig.AutostartTray).AsBool()
 	bundlePath := config.Get(crcConfig.Bundle).AsString()
-	preset := crcConfig.GetPreset(config)
 	logging.Infof("Using bundle path %s", bundlePath)
-	return doFixPreflightChecks(config, getPreflightChecks(experimentalFeatures, trayAutostart, mode, bundlePath, preset), checkOnly)
+	preset := crcConfig.GetPreset(config)
+	opts := optionsNew(mode, bundlePath, preset)
+
+	trayAutostart := config.Get(crcConfig.AutostartTray).AsBool()
+	return doFixPreflightChecks(config, opts, getPreflightChecks(experimentalFeatures, trayAutostart, mode, bundlePath, preset), checkOnly)
 }
 
 func RegisterSettings(config crcConfig.Schema) {
@@ -185,5 +223,5 @@ func CleanUpHost() error {
 	// any extra step/confusion we are just adding the checks
 	// which are behind the experiment flag. This way cleanup
 	// perform action in a sane way.
-	return doCleanUpPreflightChecks(getAllPreflightChecks())
+	return doCleanUpPreflightChecks(&commonOptions{}, getAllPreflightChecks())
 }
