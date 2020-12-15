@@ -107,6 +107,39 @@ func TestViperConfigSizeBackwardCompat(t *testing.T) {
 }
 */
 
+func TestViperConfigSizeFlag(t *testing.T) {
+	config, err := newTestConfig()
+	require.NoError(t, err)
+	addSettings(config)
+	defer config.Close()
+
+	memory := units.New(7, units.GiB)
+	flagSet := pflag.NewFlagSet("start", pflag.ExitOnError)
+	flagSet.Var(&memory, "memory", "--memory flag bound to 'memory' config key")
+
+	_ = config.StorageBindFlagSet(flagSet)
+
+	assert.Equal(t, SettingValue{
+		Value:     units.Size(7 * 1024 * 1024 * 1024),
+		IsDefault: true,
+	}, config.Get(Memory))
+
+	assert.NoError(t, flagSet.Set(Memory, "5GB"))
+
+	assert.Equal(t, SettingValue{
+		Value:     units.Size(5_000_000_000),
+		IsDefault: false,
+	}, config.Get(Memory))
+
+	_, err = config.Set(Memory, units.New(6, units.KB))
+	assert.NoError(t, err)
+
+	assert.Equal(t, SettingValue{
+		Value:     units.Size(6_000),
+		IsDefault: false,
+	}, config.Get(Memory))
+}
+
 func TestViperConfigSetAndGet(t *testing.T) {
 	config, err := newTestConfig()
 	require.NoError(t, err)

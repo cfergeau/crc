@@ -102,6 +102,20 @@ func (s Size) BytesSizeStr() string {
 	return units.BytesSize(float64(s))
 }
 
+/* Set() and Type() are needed for flagp support to satisfy its Value interface */
+func (s *Size) Set(valueStr string) error {
+	value, err := ToSizeE(valueStr, Bytes)
+	if err != nil {
+		return err
+	}
+	*s = value
+	return nil
+}
+
+func (s *Size) Type() string {
+	return "github.com/code-ready/crc/pkg/units.Size"
+}
+
 func (s Size) ConvertTo(unit Unit) uint64 {
 	return uint64(s) / uint64(unit)
 }
