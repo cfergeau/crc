@@ -8,13 +8,12 @@ import (
 
 	"github.com/YourFin/binappend"
 	"github.com/code-ready/crc/pkg/crc/version"
+	"github.com/code-ready/crc/pkg/units"
 )
 
 const (
-	DefaultName     = "crc"
-	DefaultCPUs     = 4
-	DefaultMemory   = 9216
-	DefaultDiskSize = 31
+	DefaultName = "crc"
+	DefaultCPUs = 4
 
 	DefaultSSHUser = "core"
 	DefaultSSHPort = 22
@@ -92,6 +91,11 @@ func GetDefaultBundle() string {
 }
 
 var (
+	DefaultMemory      = units.New(9, units.GiB)
+	DefaultDiskSize    = units.New(31, units.GiB)
+	DefaultMemoryMiB   = int(DefaultMemory.ConvertTo(units.MiB))
+	DefaultDiskSizeGiB = int(DefaultDiskSize.ConvertTo(units.GiB))
+
 	CrcBaseDir         = filepath.Join(GetHomeDir(), ".crc")
 	CrcBinDir          = filepath.Join(CrcBaseDir, "bin")
 	CrcOcBinDir        = filepath.Join(CrcBinDir, "oc")

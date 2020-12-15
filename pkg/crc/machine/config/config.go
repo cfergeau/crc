@@ -1,6 +1,9 @@
 package config
 
-import "github.com/code-ready/crc/pkg/crc/network"
+import (
+	"github.com/code-ready/crc/pkg/crc/network"
+	crcunits "github.com/code-ready/crc/pkg/units"
+)
 
 type MachineConfig struct {
 	// CRC system bundle
@@ -8,9 +11,9 @@ type MachineConfig struct {
 
 	// Virtual machine configuration
 	Name            string
-	Memory          int
+	Memory          crcunits.Size
 	CPUs            int
-	DiskSize        int
+	DiskSize        crcunits.Size
 	ImageSourcePath string
 	ImageFormat     string
 	SSHKeyPath      string

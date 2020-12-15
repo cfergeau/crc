@@ -3,6 +3,7 @@ package machine
 import (
 	"github.com/code-ready/crc/pkg/crc/cluster"
 	"github.com/code-ready/crc/pkg/crc/network"
+	crcunits "github.com/code-ready/crc/pkg/units"
 	"github.com/code-ready/machine/libmachine/state"
 )
 
@@ -11,9 +12,9 @@ type StartConfig struct {
 	BundlePath string
 
 	// Hypervisor
-	Memory   int // Memory size in MiB
+	Memory   crcunits.Size
 	CPUs     int
-	DiskSize int // Disk size in GiB
+	DiskSize crcunits.Size
 
 	// Nameserver
 	NameServer string

@@ -12,6 +12,7 @@ import (
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/crc/pkg/crc/version"
+	crcunits "github.com/code-ready/crc/pkg/units"
 	"github.com/docker/go-units"
 	"github.com/pbnjay/memory"
 )
@@ -26,18 +27,25 @@ func ValidateCPUs(value int) error {
 
 // ValidateMemory checks if provided Memory count is valid
 func ValidateMemory(value int) error {
-	if value < constants.DefaultMemory {
-		return fmt.Errorf("requires memory in MiB >= %d", constants.DefaultMemory)
+	if value < 0 {
+		return fmt.Errorf("memory size must be positive")
 	}
-	return ValidateEnoughMemory(value)
+	if uint(value*units.MiB) < uint(constants.DefaultMemory) {
+		return fmt.Errorf("requires memory in MiB >= %s", units.BytesSize(float64(constants.DefaultMemory)))
+	}
+	return ValidateEnoughMemory(crcunits.Size(value))
 }
 
 func ValidateDiskSize(value int) error {
-	if value < constants.DefaultDiskSize {
-		return fmt.Errorf("requires disk size in GiB >= %d", constants.DefaultDiskSize)
+	if value < 0 {
+		return fmt.Errorf("disk size must be positive")
+	}
+	valueBytes := crcunits.Size(value * units.GiB)
+	if valueBytes < constants.DefaultDiskSize {
+		return fmt.Errorf("requires disk size in GiB >= %s", units.BytesSize(float64(constants.DefaultDiskSize)))
 	}
 	// https://github.com/code-ready/machine-driver-hyperkit/issues/18
-	if runtime.GOOS == "darwin" && value > constants.DefaultDiskSize {
+	if runtime.GOOS == "darwin" && valueBytes > constants.DefaultDiskSize {
 		return fmt.Errorf("Disk resizing is not supported on macOS")
 	}
 
@@ -45,14 +53,13 @@ func ValidateDiskSize(value int) error {
 }
 
 // ValidateEnoughMemory checks if enough memory is installed on the host
-func ValidateEnoughMemory(value int) error {
+func ValidateEnoughMemory(value crcunits.Size) error {
 	totalMemory := memory.TotalMemory()
 	logging.Debugf("Total memory of system is %d bytes", totalMemory)
-	valueBytes := value * 1024 * 1024
-	if totalMemory < uint64(valueBytes) {
+	if totalMemory < uint64(value) {
 		return fmt.Errorf("only %s of memory found (%s required)",
-			units.HumanSize(float64(totalMemory)),
-			units.HumanSize(float64(valueBytes)))
+			units.BytesSize(float64(totalMemory)),
+			units.BytesSize(float64(value)))
 	}
 	return nil
 }

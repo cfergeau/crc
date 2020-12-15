@@ -15,6 +15,7 @@ import (
 	"github.com/code-ready/crc/pkg/crc/preflight"
 	"github.com/code-ready/crc/pkg/crc/validation"
 	"github.com/code-ready/crc/pkg/crc/version"
+	"github.com/code-ready/crc/pkg/units"
 )
 
 type Handler struct {
@@ -71,7 +72,7 @@ func parseStartArgs(args json.RawMessage) (startArgs, error) {
 func getStartConfig(cfg crcConfig.Storage, args startArgs) machine.StartConfig {
 	startConfig := machine.StartConfig{
 		BundlePath: cfg.Get(config.Bundle).AsString(),
-		Memory:     cfg.Get(config.Memory).AsInt(),
+		Memory:     units.New(cfg.Get(config.Memory).AsUint64(), units.MiB),
 		CPUs:       cfg.Get(config.CPUs).AsInt(),
 		NameServer: cfg.Get(config.NameServer).AsString(),
 	}

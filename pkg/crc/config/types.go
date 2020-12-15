@@ -1,6 +1,8 @@
 package config
 
-import "github.com/spf13/cast"
+import (
+	"github.com/spf13/cast"
+)
 
 type Storage interface {
 	Get(key string) SettingValue
@@ -36,6 +38,10 @@ func (v SettingValue) AsString() string {
 
 func (v SettingValue) AsInt() int {
 	return cast.ToInt(v.Value)
+}
+
+func (v SettingValue) AsUint64() uint64 {
+	return cast.ToUint64(v.Value)
 }
 
 // validationFnType takes the key, value as args and checks if valid

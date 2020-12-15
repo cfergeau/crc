@@ -1,9 +1,10 @@
 package machine
 
 import (
-	"github.com/code-ready/crc/pkg/crc/machine/config"
 	"github.com/code-ready/crc/pkg/libmachine/host"
+	crcunits "github.com/code-ready/crc/pkg/units"
 	libmachine "github.com/code-ready/machine/libmachine/drivers"
+	"github.com/docker/go-units"
 )
 
 type valueSetter func(driver *libmachine.VMDriver) bool
@@ -21,12 +22,16 @@ func updateDriverValue(host *host.Host, setDriverValue valueSetter) error {
 	return updateDriverConfig(host, driver)
 }
 
-func setMemory(host *host.Host, memorySize int) error {
+func setMemory(host *host.Host, newSize crcunits.Size) error {
 	memorySetter := func(driver *libmachine.VMDriver) bool {
-		if driver.Memory == memorySize {
+		if driver.Memory < 0 {
 			return false
 		}
-		driver.Memory = memorySize
+		driverSize := crcunits.New(uint64(driver.Memory), units.MiB)
+		if driverSize == newSize {
+			return false
+		}
+		driver.Memory = int(newSize.ConvertTo(units.GiB))
 		return true
 	}
 
@@ -45,13 +50,13 @@ func setVcpus(host *host.Host, vcpus int) error {
 	return updateDriverValue(host, vcpuSetter)
 }
 
-func setDiskSize(host *host.Host, diskSizeGiB int) error {
+func setDiskSize(host *host.Host, newSize crcunits.Size) error {
 	diskSizeSetter := func(driver *libmachine.VMDriver) bool {
-		capacity := config.ConvertGiBToBytes(diskSizeGiB)
-		if driver.DiskCapacity == capacity {
+		driverSize := crcunits.New(driver.DiskCapacity, units.GiB)
+		if driverSize == newSize {
 			return false
 		}
-		driver.DiskCapacity = capacity
+		driver.DiskCapacity = newSize.ConvertTo(units.GiB)
 		return true
 	}
 

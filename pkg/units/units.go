@@ -9,6 +9,24 @@ import (
 	units "github.com/docker/go-units"
 )
 
+type Unit uint64
+
+const (
+	Bytes Unit = 1
+
+	KB Unit = units.KB
+	MB Unit = units.MB
+	GB Unit = units.GB
+	TB Unit = units.TB
+	PB Unit = units.PB
+
+	KiB Unit = units.KiB
+	MiB Unit = units.MiB
+	GiB Unit = units.GiB
+	TiB Unit = units.TiB
+	PiB Unit = units.PiB
+)
+
 type unitMap map[string]int64
 
 var (
@@ -66,4 +84,14 @@ func parseSize(sizeStr string, mode parsingMode) (int64, error) {
 	}
 
 	return int64(size), nil
+}
+
+type Size uint64
+
+func (s Size) ConvertTo(unit Unit) uint64 {
+	return uint64(s) / uint64(unit)
+}
+
+func New(size uint64, unit Unit) Size {
+	return Size(size * uint64(unit))
 }
