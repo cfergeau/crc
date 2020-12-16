@@ -3,7 +3,7 @@ package machine
 import (
 	"github.com/code-ready/crc/pkg/crc/cluster"
 	"github.com/code-ready/crc/pkg/crc/network"
-	crcunits "github.com/code-ready/crc/pkg/units"
+	units "github.com/code-ready/crc/pkg/units"
 	"github.com/code-ready/machine/libmachine/state"
 )
 
@@ -12,9 +12,9 @@ type StartConfig struct {
 	BundlePath string
 
 	// Hypervisor
-	Memory   crcunits.Size
+	Memory   units.Size
 	CPUs     int
-	DiskSize crcunits.Size
+	DiskSize units.Size
 
 	// Nameserver
 	NameServer string
@@ -49,8 +49,8 @@ type ClusterStatusResult struct {
 	CrcStatus        state.State
 	OpenshiftStatus  string
 	OpenshiftVersion string
-	DiskUse          int64
-	DiskSize         int64
+	DiskUse          units.Size
+	DiskSize         units.Size
 }
 
 type ConsoleResult struct {

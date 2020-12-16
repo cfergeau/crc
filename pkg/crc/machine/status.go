@@ -6,6 +6,7 @@ import (
 	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/crc/pkg/crc/oc"
 	crcssh "github.com/code-ready/crc/pkg/crc/ssh"
+	units "github.com/code-ready/crc/pkg/units"
 	"github.com/code-ready/machine/libmachine/state"
 	"github.com/pkg/errors"
 )
@@ -66,8 +67,8 @@ func (client *client) Status() (*ClusterStatusResult, error) {
 		CrcStatus:        state.Running,
 		OpenshiftStatus:  getOpenShiftStatus(sshRunner, client.monitoringEnabled),
 		OpenshiftVersion: crcBundleMetadata.GetOpenshiftVersion(),
-		DiskUse:          diskUse,
-		DiskSize:         diskSize,
+		DiskUse:          units.New(diskUse, units.Bytes),
+		DiskSize:         units.New(diskSize, units.Bytes),
 	}, nil
 }
 

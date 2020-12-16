@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/crc/pkg/crc/machine"
+	"github.com/code-ready/crc/pkg/units"
 )
 
 type AdaptedClient interface {
@@ -34,8 +35,8 @@ type ClusterStatusResult struct {
 	CrcStatus        string
 	OpenshiftStatus  string
 	OpenshiftVersion string
-	DiskUse          int64
-	DiskSize         int64
+	DiskUse          uint64
+	DiskSize         uint64
 	Error            string
 	Success          bool
 }
@@ -117,8 +118,8 @@ func (a *Adapter) Status() ClusterStatusResult {
 		CrcStatus:        res.CrcStatus.String(),
 		OpenshiftStatus:  res.OpenshiftStatus,
 		OpenshiftVersion: res.OpenshiftVersion,
-		DiskUse:          res.DiskUse,
-		DiskSize:         res.DiskSize,
+		DiskUse:          res.DiskUse.ConvertTo(units.Bytes),
+		DiskSize:         res.DiskSize.ConvertTo(units.Bytes),
 		Success:          true,
 	}
 }

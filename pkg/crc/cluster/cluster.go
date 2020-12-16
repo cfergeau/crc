@@ -70,7 +70,7 @@ func checkCertValidity(sshRunner *ssh.Runner, cert string) (bool, error) {
 }
 
 // Return size of disk, used space in bytes and the mountpoint
-func GetRootPartitionUsage(sshRunner *ssh.Runner) (int64, int64, error) {
+func GetRootPartitionUsage(sshRunner *ssh.Runner) (uint64, uint64, error) {
 	cmd := "df -B1 --output=size,used,target /sysroot | tail -1"
 
 	out, _, err := sshRunner.Run(cmd)
@@ -79,11 +79,11 @@ func GetRootPartitionUsage(sshRunner *ssh.Runner) (int64, int64, error) {
 		return 0, 0, err
 	}
 	diskDetails := strings.Split(strings.TrimSpace(out), " ")
-	diskSize, err := strconv.ParseInt(diskDetails[0], 10, 64)
+	diskSize, err := strconv.ParseUint(diskDetails[0], 10, 64)
 	if err != nil {
 		return 0, 0, err
 	}
-	diskUsage, err := strconv.ParseInt(diskDetails[1], 10, 64)
+	diskUsage, err := strconv.ParseUint(diskDetails[1], 10, 64)
 	if err != nil {
 		return 0, 0, err
 	}

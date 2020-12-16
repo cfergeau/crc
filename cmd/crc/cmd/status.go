@@ -9,6 +9,7 @@ import (
 
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/machine"
+	crcunits "github.com/code-ready/crc/pkg/units"
 	"github.com/docker/go-units"
 	"github.com/spf13/cobra"
 )
@@ -31,8 +32,8 @@ type status struct {
 	CrcStatus        string `json:"crcStatus"`
 	OpenShiftStatus  string `json:"openshiftStatus"`
 	OpenShiftVersion string `json:"openshiftVersion"`
-	DiskUsage        int64  `json:"diskUsage"`
-	DiskSize         int64  `json:"diskSize"`
+	DiskUsage        uint64 `json:"diskUsage"`
+	DiskSize         uint64 `json:"diskSize"`
 	CacheUsage       int64  `json:"cacheUsage"`
 	CacheDir         string `json:"cacheDir"`
 }
@@ -60,8 +61,8 @@ func runStatus(writer io.Writer, client machine.Client, cacheDir, outputFormat s
 		CrcStatus:        clusterStatus.CrcStatus.String(),
 		OpenShiftStatus:  clusterStatus.OpenshiftStatus,
 		OpenShiftVersion: clusterStatus.OpenshiftVersion,
-		DiskUsage:        clusterStatus.DiskUse,
-		DiskSize:         clusterStatus.DiskSize,
+		DiskUsage:        clusterStatus.DiskUse.ConvertTo(crcunits.Bytes),
+		DiskSize:         clusterStatus.DiskSize.ConvertTo(crcunits.Bytes),
 		CacheUsage:       size,
 		CacheDir:         cacheDir,
 	}
