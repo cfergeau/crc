@@ -80,7 +80,9 @@ func (runner *Runner) runSSHCommand(command string, runPrivate bool) (string, st
 			logging.Debugf("SSH command succeeded")
 		}
 	} else {
-		logging.Debugf("SSH command results: err: %v, output: %s", err, string(stdout))
+		logging.Debugf("SSH command failed: %v", err)
+		logging.Debugf("stdout: %s", string(stdout))
+		logging.Debugf("stderr: %s", string(stderr))
 	}
 
 	if err != nil {
