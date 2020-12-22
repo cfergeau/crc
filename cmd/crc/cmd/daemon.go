@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -14,6 +15,7 @@ import (
 	"time"
 
 	cmdConfig "github.com/code-ready/crc/cmd/crc/cmd/config"
+	"github.com/code-ready/crc/pkg/crc/adminhelper"
 	"github.com/code-ready/crc/pkg/crc/api"
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/daemonclient"
@@ -147,6 +149,17 @@ func run(configuration *types.Configuration) error {
 		}
 	}()
 
+	ln, err := vn.Listen("tcp", fmt.Sprintf("%s:80", configuration.GatewayIP))
+	if err != nil {
+		return err
+	}
+	go func() {
+		mux := internalAPIMux()
+		if err := http.Serve(ln, mux); err != nil {
+			errCh <- err
+		}
+	}()
+
 	go func() {
 		mux := http.NewServeMux()
 		mux.Handle(types.ConnectPath, vn.Mux())
@@ -189,6 +202,44 @@ func run(configuration *types.Configuration) error {
 	case err := <-errCh:
 		return err
 	}
+}
+
+// This API is only exposed in the virtual network. Any process can reach it by connecting to gateway.crc.testing.
+func internalAPIMux() *http.ServeMux {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/hosts/add", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "post only", http.StatusBadRequest)
+			return
+		}
+		var req []string
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		if err := adminhelper.AddToHostsFile("127.0.0.1", req...); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+	mux.HandleFunc("/hosts/remove", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "post only", http.StatusBadRequest)
+			return
+		}
+		var req []string
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		if err := adminhelper.RemoveFromHostsFile(req...); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	})
+	return mux
 }
 
 func runDaemon() error {
