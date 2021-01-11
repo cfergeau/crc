@@ -16,25 +16,64 @@ const (
 	NameServer = "nameservers"
 )
 
-func newTestConfig(configFile, envPrefix string) (*Config, error) {
-	storage, err := NewViperStorage(configFile, envPrefix)
+type testConfig struct {
+	*Config
+	configDir string
+}
+
+func (config *testConfig) Close() {
+	os.RemoveAll(config.configDir)
+}
+
+func (config *testConfig) FileContent() ([]byte, error) {
+	configFile := filepath.Join(config.configDir, "crc.json")
+	return ioutil.ReadFile(configFile)
+}
+
+func newTestConfig() (*testConfig, error) {
+	return newTestConfigWithInitialContent([]byte{})
+}
+
+func newTestConfigWithInitialContent(fileContent []byte) (*testConfig, error) {
+	dir, err := ioutil.TempDir("", "cfg")
 	if err != nil {
 		return nil, err
 	}
-	config := New(storage)
-	config.AddSetting(CPUs, 4, ValidateCPUs, RequiresRestartMsg)
-	config.AddSetting(NameServer, "", ValidateIPAddress, SuccessfullyApplied)
-	return config, nil
+	configFile := filepath.Join(dir, "crc.json")
+	testConfig := testConfig{configDir: dir}
+
+	if len(fileContent) != 0 {
+		err := ioutil.WriteFile(configFile, fileContent, 0600)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	err = testConfig.Reload()
+	if err != nil {
+		testConfig.Close()
+		return nil, err
+	}
+	return &testConfig, nil
+}
+
+func (config *testConfig) Reload() error {
+	configFile := filepath.Join(config.configDir, "crc.json")
+	storage, err := NewViperStorage(configFile, "CRC")
+	if err != nil {
+		return err
+	}
+	cfg := New(storage)
+	cfg.AddSetting(CPUs, 4, ValidateCPUs, RequiresRestartMsg)
+	cfg.AddSetting(NameServer, "", ValidateIPAddress, SuccessfullyApplied)
+	config.Config = cfg
+	return nil
 }
 
 func TestViperConfigUnknown(t *testing.T) {
-	dir, err := ioutil.TempDir("", "cfg")
+	config, err := newTestConfig()
 	require.NoError(t, err)
-	defer os.RemoveAll(dir)
-	configFile := filepath.Join(dir, "crc.json")
-
-	config, err := newTestConfig(configFile, "CRC")
-	require.NoError(t, err)
+	defer config.Close()
 
 	assert.Equal(t, SettingValue{
 		Invalid: true,
@@ -42,13 +81,9 @@ func TestViperConfigUnknown(t *testing.T) {
 }
 
 func TestViperConfigSetAndGet(t *testing.T) {
-	dir, err := ioutil.TempDir("", "cfg")
+	config, err := newTestConfig()
 	require.NoError(t, err)
-	defer os.RemoveAll(dir)
-	configFile := filepath.Join(dir, "crc.json")
-
-	config, err := newTestConfig(configFile, "CRC")
-	require.NoError(t, err)
+	defer config.Close()
 
 	_, err = config.Set(CPUs, 5)
 	assert.NoError(t, err)
@@ -58,20 +93,15 @@ func TestViperConfigSetAndGet(t *testing.T) {
 		IsDefault: false,
 	}, config.Get(CPUs))
 
-	bin, err := ioutil.ReadFile(configFile)
+	bin, err := config.FileContent()
 	assert.NoError(t, err)
 	assert.JSONEq(t, `{"cpus":5}`, string(bin))
 }
 
 func TestViperConfigUnsetAndGet(t *testing.T) {
-	dir, err := ioutil.TempDir("", "cfg")
+	config, err := newTestConfigWithInitialContent([]byte("{\"cpus\": 5}"))
 	require.NoError(t, err)
-	defer os.RemoveAll(dir)
-	configFile := filepath.Join(dir, "crc.json")
-	assert.NoError(t, ioutil.WriteFile(configFile, []byte("{\"cpus\": 5}"), 0600))
-
-	config, err := newTestConfig(configFile, "CRC")
-	require.NoError(t, err)
+	defer config.Close()
 
 	_, err = config.Unset(CPUs)
 	assert.NoError(t, err)
@@ -81,24 +111,20 @@ func TestViperConfigUnsetAndGet(t *testing.T) {
 		IsDefault: true,
 	}, config.Get(CPUs))
 
-	bin, err := ioutil.ReadFile(configFile)
+	bin, err := config.FileContent()
 	assert.NoError(t, err)
 	assert.Equal(t, "{}", string(bin))
 }
 
 func TestViperConfigSetReloadAndGet(t *testing.T) {
-	dir, err := ioutil.TempDir("", "cfg")
+	config, err := newTestConfig()
 	require.NoError(t, err)
-	defer os.RemoveAll(dir)
-	configFile := filepath.Join(dir, "crc.json")
-
-	config, err := newTestConfig(configFile, "CRC")
-	require.NoError(t, err)
+	defer config.Close()
 
 	_, err = config.Set(CPUs, 5)
 	require.NoError(t, err)
 
-	config, err = newTestConfig(configFile, "CRC")
+	err = config.Reload()
 	require.NoError(t, err)
 
 	assert.Equal(t, SettingValue{
@@ -108,13 +134,9 @@ func TestViperConfigSetReloadAndGet(t *testing.T) {
 }
 
 func TestViperConfigLoadDefaultValue(t *testing.T) {
-	dir, err := ioutil.TempDir("", "cfg")
+	config, err := newTestConfig()
 	require.NoError(t, err)
-	defer os.RemoveAll(dir)
-	configFile := filepath.Join(dir, "crc.json")
-
-	config, err := newTestConfig(configFile, "CRC")
-	require.NoError(t, err)
+	defer config.Close()
 
 	assert.Equal(t, SettingValue{
 		Value:     4,
@@ -124,7 +146,7 @@ func TestViperConfigLoadDefaultValue(t *testing.T) {
 	_, err = config.Set(CPUs, 4)
 	assert.NoError(t, err)
 
-	bin, err := ioutil.ReadFile(configFile)
+	bin, err := config.FileContent()
 	assert.NoError(t, err)
 	assert.JSONEq(t, `{"cpus":4}`, string(bin))
 
@@ -133,7 +155,7 @@ func TestViperConfigLoadDefaultValue(t *testing.T) {
 		IsDefault: true,
 	}, config.Get(CPUs))
 
-	config, err = newTestConfig(configFile, "CRC")
+	err = config.Reload()
 	require.NoError(t, err)
 
 	assert.Equal(t, SettingValue{
@@ -186,18 +208,14 @@ func TestViperConfigBindFlagSet(t *testing.T) {
 }
 
 func TestViperConfigCastSet(t *testing.T) {
-	dir, err := ioutil.TempDir("", "cfg")
+	config, err := newTestConfig()
 	require.NoError(t, err)
-	defer os.RemoveAll(dir)
-	configFile := filepath.Join(dir, "crc.json")
-
-	config, err := newTestConfig(configFile, "CRC")
-	require.NoError(t, err)
+	defer config.Close()
 
 	_, err = config.Set(CPUs, "5")
 	require.NoError(t, err)
 
-	config, err = newTestConfig(configFile, "CRC")
+	err = config.Reload()
 	require.NoError(t, err)
 
 	assert.Equal(t, SettingValue{
@@ -205,33 +223,24 @@ func TestViperConfigCastSet(t *testing.T) {
 		IsDefault: false,
 	}, config.Get(CPUs))
 
-	bin, err := ioutil.ReadFile(configFile)
+	bin, err := config.FileContent()
 	assert.NoError(t, err)
 	assert.JSONEq(t, `{"cpus": 5}`, string(bin))
 }
 
 func TestCannotSetWithWrongType(t *testing.T) {
-	dir, err := ioutil.TempDir("", "cfg")
+	config, err := newTestConfig()
 	require.NoError(t, err)
-	defer os.RemoveAll(dir)
-	configFile := filepath.Join(dir, "crc.json")
-
-	config, err := newTestConfig(configFile, "CRC")
-	require.NoError(t, err)
+	defer config.Close()
 
 	_, err = config.Set(CPUs, "helloworld")
 	assert.EqualError(t, err, "Value 'helloworld' for configuration property 'cpus' is invalid, reason: unable to cast \"helloworld\" of type string to int")
 }
 
 func TestCannotGetWithWrongType(t *testing.T) {
-	dir, err := ioutil.TempDir("", "cfg")
+	config, err := newTestConfigWithInitialContent([]byte("{\"cpus\": \"hello\"}"))
 	require.NoError(t, err)
-	defer os.RemoveAll(dir)
-	configFile := filepath.Join(dir, "crc.json")
-	assert.NoError(t, ioutil.WriteFile(configFile, []byte("{\"cpus\": \"hello\"}"), 0600))
-
-	config, err := newTestConfig(configFile, "CRC")
-	require.NoError(t, err)
+	defer config.Close()
 
 	assert.True(t, config.Get(CPUs).Invalid)
 }
