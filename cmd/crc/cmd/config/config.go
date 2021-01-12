@@ -6,7 +6,9 @@ import (
 
 	"github.com/code-ready/crc/pkg/crc/config"
 	"github.com/code-ready/crc/pkg/crc/constants"
+	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/crc/pkg/crc/network"
+	"github.com/code-ready/crc/pkg/units"
 	"github.com/spf13/cobra"
 )
 
@@ -49,6 +51,43 @@ func RegisterSettings(cfg *config.Config) {
 
 	// Telemeter Configuration
 	cfg.AddSetting(ConsentTelemetry, "", config.ValidateYesNo, config.SuccessfullyApplied)
+}
+
+func MigrateOldConfig(cfg *config.Config) bool {
+	var configMigrated = false
+	/* Prior to crc 1.2x, 'memory' was stored in MiB in the config file, and 'disk-size' was stored in GiB.
+	 * After this version, they are stored in bytes. This function will convert these 2 keys to the new
+	 * values
+	 */
+	memorySize := cfg.Get(Memory).AsSize().ToBytes()
+	defaultMemory := constants.DefaultMemory.ToBytes()
+	/* old value in config file is something like 9216 (old default, 9MiB)
+	 * new value will be the same, but in bytes (9,663,676,416)
+	 */
+	if memorySize <= defaultMemory && memorySize*uint64(units.MiB) >= defaultMemory {
+		logging.Infof("Migrating old configuration file, updating 'memory' setting from '%d' to '%d MiB'", memorySize, memorySize)
+		_, err := cfg.Set(Memory, units.New(memorySize, units.MiB))
+		if err != nil {
+			logging.Warnf("Failed to migrate memory setting: %v", err)
+		}
+		configMigrated = true
+	}
+
+	/* old value in config file was in GiB (old default, 35)
+	 * new value is stored in bytes
+	 */
+	diskSize := cfg.Get(DiskSize).AsSize().ToBytes()
+	defaultDiskSize := constants.DefaultDiskSize.ConvertTo(units.Bytes)
+	if diskSize <= defaultDiskSize && diskSize*uint64(units.GiB) >= defaultDiskSize {
+		logging.Infof("Migrating old configuration file, updating 'disk-size' setting from '%d' to '%d GiB'", diskSize, diskSize)
+		_, err := cfg.Set(DiskSize, units.New(diskSize, units.GiB))
+		if err != nil {
+			logging.Warnf("Failed to migrate disk size setting: %v", err)
+		}
+		configMigrated = true
+	}
+
+	return configMigrated
 }
 
 func isPreflightKey(key string) bool {
