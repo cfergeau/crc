@@ -4,13 +4,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	//"testing"
-
-	//"github.com/code-ready/crc/pkg/units"
 
 	"github.com/spf13/pflag"
-	//"github.com/stretchr/testify/assert"
-	//"github.com/stretchr/testify/require"
 )
 
 type TestConfig struct {
