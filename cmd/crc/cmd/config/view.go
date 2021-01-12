@@ -9,6 +9,7 @@ import (
 	"text/template"
 
 	"github.com/code-ready/crc/pkg/crc/config"
+	"github.com/code-ready/crc/pkg/crc/constants"
 
 	"github.com/spf13/cobra"
 )
@@ -34,6 +35,10 @@ func configViewCmd(config config.Storage) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			fmt.Printf("invalid? %v\n", config.Get(Memory).Invalid)
+			fmt.Printf("%T: %v %T: %v\n", config.Get(Memory).Value, config.Get(Memory).Value, constants.DefaultMemory, constants.DefaultMemory)
+			fmt.Printf("invalid? %v\n", config.Get(DiskSize).Invalid)
+			fmt.Printf("%T: %v %T: %v\n", config.Get(DiskSize).Value, config.Get(DiskSize).Value, constants.DefaultDiskSize, constants.DefaultDiskSize)
 			return runConfigView(config.AllConfigs(), tmpl, os.Stdout)
 		},
 	}
@@ -63,11 +68,14 @@ func runConfigView(cfg map[string]config.SettingValue, tmpl *template.Template, 
 		}
 		lines = append(lines, buffer.String())
 	}
+
 	sort.Strings(lines)
 
+	fmt.Fprintln(writer, "-------")
 	for _, line := range lines {
 		fmt.Fprintln(writer, line)
 	}
+	fmt.Fprintln(writer, "-------")
 
 	return nil
 }
