@@ -104,6 +104,63 @@ func TestViperConfigSizeType(t *testing.T) {
 		Value:     units.Size(16_000_000),
 		IsDefault: false,
 	}, config.Get(Memory))
+
+	/* Test behaviour with unitless values */
+	_, err = config.Set(Memory, "4")
+	assert.NoError(t, err)
+
+	assert.Equal(t, SettingValue{
+		Value:     units.Size(4) ,
+		IsDefault: false,
+	}, config.Get(Memory))
+
+	_, err = config.Set(Memory, 4)
+	assert.NoError(t, err)
+
+	assert.Equal(t, SettingValue{
+		Value:     units.Size(4) ,
+		IsDefault: false,
+	}, config.Get(Memory))
+
+}
+
+func TestViperConfigSizeBackwardCompat(t *testing.T) {
+	config, err := newTestConfig()
+	require.NoError(t, err)
+	defer config.Close()
+
+	_, err = config.Set(Memory, units.New(8, units.KiB))
+	assert.NoError(t, err)
+
+	assert.Equal(t, SettingValue{
+		Value:     units.Size(8192) ,
+		IsDefault: false,
+	}, config.Get(Memory))
+
+	_, err = config.Set(Memory, "16 MB")
+	assert.NoError(t, err)
+
+	assert.Equal(t, SettingValue{
+		Value:     units.Size(16_000_000) ,
+		IsDefault: false,
+	}, config.Get(Memory))
+
+	/* Test behaviour with unitless values */
+	_, err = config.Set(Memory, "4")
+	assert.NoError(t, err)
+
+	assert.Equal(t, SettingValue{
+		Value:     units.Size(4) ,
+		IsDefault: false,
+	}, config.Get(Memory))
+
+	_, err = config.Set(Memory, 4)
+	assert.NoError(t, err)
+
+	assert.Equal(t, SettingValue{
+		Value:     units.Size(4) ,
+		IsDefault: false,
+	}, config.Get(Memory))
 }
 
 func TestViperConfigSetAndGet(t *testing.T) {
