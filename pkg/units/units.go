@@ -2,11 +2,13 @@ package units
 
 import (
 	"fmt"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
 
 	units "github.com/docker/go-units"
+	"github.com/spf13/cast"
 )
 
 type Unit uint64
@@ -94,4 +96,51 @@ func (s Size) ConvertTo(unit Unit) uint64 {
 
 func New(size uint64, unit Unit) Size {
 	return Size(size * uint64(unit))
+}
+
+func ToSizeE(value interface{}, defaultUnit Unit) (Size, error) {
+	rawValue := indirect(value)
+	switch v := rawValue.(type) {
+	case Size:
+		return v, nil
+	case string:
+		bytes, err := FromSize(v)
+		if err != nil {
+			return Size(0), err
+		}
+		return New(uint64(bytes), Bytes), nil
+
+	default:
+		u, err := cast.ToUint64E(v)
+		if err != nil {
+			return Size(0), err
+		}
+		return New(u, defaultUnit), nil
+	}
+}
+
+func ToSize(value interface{}, defaultUnit Unit) Size {
+	size, _ := ToSizeE(value, defaultUnit)
+	return size
+}
+
+// func indirect() is:
+// Copyright 2011 The Go Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+//
+// indirect returns the value, after dereferencing as many times
+// as necessary to reach the base type (or nil).
+func indirect(a interface{}) interface{} {
+	if a == nil {
+		return nil
+	}
+	if t := reflect.TypeOf(a); t.Kind() != reflect.Ptr {
+		// Avoid creating a reflect.Value if it's not a pointer.
+		return a
+	}
+	v := reflect.ValueOf(a)
+	for v.Kind() == reflect.Ptr && !v.IsNil() {
+		v = v.Elem()
+	}
+	return v.Interface()
 }

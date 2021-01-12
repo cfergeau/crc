@@ -5,6 +5,8 @@ import (
 	"reflect"
 
 	"github.com/spf13/cast"
+
+	"github.com/code-ready/crc/pkg/units"
 )
 
 const (
@@ -48,6 +50,10 @@ func (c *Config) AddSetting(name string, defValue interface{}, validationFn Vali
 	}
 }
 
+func sameType(a, b interface{}) bool {
+	return reflect.TypeOf(a) == reflect.TypeOf(b)
+}
+
 // Set sets the value for a given config key
 func (c *Config) Set(key string, value interface{}) (string, error) {
 	setting, ok := c.settingsByName[key]
@@ -70,6 +76,16 @@ func (c *Config) Set(key string, value interface{}) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf(invalidProp, value, key, err)
 		}
+	case units.Size:
+		castValue, err = units.ToSizeE(value, units.MiB)
+		if err != nil {
+			return "", fmt.Errorf(invalidProp, value, key, err)
+		}
+	default:
+		if !sameType(value, setting.defaultValue) {
+			return "", fmt.Errorf(invalidProp, value, key, fmt.Errorf("Incompatible types (value: %T, default value: %T)", value, setting.defaultValue))
+		}
+		castValue = value
 	}
 
 	ok, expectedValue := c.settingsByName[key].validationFn(castValue)
@@ -122,6 +138,13 @@ func (c *Config) Get(key string) SettingValue {
 		value = cast.ToString(value)
 	case bool:
 		value, err = cast.ToBoolE(value)
+		if err != nil {
+			return SettingValue{
+				Invalid: true,
+			}
+		}
+	case units.Size:
+		value, err = units.ToSizeE(value, units.Bytes)
 		if err != nil {
 			return SettingValue{
 				Invalid: true,

@@ -5,29 +5,27 @@ import (
 	"runtime"
 	"strings"
 	"testing"
-
-	units "github.com/docker/go-units"
 )
 
 func TestFromSize(t *testing.T) {
 	assertSuccessEquals(t, 32, FromSize, "32")
 	assertSuccessEquals(t, 32, FromSize, "32b")
 	assertSuccessEquals(t, 32, FromSize, "32B")
-	assertSuccessEquals(t, 32*units.KB, FromSize, "32k")
-	assertSuccessEquals(t, 32*units.KB, FromSize, "32K")
-	assertSuccessEquals(t, 32*units.KB, FromSize, "32kb")
-	assertSuccessEquals(t, 32*units.KB, FromSize, "32Kb")
-	assertSuccessEquals(t, 32*units.KiB, FromSize, "32Kib")
-	assertSuccessEquals(t, 32*units.KiB, FromSize, "32KIB")
-	assertSuccessEquals(t, 32*units.MB, FromSize, "32Mb")
-	assertSuccessEquals(t, 32*units.GB, FromSize, "32Gb")
-	assertSuccessEquals(t, 32*units.TB, FromSize, "32Tb")
-	assertSuccessEquals(t, 32*units.PB, FromSize, "32Pb")
-	assertSuccessEquals(t, 32*units.PB, FromSize, "32PB")
-	assertSuccessEquals(t, 32*units.PB, FromSize, "32P")
+	assertSuccessEquals(t, 32*int64(KB), FromSize, "32k")
+	assertSuccessEquals(t, 32*int64(KB), FromSize, "32K")
+	assertSuccessEquals(t, 32*int64(KB), FromSize, "32kb")
+	assertSuccessEquals(t, 32*int64(KB), FromSize, "32Kb")
+	assertSuccessEquals(t, 32*int64(KiB), FromSize, "32Kib")
+	assertSuccessEquals(t, 32*int64(KiB), FromSize, "32KIB")
+	assertSuccessEquals(t, 32*int64(MB), FromSize, "32Mb")
+	assertSuccessEquals(t, 32*int64(GB), FromSize, "32Gb")
+	assertSuccessEquals(t, 32*int64(TB), FromSize, "32Tb")
+	assertSuccessEquals(t, 32*int64(PB), FromSize, "32Pb")
+	assertSuccessEquals(t, 32*int64(PB), FromSize, "32PB")
+	assertSuccessEquals(t, 32*int64(PB), FromSize, "32P")
 
 	assertSuccessEquals(t, 32, FromSize, "32.3")
-	tmp := 32.3 * units.MiB
+	tmp := 32.3 * float64(MiB)
 	assertSuccessEquals(t, int64(tmp), FromSize, "32.3 MiB")
 
 	assertError(t, FromSize, "")

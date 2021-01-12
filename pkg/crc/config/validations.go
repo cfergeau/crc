@@ -19,6 +19,10 @@ func ValidateBool(value interface{}) (bool, string) {
 	return false, "must be true or false"
 }
 
+func ValidateSize(value interface{}) (bool, string) {
+	return true, ""
+}
+
 // ValidateDiskSize checks if provided disk size is valid in the config
 func ValidateDiskSize(value interface{}) (bool, string) {
 	diskSize, err := cast.ToIntE(value)

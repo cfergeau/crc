@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/code-ready/crc/pkg/units"
+
 	"github.com/spf13/pflag"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -14,6 +16,7 @@ import (
 const (
 	CPUs       = "cpus"
 	NameServer = "nameservers"
+	Memory     = "memory"
 )
 
 type testConfig struct {
@@ -66,6 +69,7 @@ func (config *testConfig) Reload() error {
 	cfg := New(storage)
 	cfg.AddSetting(CPUs, 4, ValidateCPUs, RequiresRestartMsg)
 	cfg.AddSetting(NameServer, "", ValidateIPAddress, SuccessfullyApplied)
+	cfg.AddSetting(Memory, units.New(7, units.GiB), ValidateSize, SuccessfullyApplied)
 	config.Config = cfg
 	return nil
 }
@@ -78,6 +82,28 @@ func TestViperConfigUnknown(t *testing.T) {
 	assert.Equal(t, SettingValue{
 		Invalid: true,
 	}, config.Get("foo"))
+}
+
+func TestViperConfigSizeType(t *testing.T) {
+	config, err := newTestConfig()
+	require.NoError(t, err)
+	defer config.Close()
+
+	_, err = config.Set(Memory, units.New(8, units.KiB))
+	assert.NoError(t, err)
+
+	assert.Equal(t, SettingValue{
+		Value:     units.Size(8192),
+		IsDefault: false,
+	}, config.Get(Memory))
+
+	_, err = config.Set(Memory, "16 MB")
+	assert.NoError(t, err)
+
+	assert.Equal(t, SettingValue{
+		Value:     units.Size(16_000_000),
+		IsDefault: false,
+	}, config.Get(Memory))
 }
 
 func TestViperConfigSetAndGet(t *testing.T) {

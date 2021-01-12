@@ -1,6 +1,8 @@
 package config
 
 import (
+	"github.com/code-ready/crc/pkg/units"
+
 	"github.com/spf13/cast"
 )
 
@@ -26,6 +28,10 @@ type SettingValue struct {
 	Value     interface{}
 	Invalid   bool
 	IsDefault bool
+}
+
+func (v SettingValue) AsSize(defaultUnit units.Unit) units.Size {
+	return units.ToSize(v.Value, defaultUnit)
 }
 
 func (v SettingValue) AsBool() bool {
