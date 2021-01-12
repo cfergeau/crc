@@ -26,26 +26,27 @@ func ValidateCPUs(value int) error {
 }
 
 // ValidateMemory checks if provided Memory count is valid
-func ValidateMemory(value int) error {
-	if value < 0 {
+func ValidateMemory(value crcunits.Size) error {
+	valueBytes := value.ToBytes()
+	if valueBytes < 0 {
 		return fmt.Errorf("memory size must be positive")
 	}
-	if uint(value*units.MiB) < uint(constants.DefaultMemory) {
-		return fmt.Errorf("requires memory in MiB >= %s", units.BytesSize(float64(constants.DefaultMemory)))
+	if valueBytes < constants.DefaultMemory.ToBytes() {
+		return fmt.Errorf("requires memory size >= %s", constants.DefaultMemory.BytesSizeStr())
 	}
-	return ValidateEnoughMemory(crcunits.Size(value))
+	return ValidateEnoughMemory(value)
 }
 
-func ValidateDiskSize(value int) error {
-	if value < 0 {
+func ValidateDiskSize(value crcunits.Size) error {
+	valueBytes := value.ToBytes()
+	if valueBytes < 0 {
 		return fmt.Errorf("disk size must be positive")
 	}
-	valueBytes := crcunits.Size(value * units.GiB)
-	if valueBytes < constants.DefaultDiskSize {
-		return fmt.Errorf("requires disk size in GiB >= %s", units.BytesSize(float64(constants.DefaultDiskSize)))
+	if valueBytes < constants.DefaultDiskSize.ToBytes() {
+		return fmt.Errorf("requires disk size >= %s", constants.DefaultDiskSize.BytesSizeStr())
 	}
 	// https://github.com/code-ready/machine-driver-hyperkit/issues/18
-	if runtime.GOOS == "darwin" && valueBytes > constants.DefaultDiskSize {
+	if runtime.GOOS == "darwin" && valueBytes > constants.DefaultDiskSize.ToBytes() {
 		return fmt.Errorf("Disk resizing is not supported on macOS")
 	}
 

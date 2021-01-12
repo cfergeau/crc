@@ -9,6 +9,7 @@ import (
 	"text/template"
 
 	"github.com/code-ready/crc/pkg/crc/config"
+
 	"github.com/spf13/cobra"
 )
 

@@ -6,7 +6,7 @@ import (
 	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/crc/pkg/crc/oc"
 	crcssh "github.com/code-ready/crc/pkg/crc/ssh"
-	units "github.com/code-ready/crc/pkg/units"
+	"github.com/code-ready/crc/pkg/units"
 	"github.com/code-ready/machine/libmachine/state"
 	"github.com/pkg/errors"
 )

@@ -7,6 +7,7 @@ import (
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/network"
 	"github.com/code-ready/crc/pkg/crc/validation"
+	"github.com/code-ready/crc/pkg/units"
 	"github.com/spf13/cast"
 )
 
@@ -25,9 +26,9 @@ func ValidateSize(value interface{}) (bool, string) {
 
 // ValidateDiskSize checks if provided disk size is valid in the config
 func ValidateDiskSize(value interface{}) (bool, string) {
-	diskSize, err := cast.ToIntE(value)
+	diskSize, err := units.ToSizeE(value, units.GiB)
 	if err != nil {
-		return false, fmt.Sprintf("could not convert '%s' to integer", value)
+		return false, fmt.Sprintf("could not parse '%s' as disk size", value)
 	}
 	if err := validation.ValidateDiskSize(diskSize); err != nil {
 		return false, err.Error()
@@ -50,9 +51,9 @@ func ValidateCPUs(value interface{}) (bool, string) {
 
 // ValidateMemory checks if provided memory is valid in the config
 func ValidateMemory(value interface{}) (bool, string) {
-	v, err := cast.ToIntE(value)
+	v, err := units.ToSizeE(value, units.MiB)
 	if err != nil {
-		return false, fmt.Sprintf("requires integer value in MiB >= %d", constants.DefaultMemory)
+		return false, fmt.Sprintf("could not parse '%s' as memory size", value)
 	}
 	if err := validation.ValidateMemory(v); err != nil {
 		return false, err.Error()

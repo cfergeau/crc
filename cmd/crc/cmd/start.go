@@ -17,7 +17,6 @@ import (
 	"github.com/code-ready/crc/pkg/crc/preflight"
 	"github.com/code-ready/crc/pkg/crc/validation"
 	crcversion "github.com/code-ready/crc/pkg/crc/version"
-	"github.com/code-ready/crc/pkg/units"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -30,8 +29,10 @@ func init() {
 	flagSet.StringP(cmdConfig.Bundle, "b", constants.DefaultBundlePath, "The system bundle used for deployment of the OpenShift cluster")
 	flagSet.StringP(cmdConfig.PullSecretFile, "p", "", fmt.Sprintf("File path of image pull secret (download from %s)", constants.CrcLandingPageURL))
 	flagSet.IntP(cmdConfig.CPUs, "c", constants.DefaultCPUs, "Number of CPU cores to allocate to the OpenShift cluster")
-	flagSet.IntP(cmdConfig.Memory, "m", int(constants.DefaultMemoryMiB), "MiB of memory to allocate to the OpenShift cluster")
-	flagSet.UintP(cmdConfig.DiskSize, "d", uint(constants.DefaultDiskSizeGiB), "Total size in GiB of the disk used by the OpenShift cluster")
+	defaultMemoryMiB := int(constants.DefaultMemory.ConvertTo(units.MiB))
+	flagSet.IntP(cmdConfig.Memory, "m", defaultMemoryMiB, "MiB of memory to allocate to the OpenShift cluster")
+	defaultDiskSizeGiB := uint(constants.DefaultDiskSize.ConvertTo(units.GiB))
+	flagSet.UintP(cmdConfig.DiskSize, "d", defaultDiskSizeGiB, "Total size in GiB of the disk used by the OpenShift cluster")
 	flagSet.StringP(cmdConfig.NameServer, "n", "", "IPv4 address of nameserver to use for the OpenShift cluster")
 	flagSet.Bool(cmdConfig.DisableUpdateCheck, false, "Don't check for update")
 
@@ -66,8 +67,8 @@ func runStart(arguments []string) (*machine.StartResult, error) {
 
 	startConfig := machine.StartConfig{
 		BundlePath: config.Get(cmdConfig.Bundle).AsString(),
-		Memory:     units.New(config.Get(cmdConfig.Memory).AsUint64(), units.MiB),
-		DiskSize:   units.New(config.Get(cmdConfig.DiskSize).AsUint64(), units.GiB),
+		Memory:     config.Get(cmdConfig.Memory).AsSize(),
+		DiskSize:   config.Get(cmdConfig.DiskSize).AsSize(),
 		CPUs:       config.Get(cmdConfig.CPUs).AsInt(),
 		NameServer: config.Get(cmdConfig.NameServer).AsString(),
 		PullSecret: &cluster.PullSecret{
@@ -166,13 +167,13 @@ func isDebugLog() bool {
 }
 
 func validateStartFlags() error {
-	if err := validation.ValidateMemory(config.Get(cmdConfig.Memory).AsInt()); err != nil {
+	if err := validation.ValidateMemory(config.Get(cmdConfig.Memory).AsSize()); err != nil {
 		return err
 	}
 	if err := validation.ValidateCPUs(config.Get(cmdConfig.CPUs).AsInt()); err != nil {
 		return err
 	}
-	if err := validation.ValidateDiskSize(config.Get(cmdConfig.DiskSize).AsInt()); err != nil {
+	if err := validation.ValidateDiskSize(config.Get(cmdConfig.DiskSize).AsSize()); err != nil {
 		return err
 	}
 	if err := validation.ValidateBundle(config.Get(cmdConfig.Bundle).AsString()); err != nil {

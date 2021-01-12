@@ -91,10 +91,8 @@ func GetDefaultBundle() string {
 }
 
 var (
-	DefaultMemory      = units.New(9, units.GiB)
-	DefaultDiskSize    = units.New(31, units.GiB)
-	DefaultMemoryMiB   = int(DefaultMemory.ConvertTo(units.MiB))
-	DefaultDiskSizeGiB = int(DefaultDiskSize.ConvertTo(units.GiB))
+	DefaultMemory   = units.New(9, units.GiB)
+	DefaultDiskSize = units.New(31, units.GiB)
 
 	CrcBaseDir         = filepath.Join(GetHomeDir(), ".crc")
 	CrcBinDir          = filepath.Join(CrcBaseDir, "bin")
