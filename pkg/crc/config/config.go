@@ -128,10 +128,9 @@ func (c *Config) Get(key string) SettingValue {
 			}
 		}
 	default:
-		/*	return SettingValue{
-				Invalid: true,
-			}
-		*/
+		return SettingValue{
+			Invalid: true,
+		}
 	}
 	return SettingValue{
 		Value:     value,
