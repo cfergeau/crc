@@ -42,9 +42,6 @@ func (c *Config) AllConfigs() map[string]SettingValue {
 // AddSetting returns a filled struct of ConfigSetting
 // takes the config name and default value as arguments
 func (c *Config) AddSetting(name string, defValue interface{}, validationFn ValidationFnType, callbackFn SetFn) {
-	if name == "memory" || name == "disk-size" {
-		fmt.Printf("Adding setting %s - defValue %T %v \n", name, defValue, defValue)
-	}
 	c.settingsByName[name] = Setting{
 		Name:         name,
 		defaultValue: defValue,
@@ -59,9 +56,6 @@ func sameType(a, b interface{}) bool {
 
 // Set sets the value for a given config key
 func (c *Config) Set(key string, value interface{}) (string, error) {
-	if key == "memory" || key == "disk-size" {
-		fmt.Printf("setting %s to %T %v\n", key, value, value)
-	}
 	setting, ok := c.settingsByName[key]
 	if !ok {
 		return "", fmt.Errorf(configPropDoesntExistMsg, key)
@@ -88,7 +82,6 @@ func (c *Config) Set(key string, value interface{}) (string, error) {
 			return "", fmt.Errorf(invalidProp, value, key, err)
 		}
 	default:
-		fmt.Printf("Unknown type !! %T\n", setting.defaultValue)
 		if !sameType(value, setting.defaultValue) {
 			return "", fmt.Errorf(invalidProp, value, key, fmt.Errorf("Incompatible types (value: %T, default value: %T)", value, setting.defaultValue))
 		}
@@ -129,15 +122,8 @@ func (c *Config) Get(key string) SettingValue {
 		}
 	}
 	value := c.storage.Get(key)
-	if key == "memory" || key == "disk-size" {
-		fmt.Printf("%s: value: %T %v\n", key, value, value)
-	}
-
 	if value == nil {
 		value = setting.defaultValue
-	}
-	if key == "memory" || key == "disk-size" {
-		fmt.Printf("%s: value: %T %v\n", key, value, value)
 	}
 	var err error
 	switch setting.defaultValue.(type) {
@@ -165,8 +151,6 @@ func (c *Config) Get(key string) SettingValue {
 			}
 		}
 	default:
-		// fmt.Printf("Unknown type for %s!! %T - assuming defaultValue type and config value type are compatible\n", key, setting.defaultValue);
-		fmt.Printf("Unknown type for %s!! %T\n", key, setting.defaultValue)
 		return SettingValue{
 			Invalid: true,
 		}

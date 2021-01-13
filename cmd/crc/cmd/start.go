@@ -30,7 +30,6 @@ func init() {
 	flagSet.StringP(cmdConfig.PullSecretFile, "p", "", fmt.Sprintf("File path of image pull secret (download from %s)", constants.CrcLandingPageURL))
 	flagSet.IntP(cmdConfig.CPUs, "c", constants.DefaultCPUs, "Number of CPU cores to allocate to the OpenShift cluster")
 	defaultMemoryMiB := int(constants.DefaultMemory.ConvertTo(units.MiB))
-	fmt.Printf("defaultMemory: %d\n", defaultMemoryMiB)
 	flagSet.IntP(cmdConfig.Memory, "m", defaultMemoryMiB, "MiB of memory to allocate to the OpenShift cluster")
 	defaultDiskSizeGiB := uint(constants.DefaultDiskSize.ConvertTo(units.GiB))
 	flagSet.UintP(cmdConfig.DiskSize, "d", defaultDiskSizeGiB, "Total size in GiB of the disk used by the OpenShift cluster")

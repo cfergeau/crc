@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 
@@ -33,7 +32,6 @@ func RegisterSettings(cfg *config.Config) {
 	// Start command settings in config
 	cfg.AddSetting(Bundle, constants.DefaultBundlePath, config.ValidateBundle, config.SuccessfullyApplied)
 	cfg.AddSetting(CPUs, constants.DefaultCPUs, config.ValidateCPUs, config.RequiresRestartMsg)
-	fmt.Printf("constants.DefaultMemory: %T %v\n", constants.DefaultMemory, constants.DefaultMemory)
 	cfg.AddSetting(Memory, constants.DefaultMemory, config.ValidateMemory, config.RequiresRestartMsg)
 	cfg.AddSetting(DiskSize, constants.DefaultDiskSize, config.ValidateDiskSize, config.RequiresRestartMsg)
 	cfg.AddSetting(NameServer, "", config.ValidateIPAddress, config.SuccessfullyApplied)
