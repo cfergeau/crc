@@ -57,10 +57,10 @@ func ValidateDiskSize(value crcunits.Size) error {
 func ValidateEnoughMemory(value crcunits.Size) error {
 	totalMemory := memory.TotalMemory()
 	logging.Debugf("Total memory of system is %d bytes", totalMemory)
-	if totalMemory < uint64(value) {
+	if totalMemory < value.ToBytes() {
 		return fmt.Errorf("only %s of memory found (%s required)",
 			units.BytesSize(float64(totalMemory)),
-			units.BytesSize(float64(value)))
+			value.BytesSizeStr())
 	}
 	return nil
 }
