@@ -91,7 +91,7 @@ func parseSize(sizeStr string, mode parsingMode) (int64, error) {
 type Size uint64
 
 func (s Size) String() string {
-	return s.HumanSizeStr()
+	return fmt.Sprintf("%d", int64(s))
 }
 
 func (s Size) HumanSizeStr() string {
