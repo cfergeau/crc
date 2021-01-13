@@ -28,7 +28,7 @@ func ValidateCPUs(value int) error {
 // ValidateMemory checks if provided Memory count is valid
 func ValidateMemory(value crcunits.Size) error {
 	valueBytes := value.ToBytes()
-	if valueBytes < 0 {
+	if int64(valueBytes) < 0 {
 		return fmt.Errorf("memory size must be positive")
 	}
 	if valueBytes < constants.DefaultMemory.ToBytes() {
@@ -39,7 +39,7 @@ func ValidateMemory(value crcunits.Size) error {
 
 func ValidateDiskSize(value crcunits.Size) error {
 	valueBytes := value.ToBytes()
-	if valueBytes < 0 {
+	if int64(valueBytes) < 0 {
 		return fmt.Errorf("disk size must be positive")
 	}
 	if valueBytes < constants.DefaultDiskSize.ToBytes() {
