@@ -90,8 +90,24 @@ func parseSize(sizeStr string, mode parsingMode) (int64, error) {
 
 type Size uint64
 
+func (s Size) String() string {
+	return s.HumanSizeStr()
+}
+
+func (s Size) HumanSizeStr() string {
+	return units.HumanSize(float64(s))
+}
+
+func (s Size) BytesSizeStr() string {
+	return units.BytesSize(float64(s))
+}
+
 func (s Size) ConvertTo(unit Unit) uint64 {
 	return uint64(s) / uint64(unit)
+}
+
+func (s Size) ToBytes() uint64 {
+	return s.ConvertTo(Bytes)
 }
 
 func New(size uint64, unit Unit) Size {

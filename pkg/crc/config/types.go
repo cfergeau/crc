@@ -30,8 +30,8 @@ type SettingValue struct {
 	IsDefault bool
 }
 
-func (v SettingValue) AsSize(defaultUnit units.Unit) units.Size {
-	return units.ToSize(v.Value, defaultUnit)
+func (v SettingValue) AsSize() units.Size {
+	return units.ToSize(v.Value, units.Bytes)
 }
 
 func (v SettingValue) AsBool() bool {
