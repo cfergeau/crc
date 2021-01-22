@@ -76,7 +76,8 @@ func TestFileExists(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, FileExists(filename))
 
-	os.Chmod(dirname, 0000)
+	err = os.Chmod(dirname, 0000)
+	assert.NoError(t, err)
 	assert.False(t, FileExists(filename))
 	filename = filepath.Join(dirname, "nonexistent")
 	assert.False(t, FileExists(filename))
