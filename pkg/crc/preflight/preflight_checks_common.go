@@ -12,6 +12,7 @@ import (
 	"github.com/code-ready/crc/pkg/crc/validation"
 	"github.com/code-ready/crc/pkg/crc/version"
 	"github.com/code-ready/crc/pkg/embed"
+	crcos "github.com/code-ready/crc/pkg/os"
 	"github.com/docker/go-units"
 	"github.com/pkg/errors"
 )
@@ -64,7 +65,9 @@ func checkBundleExtracted() error {
 	if !version.IsRelease() {
 		return nil
 	}
-	if _, err := os.Stat(constants.DefaultBundlePath); os.IsNotExist(err) {
+	logging.Infof("Checking if %s exists", constants.DefaultBundlePath)
+	if _, err := bundle.GetCachedBundleInfo(constants.GetDefaultBundle()); err != nil {
+		logging.Infof("error getting bundle info for %s: %v", constants.GetDefaultBundle(), err)
 		return err
 	}
 	return nil
@@ -77,19 +80,30 @@ func fixBundleExtracted() error {
 	if err := os.Chmod(constants.MachineCacheDir, 0775); err != nil {
 		logging.Debugf("Error changing %s permissions to 0775", constants.MachineCacheDir)
 	}
-	if version.IsRelease() {
-		bundleDir := filepath.Dir(constants.DefaultBundlePath)
-		if err := os.MkdirAll(bundleDir, 0775); err != nil {
-			return fmt.Errorf("Cannot create directory %s: %v", bundleDir, err)
-		}
 
-		if err := embed.Extract(filepath.Base(constants.DefaultBundlePath), constants.DefaultBundlePath); err != nil {
+	if !version.IsRelease() {
+		return fmt.Errorf("CRC bundle is not embedded in the executable")
+	}
+
+	bundleDir := filepath.Dir(constants.DefaultBundlePath)
+	logging.Infof("Ensuring directory %s exists", bundleDir)
+	if err := os.MkdirAll(bundleDir, 0775); err != nil {
+		return fmt.Errorf("Cannot create directory %s: %v", bundleDir, err)
+	}
+
+	if !crcos.FileExists(constants.DefaultBundlePath) && constants.BundleEmbedded() {
+		logging.Infof("Extracting embedded bundle %s to %s", constants.GetDefaultBundle(), bundleDir)
+		if err := embed.Extract(bundleDir, constants.DefaultBundlePath); err != nil {
 			return err
 		}
-		_, err := bundle.Extract(constants.DefaultBundlePath)
-		return err
 	}
-	return fmt.Errorf("CRC bundle is not embedded in the executable")
+
+	var err error
+	if _, err := bundle.GetCachedBundleInfo(constants.GetDefaultBundle()); err != nil {
+		logging.Infof("Uncompressiong %s", constants.GetDefaultBundle())
+		_, err = bundle.Extract(constants.DefaultBundlePath)
+	}
+	return err
 }
 
 // Check if podman executable is cached or not
