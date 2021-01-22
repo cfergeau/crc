@@ -16,7 +16,15 @@ import (
 	"github.com/segmentio/analytics-go"
 )
 
-var WriteKey = "R7jGNYYO5gH0Nl5gDlMEuZ3gPlDJKQak" // test
+const testWriteKey = "R7jGNYYO5gH0Nl5gDlMEuZ3gPlDJKQak"
+
+var WriteKey = testWriteKey
+
+func init() {
+	if _, isSet := os.LookupEnv("CRC_DEBUG_FORCE_SEGMENT_TEST_KEY"); isSet {
+		WriteKey = testWriteKey
+	}
+}
 
 type Client struct {
 	segmentClient     analytics.Client
