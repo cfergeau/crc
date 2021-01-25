@@ -27,18 +27,31 @@ func AddToHostsFile(instanceIP string, hostnames ...string) error {
 	if err := validateHostnames(hostnames); err != nil {
 		return err
 	}
-	return execute(append([]string{"add", instanceIP}, hostnames...)...)
+	var filtered []string
+	for _, hostname := range hostnames {
+		stdout, err := execute("contains", instanceIP, hostname)
+		if err != nil {
+			return err
+		}
+		if strings.TrimSpace(stdout) == "false" {
+			filtered = append(filtered, hostname)
+		}
+	}
+	if len(filtered) == 0 {
+		return nil
+	}
+	return executePrivileged(append([]string{"add", instanceIP}, filtered...)...)
 }
 
 func RemoveFromHostsFile(hostnames ...string) error {
 	if err := validateHostnames(hostnames); err != nil {
 		return err
 	}
-	return execute(append([]string{"rm"}, hostnames...)...)
+	return executePrivileged(append([]string{"rm"}, hostnames...)...)
 }
 
 func CleanHostsFile() error {
-	return execute([]string{"clean", constants.ClusterDomain, constants.AppsDomain}...)
+	return executePrivileged([]string{"clean", constants.ClusterDomain, constants.AppsDomain}...)
 }
 
 func validateHostnames(hostnames []string) error {
