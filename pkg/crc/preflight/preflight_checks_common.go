@@ -10,7 +10,6 @@ import (
 	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/crc/pkg/crc/machine/bundle"
 	"github.com/code-ready/crc/pkg/crc/validation"
-	"github.com/code-ready/crc/pkg/crc/version"
 	"github.com/code-ready/crc/pkg/embed"
 	crcos "github.com/code-ready/crc/pkg/os"
 	"github.com/docker/go-units"
@@ -62,7 +61,7 @@ var genericPreflightChecks = [...]Check{
 }
 
 func checkBundleExtracted() error {
-	if !version.IsRelease() {
+	if !constants.IsRelease() {
 		return nil
 	}
 	logging.Infof("Checking if %s exists", constants.DefaultBundlePath)
@@ -81,7 +80,7 @@ func fixBundleExtracted() error {
 		logging.Debugf("Error changing %s permissions to 0775", constants.MachineCacheDir)
 	}
 
-	if !version.IsRelease() {
+	if !constants.IsRelease() {
 		return fmt.Errorf("CRC bundle is not embedded in the executable")
 	}
 
