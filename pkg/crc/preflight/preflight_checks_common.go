@@ -60,16 +60,28 @@ var genericPreflightChecks = [...]Check{
 	},
 }
 
-func checkBundleExtracted() error {
-	if !constants.IsRelease() {
-		return nil
-	}
-	logging.Infof("Checking if %s exists", constants.DefaultBundlePath)
-	if _, err := bundle.GetCachedBundleInfo(constants.GetDefaultBundle()); err != nil {
-		logging.Infof("error getting bundle info for %s: %v", constants.GetDefaultBundle(), err)
+func isBundleValid(bundleName string) error {
+	logging.Infof("Checking if %s is present and valid", constants.DefaultBundlePath)
+	bundle, err := bundle.GetCachedBundleInfo(bundleName)
+	if err != nil {
+		logging.Infof("Error getting bundle info for %s: %v", bundle, err)
 		return err
 	}
+	if err := bundle.Verify(); err != nil {
+		logging.Infof("Uncompressed bundle is invalid: %v", err)
+		return err
+	}
+
 	return nil
+}
+
+func checkBundleExtracted() error {
+	if !constants.IsRelease() {
+		logging.Debugf("Development build, skipping check")
+		return nil
+	}
+
+	return isBundleValid(constants.GetDefaultBundle())
 }
 
 func fixBundleExtracted() error {
@@ -97,12 +109,13 @@ func fixBundleExtracted() error {
 		}
 	}
 
-	var err error
-	if _, err := bundle.GetCachedBundleInfo(constants.GetDefaultBundle()); err != nil {
-		logging.Infof("Uncompressiong %s", constants.GetDefaultBundle())
-		_, err = bundle.Extract(constants.DefaultBundlePath)
+	if isBundleValid(constants.GetDefaultBundle()) != nil {
+		logging.Infof("Uncompressing %s", constants.GetDefaultBundle())
+		_, err := bundle.Extract(constants.DefaultBundlePath)
+		return err
 	}
-	return err
+
+	return nil
 }
 
 // Check if podman executable is cached or not
