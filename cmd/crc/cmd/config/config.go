@@ -98,8 +98,8 @@ func configurableFields(config *config.Config) string {
 	var fields []string
 	var buf bytes.Buffer
 	writer := tabwriter.NewWriter(&buf, 0, 8, 1, ' ', tabwriter.TabIndent)
-	for _, keyAndValueType := range keysAndValueType(config) {
-		fmt.Fprintln(writer, keyAndValueType)
+	for key, cfg := range config.AllConfigs() {
+		fmt.Fprintf(writer, "%s\t%s\n", key, cfg.Help)
 	}
 	writer.Flush()
 	keys := strings.Split(buf.String(), "\n")
@@ -113,24 +113,6 @@ func configurableFields(config *config.Config) string {
 		fields = append(fields, " * "+key)
 	}
 	return strings.Join(fields, "\n")
-}
-func keysAndValueType(config *config.Config) []string {
-	var keyAndValueType []string
-	for key, value := range config.AllConfigs() {
-		var valueType string
-		switch value.Value.(type) {
-		case int:
-			valueType = "Number"
-		case string:
-			valueType = "String"
-		case bool:
-			valueType = "true/false"
-		default:
-			valueType = fmt.Sprintf("%T", value.Value)
-		}
-		keyAndValueType = append(keyAndValueType, fmt.Sprintf("%s\t%s", key, valueType))
-	}
-	return keyAndValueType
 }
 
 func GetConfigCmd(config *config.Config) *cobra.Command {
