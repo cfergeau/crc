@@ -33,25 +33,40 @@ const (
 
 func RegisterSettings(cfg *config.Config) {
 	// Start command settings in config
-	cfg.AddSetting(Bundle, constants.DefaultBundlePath, config.ValidateBundlePath, config.SuccessfullyApplied)
-	cfg.AddSetting(CPUs, constants.DefaultCPUs, config.ValidateCPUs, config.RequiresRestartMsg)
-	cfg.AddSetting(Memory, constants.DefaultMemory, config.ValidateMemory, config.RequiresRestartMsg)
-	cfg.AddSetting(DiskSize, constants.DefaultDiskSize, config.ValidateDiskSize, config.RequiresRestartMsg)
-	cfg.AddSetting(NameServer, "", config.ValidateIPAddress, config.SuccessfullyApplied)
-	cfg.AddSetting(PullSecretFile, "", config.ValidatePath, config.SuccessfullyApplied)
-	cfg.AddSetting(DisableUpdateCheck, false, config.ValidateBool, config.SuccessfullyApplied)
-	cfg.AddSetting(ExperimentalFeatures, false, config.ValidateBool, config.SuccessfullyApplied)
-	cfg.AddSetting(NetworkMode, string(network.DefaultMode), network.ValidateMode, network.SuccessfullyAppliedMode)
+	cfg.AddSetting(Bundle, constants.DefaultBundlePath, config.ValidateBundlePath, config.SuccessfullyApplied,
+		fmt.Sprintf("Bundle path (string, default '%s')", constants.DefaultBundlePath))
+	cfg.AddSetting(CPUs, constants.DefaultCPUs, config.ValidateCPUs, config.RequiresRestartMsg,
+		fmt.Sprintf("Number of CPU cores (integer, default '%d')", constants.DefaultCPUs))
+	cfg.AddSetting(Memory, constants.DefaultMemory, config.ValidateMemory, config.RequiresRestartMsg,
+		fmt.Sprintf("Memory size in MiB (integer, default '%d')", constants.DefaultMemory))
+	cfg.AddSetting(DiskSize, constants.DefaultDiskSize, config.ValidateDiskSize, config.RequiresRestartMsg,
+		fmt.Sprintf("Total size in GiB of the disk (integer, default '%d')", constants.DefaultDiskSize))
+	cfg.AddSetting(NameServer, "", config.ValidateIPAddress, config.SuccessfullyApplied,
+		"IPv4 address of nameserver (string, like '1.1.1.1 or 8.8.8.8')")
+	cfg.AddSetting(PullSecretFile, "", config.ValidatePath, config.SuccessfullyApplied,
+		fmt.Sprintf("Path of image pull secret (download from %s)", constants.CrcLandingPageURL))
+	cfg.AddSetting(DisableUpdateCheck, false, config.ValidateBool, config.SuccessfullyApplied,
+		"Don't check for update (default false)")
+	cfg.AddSetting(ExperimentalFeatures, false, config.ValidateBool, config.SuccessfullyApplied,
+		"Enable experimental features (default false)")
+	cfg.AddSetting(NetworkMode, string(network.DefaultMode), network.ValidateMode, network.SuccessfullyAppliedMode,
+		"Network mode (default or vsock)")
 	// Proxy Configuration
-	cfg.AddSetting(HTTPProxy, "", config.ValidateURI, config.SuccessfullyApplied)
-	cfg.AddSetting(HTTPSProxy, "", config.ValidateURI, config.SuccessfullyApplied)
-	cfg.AddSetting(NoProxy, "", config.ValidateNoProxy, config.SuccessfullyApplied)
-	cfg.AddSetting(ProxyCAFile, "", config.ValidatePath, config.SuccessfullyApplied)
+	cfg.AddSetting(HTTPProxy, "", config.ValidateURI, config.SuccessfullyApplied,
+		"HTTP proxy URL (string, like 'http://my-proxy.com:8443')")
+	cfg.AddSetting(HTTPSProxy, "", config.ValidateURI, config.SuccessfullyApplied,
+		"HTTPS proxy URL (string, like 'https://my-proxy.com:8443')")
+	cfg.AddSetting(NoProxy, "", config.ValidateNoProxy, config.SuccessfullyApplied,
+		"No proxy (string, like '127.0.0.1,192.168.100.1/24')")
+	cfg.AddSetting(ProxyCAFile, "", config.ValidatePath, config.SuccessfullyApplied,
+		"Certificate Authority (CA) path for proxy")
 
-	cfg.AddSetting(EnableClusterMonitoring, false, config.ValidateBool, config.SuccessfullyApplied)
+	cfg.AddSetting(EnableClusterMonitoring, false, config.ValidateBool, config.SuccessfullyApplied,
+		"Enable cluster monitoring operator (default false)")
 
 	// Telemeter Configuration
-	cfg.AddSetting(ConsentTelemetry, "", config.ValidateYesNo, config.SuccessfullyApplied)
+	cfg.AddSetting(ConsentTelemetry, "", config.ValidateYesNo, config.SuccessfullyApplied,
+		"Send feedback about CodeReady Containers (yes/no)")
 }
 
 func isPreflightKey(key string) bool {

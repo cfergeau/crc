@@ -10,7 +10,7 @@ type Storage interface {
 }
 
 type Schema interface {
-	AddSetting(name string, defValue interface{}, validationFn ValidationFnType, callbackFn SetFn)
+	AddSetting(name string, defValue interface{}, validationFn ValidationFnType, callbackFn SetFn, help string)
 }
 
 type Setting struct {
@@ -18,12 +18,14 @@ type Setting struct {
 	defaultValue interface{}
 	validationFn ValidationFnType
 	callbackFn   SetFn
+	Help         string
 }
 
 type SettingValue struct {
 	Value     interface{}
 	Invalid   bool
 	IsDefault bool
+	Help      string
 }
 
 func (v SettingValue) AsBool() bool {

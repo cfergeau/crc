@@ -144,7 +144,7 @@ func doCleanUpPreflightChecks(checks []Check) error {
 func doRegisterSettings(cfg config.Schema, checks []Check) {
 	for _, check := range checks {
 		if check.configKeySuffix != "" {
-			cfg.AddSetting(check.getSkipConfigName(), false, config.ValidateBool, config.SuccessfullyApplied)
+			cfg.AddSetting(check.getSkipConfigName(), false, config.ValidateBool, config.SuccessfullyApplied, "true/false")
 		}
 	}
 }
