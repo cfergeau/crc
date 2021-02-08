@@ -94,25 +94,19 @@ func less(lhsKey, rhsKey string) bool {
 	return lhsKey < rhsKey
 }
 
-func configurableFields(config config.Storage) string {
-	var fields []string
-	var buf bytes.Buffer
-	writer := tabwriter.NewWriter(&buf, 0, 8, 1, ' ', tabwriter.TabIndent)
-	for key, cfg := range config.AllConfigs() {
-		fmt.Fprintf(writer, "%s\t%s\n", key, cfg.Help)
+func configurableFields(config config.Schema) string {
+	var output bytes.Buffer
+
+	settings := config.AllSettings()
+	sort.Slice(settings, func(i, j int) bool {
+		return less(settings[i].Name, settings[j].Name)
+	})
+	writer := tabwriter.NewWriter(&output, 0, 8, 1, ' ', tabwriter.TabIndent)
+	for _, setting := range settings {
+		fmt.Fprintf(writer, " * %s\t%s\n", setting.Name, setting.Help)
 	}
 	writer.Flush()
-	keys := strings.Split(buf.String(), "\n")
-	sort.Slice(keys, func(i, j int) bool {
-		return less(keys[i], keys[j])
-	})
-	for _, key := range keys {
-		if key == "" {
-			continue
-		}
-		fields = append(fields, " * "+key)
-	}
-	return strings.Join(fields, "\n")
+	return output.String()
 }
 
 func GetConfigCmd(config *config.Config) *cobra.Command {

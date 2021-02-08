@@ -24,6 +24,15 @@ func New(storage RawStorage) *Config {
 	}
 }
 
+func (c *Config) AllSettings() []Setting {
+	settings := []Setting{}
+	for _, setting := range c.settingsByName {
+		settings = append(settings, setting)
+	}
+
+	return settings
+}
+
 // AllConfigs returns all the known configs
 // A known config is one which was registered through AddSetting
 // - config with a default value
@@ -136,6 +145,5 @@ func (c *Config) Get(key string) SettingValue {
 	return SettingValue{
 		Value:     value,
 		IsDefault: reflect.DeepEqual(setting.defaultValue, value),
-		Help:      setting.Help,
 	}
 }
