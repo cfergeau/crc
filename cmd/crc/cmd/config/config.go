@@ -94,7 +94,7 @@ func less(lhsKey, rhsKey string) bool {
 	return lhsKey < rhsKey
 }
 
-func configurableFields(config *config.Config) string {
+func configurableFields(config config.Storage) string {
 	var fields []string
 	var buf bytes.Buffer
 	writer := tabwriter.NewWriter(&buf, 0, 8, 1, ' ', tabwriter.TabIndent)
