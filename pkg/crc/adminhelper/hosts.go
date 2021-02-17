@@ -3,6 +3,7 @@ package adminhelper
 import (
 	"path/filepath"
 
+	"github.com/code-ready/admin-helper/pkg/types"
 	"github.com/code-ready/crc/pkg/crc/constants"
 )
 
@@ -22,13 +23,23 @@ func UpdateHostsFile(instanceIP string, hostnames ...string) error {
 }
 
 func AddToHostsFile(instanceIP string, hostnames ...string) error {
-	return execute(append([]string{"add", instanceIP}, hostnames...)...)
+	return instance().Add(&types.AddRequest{
+		IP:    instanceIP,
+		Hosts: hostnames,
+	})
 }
 
 func RemoveFromHostsFile(hostnames ...string) error {
-	return execute(append([]string{"rm"}, hostnames...)...)
+	return instance().Remove(&types.RemoveRequest{
+		Hosts: hostnames,
+	})
 }
 
 func CleanHostsFile() error {
 	return execute([]string{"clean", constants.ClusterDomain, constants.AppsDomain}...)
+}
+
+type helper interface {
+	Add(req *types.AddRequest) error
+	Remove(req *types.RemoveRequest) error
 }

@@ -4,11 +4,12 @@ go 1.14
 
 require (
 	github.com/Masterminds/semver v1.5.0
-	github.com/Microsoft/go-winio v0.4.15-0.20200908182639-5b44b70ab3ab
+	github.com/Microsoft/go-winio v0.4.16
 	github.com/YourFin/binappend v0.0.0-20181105185800-0add4bf0b9ad
 	github.com/asaskevich/govalidator v0.0.0-20200907205600-7a23bdc65eef
 	github.com/cavaliercoder/grab v2.0.0+incompatible
 	github.com/cheggaaa/pb/v3 v3.0.5
+	github.com/code-ready/admin-helper v0.0.0-20210317085515-2d7f65e95985
 	github.com/code-ready/clicumber v0.0.0-20210201104241-cecb794bdf9a
 	github.com/code-ready/gvisor-tap-vsock v0.0.0-20210308122700-d61f9aac135c
 	github.com/code-ready/machine v0.0.0-20210122113819-281ccfbb4566
@@ -42,7 +43,7 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/afero v1.4.1 // indirect
 	github.com/spf13/cast v1.3.1
-	github.com/spf13/cobra v1.1.1
+	github.com/spf13/cobra v1.1.3
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
@@ -59,7 +60,6 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/AlecAivazis/survey.v1 v1.8.8
 	gopkg.in/ini.v1 v1.62.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/api v0.20.1
 	k8s.io/client-go v0.20.1
 )
@@ -77,3 +77,5 @@ replace (
 	k8s.io/client-go => github.com/openshift/kubernetes-client-go v0.0.0-20210108114446-0829bdd68114
 	k8s.io/kubectl => github.com/openshift/kubernetes-kubectl v0.0.0-20210108115031-c0d78c0aeda3
 )
+
+replace github.com/code-ready/admin-helper => github.com/guillaumerose/admin-helper v0.0.0-20210217134427-dea613a7385a

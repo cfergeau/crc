@@ -4,7 +4,7 @@ github.com/Azure/go-ansiterm/winterm
 # github.com/Masterminds/semver v1.5.0
 ## explicit
 github.com/Masterminds/semver
-# github.com/Microsoft/go-winio v0.4.15-0.20200908182639-5b44b70ab3ab
+# github.com/Microsoft/go-winio v0.4.16
 ## explicit
 github.com/Microsoft/go-winio
 github.com/Microsoft/go-winio/pkg/guid
@@ -32,6 +32,10 @@ github.com/cavaliercoder/grab
 ## explicit
 github.com/cheggaaa/pb/v3
 github.com/cheggaaa/pb/v3/termutil
+# github.com/code-ready/admin-helper v0.0.0-20210317085515-2d7f65e95985 => github.com/guillaumerose/admin-helper v0.0.0-20210217134427-dea613a7385a
+## explicit
+github.com/code-ready/admin-helper/pkg/client
+github.com/code-ready/admin-helper/pkg/types
 # github.com/code-ready/clicumber v0.0.0-20210201104241-cecb794bdf9a
 ## explicit
 github.com/code-ready/clicumber/testsuite
@@ -263,7 +267,7 @@ github.com/spf13/afero/mem
 # github.com/spf13/cast v1.3.1
 ## explicit
 github.com/spf13/cast
-# github.com/spf13/cobra v1.1.1
+# github.com/spf13/cobra v1.1.3
 ## explicit
 github.com/spf13/cobra
 # github.com/spf13/jwalterweatherman v1.0.0
@@ -413,7 +417,6 @@ gopkg.in/ini.v1
 # gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7
 gopkg.in/tomb.v1
 # gopkg.in/yaml.v2 v2.4.0
-## explicit
 gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 gopkg.in/yaml.v3
@@ -535,3 +538,4 @@ sigs.k8s.io/yaml
 # k8s.io/apimachinery => github.com/openshift/kubernetes-apimachinery v0.0.0-20210108114224-194a87c5b03a
 # k8s.io/client-go => github.com/openshift/kubernetes-client-go v0.0.0-20210108114446-0829bdd68114
 # k8s.io/kubectl => github.com/openshift/kubernetes-kubectl v0.0.0-20210108115031-c0d78c0aeda3
+# github.com/code-ready/admin-helper => github.com/guillaumerose/admin-helper v0.0.0-20210217134427-dea613a7385a
