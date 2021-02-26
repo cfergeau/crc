@@ -118,7 +118,9 @@ func run(configuration *types.Configuration) error {
 		if httpListener == nil {
 			return
 		}
-		if err := http.Serve(httpListener, vn.Mux()); err != nil {
+		mux := http.NewServeMux()
+		mux.Handle("/network/", http.StripPrefix("/network", vn.Mux()))
+		if err := http.Serve(httpListener, mux); err != nil {
 			errCh <- err
 		}
 	}()
@@ -128,7 +130,9 @@ func run(configuration *types.Configuration) error {
 		return err
 	}
 	go func() {
-		if err := http.Serve(vsockListener, vn.Mux()); err != nil {
+		mux := http.NewServeMux()
+		mux.Handle(types.ConnectPath, vn.Mux())
+		if err := http.Serve(vsockListener, mux); err != nil {
 			errCh <- err
 		}
 	}()
