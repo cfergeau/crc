@@ -8,18 +8,15 @@ import (
 	"os/signal"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"syscall"
 	"time"
 
 	cmdConfig "github.com/code-ready/crc/cmd/crc/cmd/config"
 	"github.com/code-ready/crc/pkg/crc/api"
 	"github.com/code-ready/crc/pkg/crc/constants"
-	"github.com/code-ready/gvisor-tap-vsock/pkg/transport"
 	"github.com/code-ready/gvisor-tap-vsock/pkg/types"
 	"github.com/code-ready/gvisor-tap-vsock/pkg/virtualnetwork"
 	"github.com/docker/go-units"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -36,18 +33,6 @@ var daemonCmd = &cobra.Command{
 	Long:   "Run the crc daemon",
 	Hidden: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var endpoints []string
-		if runtime.GOOS == "windows" {
-			endpoints = append(endpoints, transport.DefaultURL)
-		} else {
-			_ = os.Remove(constants.NetworkSocketPath)
-			endpoints = append(endpoints, fmt.Sprintf("unix://%s", constants.NetworkSocketPath))
-			if runtime.GOOS == "linux" {
-				endpoints = append(endpoints, transport.DefaultURL)
-			} else if runtime.GOOS == "darwin" {
-				endpoints = append(endpoints, fmt.Sprintf("unix://%s", constants.TapSocketPath))
-			}
-		}
 		virtualNetworkConfig := types.Configuration{
 			Debug:             false, // never log packets
 			CaptureFile:       captureFile(),
@@ -105,7 +90,7 @@ var daemonCmd = &cobra.Command{
 			}
 			virtualNetworkConfig.NAT[hostVirtualIP] = "127.0.0.1"
 		}
-		err := run(&virtualNetworkConfig, endpoints)
+		err := run(&virtualNetworkConfig)
 		return err
 	},
 }
@@ -117,27 +102,37 @@ func captureFile() string {
 	return filepath.Join(constants.CrcBaseDir, "capture.pcap")
 }
 
-func run(configuration *types.Configuration, endpoints []string) error {
+func run(configuration *types.Configuration) error {
 	vn, err := virtualnetwork.New(configuration)
 	if err != nil {
 		return err
 	}
-	log.Info("waiting for clients...")
+
 	errCh := make(chan error)
 
-	for _, endpoint := range endpoints {
-		log.Infof("listening %s", endpoint)
-		ln, err := transport.Listen(endpoint)
-		if err != nil {
-			return errors.Wrap(err, "cannot listen")
-		}
-
-		go func() {
-			if err := http.Serve(ln, vn.Mux()); err != nil {
-				errCh <- err
-			}
-		}()
+	httpListener, err := httpListener()
+	if err != nil {
+		return err
 	}
+	go func() {
+		if httpListener == nil {
+			return
+		}
+		if err := http.Serve(httpListener, vn.Mux()); err != nil {
+			errCh <- err
+		}
+	}()
+
+	vsockListener, err := vsockListener()
+	if err != nil {
+		return err
+	}
+	go func() {
+		if err := http.Serve(vsockListener, vn.Mux()); err != nil {
+			errCh <- err
+		}
+	}()
+
 	if isDebugLog() {
 		go func() {
 			for {
