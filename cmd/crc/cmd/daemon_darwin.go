@@ -13,5 +13,5 @@ func vsockListener() (net.Listener, error) {
 }
 
 func httpListener() (net.Listener, error) {
-	return transport.Listen(fmt.Sprintf("unix://%s", constants.NetworkSocketPath))
+	return transport.Listen(fmt.Sprintf("unix://%s", constants.DaemonHTTPSocketPath))
 }
