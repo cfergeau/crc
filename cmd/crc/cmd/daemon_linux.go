@@ -1,17 +1,29 @@
 package cmd
 
 import (
-	"fmt"
 	"net"
+	"os"
 
 	"github.com/code-ready/crc/pkg/crc/constants"
+	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/gvisor-tap-vsock/pkg/transport"
 )
 
 func vsockListener() (net.Listener, error) {
-	return transport.Listen(transport.DefaultURL)
+	ln, err := transport.Listen(transport.DefaultURL)
+	logging.Infof("listening %s", transport.DefaultURL)
+	if err != nil {
+		return nil, err
+	}
+	return ln, nil
 }
 
 func httpListener() (net.Listener, error) {
-	return transport.Listen(fmt.Sprintf("unix://%s", constants.DaemonHTTPSocketPath))
+	_ = os.Remove(constants.DaemonHTTPSocketPath)
+	ln, err := net.Listen("unix", constants.DaemonHTTPSocketPath)
+	logging.Infof("listening %s", constants.DaemonHTTPSocketPath)
+	if err != nil {
+		return nil, err
+	}
+	return ln, nil
 }
