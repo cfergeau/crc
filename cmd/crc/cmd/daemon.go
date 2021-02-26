@@ -44,6 +44,8 @@ var daemonCmd = &cobra.Command{
 			endpoints = append(endpoints, fmt.Sprintf("unix://%s", constants.NetworkSocketPath))
 			if runtime.GOOS == "linux" {
 				endpoints = append(endpoints, transport.DefaultURL)
+			} else if runtime.GOOS == "darwin" {
+				endpoints = append(endpoints, fmt.Sprintf("unix://%s", constants.TapSocketPath))
 			}
 		}
 		virtualNetworkConfig := types.Configuration{
