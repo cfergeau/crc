@@ -227,17 +227,15 @@ func getNetworkChecksForDistro(distro *linux.OsRelease, networkMode network.Mode
 		return append(checks, daemonRunningChecks)
 	}
 
-	switch {
-	default:
+	if !(distroIsLike(distro, linux.Ubuntu) || distroIsLike(distro, linux.Fedora)) {
 		logging.Warnf("distribution-specific preflight checks are not implemented for '%s'", distro.ID)
-		fallthrough
-	case distroIsLike(distro, linux.Ubuntu), distroIsLike(distro, linux.Fedora):
-		checks = append(checks, nmPreflightChecks[:]...)
-		if usesSystemdResolved(distro) {
-			checks = append(checks, systemdResolvedPreflightChecks[:]...)
-		} else {
-			checks = append(checks, dnsmasqPreflightChecks[:]...)
-		}
+	}
+
+	checks = append(checks, nmPreflightChecks[:]...)
+	if checkSystemdResolvedIsRunning() == nil {
+		checks = append(checks, systemdResolvedPreflightChecks[:]...)
+	} else {
+		checks = append(checks, dnsmasqPreflightChecks[:]...)
 	}
 
 	return checks
@@ -255,17 +253,6 @@ func getPreflightChecksForDistro(distro *linux.OsRelease, networkMode network.Mo
 	}
 	checks = append(checks, bundleCheck)
 	return checks
-}
-
-func usesSystemdResolved(distro *linux.OsRelease) bool {
-	switch {
-	case distroIsLike(distro, linux.Ubuntu):
-		return true
-	case distro.ID == linux.Fedora:
-		return distro.VersionID >= "33"
-	default:
-		return false
-	}
 }
 
 func distroIsLike(osRelease *linux.OsRelease, osType linux.OsType) bool {
@@ -294,4 +281,11 @@ func distro() *linux.OsRelease {
 		}
 	}
 	return distro
+}
+
+func resolvectlExists() bool {
+	if _, err := os.Stat("/usr/bin/resolvectl"); err != nil {
+		return false
+	}
+	return true
 }
