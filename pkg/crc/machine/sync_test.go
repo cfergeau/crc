@@ -33,7 +33,6 @@ func TestOneStartAtTheSameTime(t *testing.T) {
 	assert.Equal(t, waitingMachine.GetName(), syncMachine.GetName())
 	_, err := syncMachine.Start(context.Background(), StartConfig{})
 	assert.EqualError(t, err, "cluster is starting")
-	assert.EqualError(t, syncMachine.Delete(), "start already in progress, cannot stop or delete yet")
 
 	startCh <- struct{}{}
 	lock.Wait()
@@ -65,6 +64,40 @@ func TestDeleteStop(t *testing.T) {
 	assert.EqualError(t, err, "cluster is stopping or deleting")
 	_, err = syncMachine.Start(context.Background(), StartConfig{})
 	assert.EqualError(t, err, "cluster is starting")
+
+	deleteCh <- struct{}{}
+	lock.Wait()
+
+	assert.False(t, syncMachine.IsProgressing())
+}
+
+func TestCancelStart(t *testing.T) {
+	isRunning := make(chan struct{}, 1)
+	deleteCh := make(chan struct{}, 1)
+	waitingMachine := &waitingMachine{
+		isRunning:        isRunning,
+		startCompleteCh:  make(chan struct{}, 1),
+		deleteCompleteCh: deleteCh,
+	}
+	syncMachine := NewSynchronizedMachine(waitingMachine)
+	assert.False(t, syncMachine.IsProgressing())
+
+	lock := &sync.WaitGroup{}
+	lock.Add(1)
+	go func() {
+		defer lock.Done()
+		_, err := syncMachine.Start(context.Background(), StartConfig{})
+		assert.EqualError(t, err, "context canceled")
+	}()
+
+	<-isRunning
+	assert.True(t, syncMachine.IsProgressing())
+
+	lock.Add(1)
+	go func() {
+		defer lock.Done()
+		assert.NoError(t, syncMachine.Delete())
+	}()
 
 	deleteCh <- struct{}{}
 	lock.Wait()
@@ -111,11 +144,15 @@ func (m *waitingMachine) PowerOff() error {
 
 func (m *waitingMachine) Start(context context.Context, startConfig StartConfig) (*StartResult, error) {
 	m.isRunning <- struct{}{}
-	<-m.startCompleteCh
-	return &StartResult{
-		Status:         state.Running,
-		KubeletStarted: true,
-	}, nil
+	select {
+	case <-context.Done():
+		return nil, context.Err()
+	case <-m.startCompleteCh:
+		return &StartResult{
+			Status:         state.Running,
+			KubeletStarted: true,
+		}, nil
+	}
 }
 
 func (m *waitingMachine) Status() (*ClusterStatusResult, error) {

@@ -3,13 +3,19 @@ package machine
 import (
 	"context"
 	"errors"
+	"time"
+
+	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/machine/libmachine/state"
 	"golang.org/x/sync/semaphore"
 )
 
+const startCancelTimeout = 15 * time.Second
+
 type Synchronized struct {
 	startLock      *semaphore.Weighted
 	stopDeleteLock *semaphore.Weighted
+	startCancel    context.CancelFunc
 	underlying     Client
 }
 
@@ -42,12 +48,13 @@ func (s *Synchronized) Delete() error {
 	return s.underlying.Delete()
 }
 
-func (s *Synchronized) Start(context context.Context, startConfig StartConfig) (*StartResult, error) {
+func (s *Synchronized) Start(ctx context.Context, startConfig StartConfig) (*StartResult, error) {
 	if !s.startLock.TryAcquire(1) {
 		return nil, errors.New("cluster is starting")
 	}
 	defer s.startLock.Release(1)
-	return s.underlying.Start(context, startConfig)
+	ctx, s.startCancel = context.WithCancel(ctx)
+	return s.underlying.Start(ctx, startConfig)
 }
 
 func (s *Synchronized) Stop() (state.State, error) {
@@ -65,10 +72,18 @@ func (s *Synchronized) lockForStopOrDelete() (func(), error) {
 
 		}, errors.New("cluster is stopping or deleting")
 	}
-	if !s.startLock.TryAcquire(1) {
+
+	if s.startCancel != nil {
+		logging.Infof("Cancelling virtual machine start...")
+		s.startCancel()
+	}
+
+	timeout, cancelFunc := context.WithTimeout(context.Background(), startCancelTimeout)
+	defer cancelFunc()
+	if err := s.startLock.Acquire(timeout, 1); err != nil {
 		return func() {
 			s.stopDeleteLock.Release(1)
-		}, errors.New("start already in progress, cannot stop or delete yet")
+		}, errors.New("cannot abort startup sequence quickly enough")
 	}
 	return func() {
 		s.stopDeleteLock.Release(1)
