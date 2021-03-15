@@ -40,9 +40,40 @@ func TestOneStartAtTheSameTime(t *testing.T) {
 	assert.False(t, syncMachine.IsProgressing())
 }
 
+func TestDeleteStop(t *testing.T) {
+	isRunning := make(chan struct{}, 1)
+	deleteCh := make(chan struct{}, 1)
+	waitingMachine := &waitingMachine{
+		isRunning:        isRunning,
+		deleteCompleteCh: deleteCh,
+	}
+	syncMachine := NewSynchronizedMachine(waitingMachine)
+	assert.False(t, syncMachine.IsProgressing())
+
+	lock := &sync.WaitGroup{}
+	lock.Add(1)
+	go func() {
+		defer lock.Done()
+		assert.NoError(t, syncMachine.Delete())
+	}()
+
+	<-isRunning
+	assert.True(t, syncMachine.IsProgressing())
+	assert.EqualError(t, syncMachine.Delete(), "cluster is stopping or deleting")
+	_, err := syncMachine.Stop()
+	assert.EqualError(t, err, "cluster is stopping or deleting")
+
+	deleteCh <- struct{}{}
+	lock.Wait()
+
+	assert.False(t, syncMachine.IsProgressing())
+}
+
 type waitingMachine struct {
-	isRunning       chan struct{}
-	startCompleteCh chan struct{}
+	isRunning        chan struct{}
+	startCompleteCh  chan struct{}
+	stopCompleteCh   chan struct{}
+	deleteCompleteCh chan struct{}
 }
 
 func (m *waitingMachine) IsRunning() (bool, error) {
@@ -54,7 +85,9 @@ func (m *waitingMachine) GetName() string {
 }
 
 func (m *waitingMachine) Delete() error {
-	return errors.New("not implemented")
+	m.isRunning <- struct{}{}
+	<-m.deleteCompleteCh
+	return nil
 }
 
 func (m *waitingMachine) Exists() (bool, error) {
@@ -87,5 +120,7 @@ func (m *waitingMachine) Status() (*ClusterStatusResult, error) {
 }
 
 func (m *waitingMachine) Stop() (state.State, error) {
-	return state.Error, errors.New("not implemented")
+	m.isRunning <- struct{}{}
+	<-m.stopCompleteCh
+	return state.Stopped, nil
 }

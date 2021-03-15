@@ -9,14 +9,16 @@ import (
 )
 
 type Synchronized struct {
-	startLock  *semaphore.Weighted
-	underlying Client
+	startLock      *semaphore.Weighted
+	stopDeleteLock *semaphore.Weighted
+	underlying     Client
 }
 
 func NewSynchronizedMachine(machine Client) *Synchronized {
 	return &Synchronized{
-		startLock:  semaphore.NewWeighted(1),
-		underlying: machine,
+		startLock:      semaphore.NewWeighted(1),
+		stopDeleteLock: semaphore.NewWeighted(1),
+		underlying:     machine,
 	}
 }
 
@@ -25,10 +27,18 @@ func (s *Synchronized) IsProgressing() bool {
 		return true
 	}
 	defer s.startLock.Release(1)
+	if !s.stopDeleteLock.TryAcquire(1) {
+		return true
+	}
+	defer s.stopDeleteLock.Release(1)
 	return false
 }
 
 func (s *Synchronized) Delete() error {
+	if !s.stopDeleteLock.TryAcquire(1) {
+		return errors.New("cluster is stopping or deleting")
+	}
+	defer s.stopDeleteLock.Release(1)
 	return s.underlying.Delete()
 }
 
@@ -41,6 +51,10 @@ func (s *Synchronized) Start(context context.Context, startConfig StartConfig) (
 }
 
 func (s *Synchronized) Stop() (state.State, error) {
+	if !s.stopDeleteLock.TryAcquire(1) {
+		return state.Error, errors.New("cluster is stopping or deleting")
+	}
+	defer s.stopDeleteLock.Release(1)
 	return s.underlying.Stop()
 }
 
