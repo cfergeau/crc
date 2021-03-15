@@ -3,7 +3,6 @@ package machine
 import (
 	"context"
 	"errors"
-
 	"github.com/code-ready/machine/libmachine/state"
 	"golang.org/x/sync/semaphore"
 )
@@ -35,10 +34,11 @@ func (s *Synchronized) IsProgressing() bool {
 }
 
 func (s *Synchronized) Delete() error {
-	if !s.stopDeleteLock.TryAcquire(1) {
-		return errors.New("cluster is stopping or deleting")
+	cleanup, err := s.lockForStopOrDelete()
+	defer cleanup()
+	if err != nil {
+		return err
 	}
-	defer s.stopDeleteLock.Release(1)
 	return s.underlying.Delete()
 }
 
@@ -51,11 +51,29 @@ func (s *Synchronized) Start(context context.Context, startConfig StartConfig) (
 }
 
 func (s *Synchronized) Stop() (state.State, error) {
-	if !s.stopDeleteLock.TryAcquire(1) {
-		return state.Error, errors.New("cluster is stopping or deleting")
+	cleanup, err := s.lockForStopOrDelete()
+	defer cleanup()
+	if err != nil {
+		return state.Error, err
 	}
-	defer s.stopDeleteLock.Release(1)
 	return s.underlying.Stop()
+}
+
+func (s *Synchronized) lockForStopOrDelete() (func(), error) {
+	if !s.stopDeleteLock.TryAcquire(1) {
+		return func() {
+
+		}, errors.New("cluster is stopping or deleting")
+	}
+	if !s.startLock.TryAcquire(1) {
+		return func() {
+			s.stopDeleteLock.Release(1)
+		}, errors.New("start already in progress, cannot stop or delete yet")
+	}
+	return func() {
+		s.stopDeleteLock.Release(1)
+		s.startLock.Release(1)
+	}, nil
 }
 
 func (s *Synchronized) GetName() string {
