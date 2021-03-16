@@ -268,7 +268,9 @@ func (client *client) Start(ctx context.Context, startConfig StartConfig) (*Star
 	}
 
 	// Trigger disk resize, this will be a no-op if no disk size change is needed
-	if _, _, err = sshRunner.Run("sudo xfs_growfs / >/dev/null"); err != nil {
+	// With 4.7, this is quite a manual process until https://github.com/openshift/installer/pull/4746 gets fixed
+	// See https://github.com/code-ready/crc/issues/2104 for details
+	if _, _, err = sshRunner.Run("sudo /usr/bin/growpart /dev/vda 4 && sudo mount -o remount,rw /sysroot && sudo xfs_growfs /dev/vda4"); err != nil {
 		return nil, errors.Wrap(err, "Error updating filesystem size")
 	}
 
