@@ -26,11 +26,21 @@ type TrayVersion struct {
 }
 
 func checkIfDaemonPlistFileExists() error {
-	daemonConfig, err := getDaemonConfig()
-	if err != nil {
-		return err
-	}
-	return launchd.CheckPlist(*daemonConfig)
+	// crc setup can be ran from any location in the
+	// users computer, and we need to update the plist
+	// file with the path of the crc executable which was
+	// used to run setup, to force it this check needs
+	// to always fail so the fix routine is triggered
+
+	return fmt.Errorf("Ignoring this check and triggering creation of daemon plist")
+
+	/*
+		daemonConfig, err := getDaemonConfig()
+		if err != nil {
+			return err
+		}
+		return launchd.CheckPlist(*daemonConfig)
+	*/
 }
 
 func getDaemonConfig() (*launchd.AgentConfig, error) {
