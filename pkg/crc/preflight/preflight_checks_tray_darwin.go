@@ -100,15 +100,14 @@ func removeTrayPlistFile() error {
 }
 
 func checkIfDaemonAgentRunning() error {
-	// restart the daemon in case the crc binary changed (upgrades, ...)
-	return fmt.Errorf("Triggering restart of crc daemon")
+	if !launchd.AgentRunning(daemonAgentLabel) {
+		return fmt.Errorf("crc daemon is not running")
+	}
+	return nil
 }
 
 func fixDaemonAgentRunning() error {
 	logging.Debug("Starting daemon agent")
-	if launchd.AgentRunning(daemonAgentLabel) {
-		_ = launchd.StopAgent(daemonAgentLabel)
-	}
 	if err := launchd.LoadPlist(daemonAgentLabel); err != nil {
 		return err
 	}
