@@ -32,7 +32,7 @@ func TestOneStartAtTheSameTime(t *testing.T) {
 	assert.True(t, syncMachine.IsProgressing())
 	assert.Equal(t, waitingMachine.GetName(), syncMachine.GetName())
 	_, err := syncMachine.Start(context.Background(), StartConfig{})
-	assert.EqualError(t, err, "cluster is starting")
+	assert.EqualError(t, err, "cluster is busy")
 
 	startCh <- struct{}{}
 	lock.Wait()
@@ -63,7 +63,7 @@ func TestDeleteStop(t *testing.T) {
 	_, err := syncMachine.Stop()
 	assert.EqualError(t, err, "cluster is stopping or deleting")
 	_, err = syncMachine.Start(context.Background(), StartConfig{})
-	assert.EqualError(t, err, "cluster is starting")
+	assert.EqualError(t, err, "cluster is busy")
 
 	deleteCh <- struct{}{}
 	lock.Wait()

@@ -3,92 +3,155 @@ package machine
 import (
 	"context"
 	"errors"
+	"sync"
 	"time"
 
 	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/machine/libmachine/state"
-	"golang.org/x/sync/semaphore"
 )
 
 const startCancelTimeout = 15 * time.Second
 
+type State int
+
+const (
+	Idle State = iota
+	Deleting
+	Stopping
+	Starting
+	Cancelling
+	Unknown
+)
+
 type Synchronized struct {
-	startLock      *semaphore.Weighted
-	stopDeleteLock *semaphore.Weighted
-	startCancel    context.CancelFunc
-	underlying     Client
+	underlying Client
+
+	stateLock    sync.Mutex
+	currentState State
+	startCancel  context.CancelFunc
+
+	syncOperationDone chan State
 }
 
 func NewSynchronizedMachine(machine Client) *Synchronized {
 	return &Synchronized{
-		startLock:      semaphore.NewWeighted(1),
-		stopDeleteLock: semaphore.NewWeighted(1),
-		underlying:     machine,
+		underlying:        machine,
+		currentState:      Idle,
+		syncOperationDone: make(chan State, 1),
 	}
+}
+
+func (s *Synchronized) CurrentState() State {
+	s.stateLock.Lock()
+	defer s.stateLock.Unlock()
+
+	return s.currentStateUnlocked()
+}
+
+func (s *Synchronized) currentStateUnlocked() State {
+	select {
+	case st := <-s.syncOperationDone:
+		if s.currentState == st {
+			s.currentState = Idle
+		}
+		if st == Starting {
+			s.startCancel = nil
+		}
+	default:
+	}
+	return s.currentState
 }
 
 func (s *Synchronized) IsProgressing() bool {
-	if !s.startLock.TryAcquire(1) {
+	state := s.CurrentState()
+	logging.Infof("state: %v", state)
+	switch state {
+	case Deleting, Stopping, Starting:
 		return true
+	default:
+		return false
 	}
-	defer s.startLock.Release(1)
-	if !s.stopDeleteLock.TryAcquire(1) {
-		return true
-	}
-	defer s.stopDeleteLock.Release(1)
-	return false
 }
 
 func (s *Synchronized) Delete() error {
-	cleanup, err := s.lockForStopOrDelete()
-	defer cleanup()
-	if err != nil {
+	if err := s.prepareStopDelete(Deleting); err != nil {
 		return err
 	}
-	return s.underlying.Delete()
+
+	err := s.underlying.Delete()
+	s.syncOperationDone <- Deleting
+	return err
+}
+
+func (s *Synchronized) prepareStart(startCancel context.CancelFunc) error {
+	s.stateLock.Lock()
+	defer s.stateLock.Unlock()
+	if s.currentStateUnlocked() != Idle {
+		return errors.New("cluster is busy")
+	}
+	s.startCancel = startCancel
+	s.currentState = Starting
+
+	return nil
 }
 
 func (s *Synchronized) Start(ctx context.Context, startConfig StartConfig) (*StartResult, error) {
-	if !s.startLock.TryAcquire(1) {
-		return nil, errors.New("cluster is starting")
+	ctx, startCancel := context.WithCancel(ctx)
+	if err := s.prepareStart(startCancel); err != nil {
+		return nil, err
 	}
-	defer s.startLock.Release(1)
-	ctx, s.startCancel = context.WithCancel(ctx)
-	return s.underlying.Start(ctx, startConfig)
+
+	startResult, err := s.underlying.Start(ctx, startConfig)
+	s.syncOperationDone <- Starting
+	return startResult, err
 }
 
-func (s *Synchronized) Stop() (state.State, error) {
-	cleanup, err := s.lockForStopOrDelete()
-	defer cleanup()
-	if err != nil {
-		return state.Error, err
-	}
-	return s.underlying.Stop()
-}
-
-func (s *Synchronized) lockForStopOrDelete() (func(), error) {
-	if !s.stopDeleteLock.TryAcquire(1) {
-		return func() {
-
-		}, errors.New("cluster is stopping or deleting")
-	}
-
+/* cancel ongoing start, and wait until the start is fully cancelled. Time out if cancellation takes more than 'timeout'
+ * s.stateLock must be locked before calling this function
+ */
+func (s *Synchronized) cancelUnlocked(timeout time.Duration) error {
 	if s.startCancel != nil {
 		logging.Infof("Cancelling virtual machine start...")
 		s.startCancel()
 	}
-
-	timeout, cancelFunc := context.WithTimeout(context.Background(), startCancelTimeout)
-	defer cancelFunc()
-	if err := s.startLock.Acquire(timeout, 1); err != nil {
-		return func() {
-			s.stopDeleteLock.Release(1)
-		}, errors.New("cannot abort startup sequence quickly enough")
+	select {
+	case <-s.syncOperationDone:
+		return nil
+	case <-time.After(timeout):
+		return errors.New("cannot abort startup sequence quickly enough")
 	}
-	return func() {
-		s.stopDeleteLock.Release(1)
-		s.startLock.Release(1)
-	}, nil
+
+	return errors.New("code should not be reached")
+}
+
+func (s *Synchronized) prepareStopDelete(state State) error {
+	s.stateLock.Lock()
+	defer s.stateLock.Unlock()
+
+	switch s.currentStateUnlocked() {
+	case Starting:
+		if err := s.cancelUnlocked(startCancelTimeout); err != nil {
+			return err
+		}
+	case Idle:
+		break
+	default:
+		return errors.New("cluster is stopping or deleting")
+	}
+
+	s.currentState = state
+	return nil
+}
+
+func (s *Synchronized) Stop() (state.State, error) {
+	if err := s.prepareStopDelete(Stopping); err != nil {
+		return state.Error, err
+	}
+
+	st, err := s.underlying.Stop()
+	s.syncOperationDone <- Stopping
+
+	return st, err
 }
 
 func (s *Synchronized) GetName() string {
