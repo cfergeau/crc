@@ -1,4 +1,4 @@
-package cmd
+package daemon
 
 import (
 	"net"
@@ -6,12 +6,12 @@ import (
 
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/logging"
-	"github.com/code-ready/gvisor-tap-vsock/pkg/transport"
 )
 
 func vsockListener() (net.Listener, error) {
-	ln, err := transport.Listen(transport.DefaultURL)
-	logging.Infof("listening %s", transport.DefaultURL)
+	_ = os.Remove(constants.TapSocketPath)
+	ln, err := net.Listen("unix", constants.TapSocketPath)
+	logging.Infof("listening %s", constants.TapSocketPath)
 	if err != nil {
 		return nil, err
 	}
