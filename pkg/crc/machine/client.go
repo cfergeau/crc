@@ -21,6 +21,7 @@ type Client interface {
 	Status() (*ClusterStatusResult, error)
 	Stop() (state.State, error)
 	IsRunning() (bool, error)
+	GenerateBundle() error
 }
 
 type client struct {

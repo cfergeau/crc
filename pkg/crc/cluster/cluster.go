@@ -126,6 +126,18 @@ func EnsurePullSecretPresentInTheCluster(ocConfig oc.Config, pullSec PullSecretL
 	return nil
 }
 
+func RemovePullSecretFromCluster(ocConfig oc.Config) error {
+	cmdArgs := []string{"patch", "secret", "pull-secret", "-p",
+		`'{"data":{".dockerconfigjson":"e30K"}}'`,
+		"-n", "openshift-config", "--type", "merge"}
+
+	_, stderr, err := ocConfig.RunOcCommand(cmdArgs...)
+	if err != nil {
+		return fmt.Errorf("Failed to remove Pull secret %w: %s", err, stderr)
+	}
+	return nil
+}
+
 func EnsureClusterIDIsNotEmpty(ocConfig oc.Config) error {
 	if err := WaitForOpenshiftResource(ocConfig, "clusterversion"); err != nil {
 		return err
@@ -294,6 +306,14 @@ func EnsurePullSecretPresentOnInstanceDisk(sshRunner *ssh.Runner, pullSecret Pul
 		return err
 	}
 	return sshRunner.CopyData([]byte(content), vmPullSecretPath, 0600)
+}
+
+func RemovePullSecretFromTheInstanceDisk(sshRunner *ssh.Runner) error {
+	logging.Info("Removing user's pull secret to instance disk...")
+	if _, _, err := sshRunner.RunPrivileged("Removing user's pull secret", "rm", "-fr", vmPullSecretPath); err != nil {
+		return err
+	}
+	return nil
 }
 
 func WaitForRequestHeaderClientCaFile(sshRunner *ssh.Runner) error {
