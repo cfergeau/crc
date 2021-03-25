@@ -99,18 +99,36 @@ func captureFile() string {
 }
 
 func run(configuration *types.Configuration) error {
-	vsockListener, err := vsockListener()
-	if err != nil {
-		return err
-	}
-
-	vn, err := virtualnetwork.New(configuration)
-	if err != nil {
-		return err
-	}
 
 	errCh := make(chan error)
 
+	if err := startHostListener(vn, errCh); err != nil {
+		return err
+	}
+
+	if err := startVsockListener(vn, errCh); err != nil {
+		return err
+	}
+
+	if err := startLegacyDaemon(errCh); err != nil {
+		return err
+	}
+
+	return daemonRun(errCh)
+}
+
+func daemonRun(errCh chan error) error {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	select {
+	case <-c:
+		return nil
+	case err := <-errCh:
+		return err
+	}
+}
+
+func startHostListener(vn *virtualnetwork.VirtualNetwork, errCh chan error) error {
 	listener, err := httpListener()
 	if err != nil {
 		return err
@@ -127,6 +145,15 @@ func run(configuration *types.Configuration) error {
 			errCh <- err
 		}
 	}()
+
+	return nil
+}
+
+func startVsockListener(vn *virtualnetwork.VirtualNetwork, errCh chan error) error {
+	vsockListener, err := vsockListener()
+	if err != nil {
+		return err
+	}
 
 	go func() {
 		mux := http.NewServeMux()
@@ -145,28 +172,22 @@ func run(configuration *types.Configuration) error {
 		}()
 	}
 
-	go func() {
-		if err := runDaemon(); err != nil {
-			errCh <- err
-		}
-	}()
-
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	select {
-	case <-c:
-		return nil
-	case err := <-errCh:
-		return err
-	}
+	return nil
 }
 
-func runDaemon() error {
+func startLegacyDaemon(errCh chan error) error {
 	// Remove if an old socket is present
 	os.Remove(constants.DaemonSocketPath)
 	apiServer, err := api.CreateServer(constants.DaemonSocketPath, config, newMachine(), logging.Memory)
 	if err != nil {
 		return err
 	}
-	return apiServer.Serve()
+
+	go func() {
+		if err := apiServer.Serve(); err != nil {
+			errCh <- err
+		}
+	}()
+
+	return nil
 }
