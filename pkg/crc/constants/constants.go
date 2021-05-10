@@ -34,7 +34,7 @@ const (
 	DaemonHTTPEndpoint        = "http://unix/api"
 
 	VSockGateway = "192.168.127.1"
-	VsockSSHPort = 2222
+	VSockSSHPort = 2222
 
 	OkdPullSecret = `{"auths":{"fake":{"auth": "Zm9vOmJhcgo="}}}` // #nosec G101
 

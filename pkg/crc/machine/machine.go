@@ -60,7 +60,7 @@ func createLibMachineClient() (libmachine.API, func()) {
 
 func getSSHPort(vsockNetwork bool) int {
 	if vsockNetwork {
-		return constants.VsockSSHPort
+		return constants.VSockSSHPort
 	}
 	return constants.DefaultSSHPort
 }

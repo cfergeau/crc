@@ -103,9 +103,9 @@ var vsockChecks = [...]Check{
 	{
 		configKeySuffix:  "check-vsock",
 		checkDescription: "Checking if vsock is correctly configured",
-		check:            checkVsock,
+		check:            checkVSock,
 		fixDescription:   "Checking if vsock is correctly configured",
-		fix:              fixVsock,
+		fix:              fixVSock,
 	},
 }
 
@@ -117,7 +117,7 @@ const (
 	registryValue = "gvisor-tap-vsock"
 )
 
-func checkVsock() error {
+func checkVSock() error {
 	stdout, _, err := powershell.Execute(fmt.Sprintf(`Get-Item -Path "%s\%s"`, registryDirectory, registryKey))
 	if err != nil {
 		return err
@@ -128,7 +128,7 @@ func checkVsock() error {
 	return nil
 }
 
-func fixVsock() error {
+func fixVSock() error {
 	cmds := []string{
 		fmt.Sprintf(`$service = New-Item -Path "%s" -Name "%s"`, registryDirectory, registryKey),
 		fmt.Sprintf(`$service.SetValue("ElementName", "%v")`, registryValue),

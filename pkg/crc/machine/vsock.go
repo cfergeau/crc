@@ -53,7 +53,7 @@ const (
 func vsockPorts() []types.ExposeRequest {
 	return []types.ExposeRequest{
 		{
-			Local:  fmt.Sprintf(":%d", constants.VsockSSHPort),
+			Local:  fmt.Sprintf(":%d", constants.VSockSSHPort),
 			Remote: fmt.Sprintf("%s:%d", virtualMachineIP, internalSSHPort),
 		},
 		{

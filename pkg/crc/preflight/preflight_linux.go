@@ -107,11 +107,11 @@ var libvirtNetworkPreflightChecks = [...]Check{
 var vsockPreflightChecks = Check{
 	configKeySuffix:    "check-vsock",
 	checkDescription:   "Checking if vsock is correctly configured",
-	check:              checkVsock,
+	check:              checkVSock,
 	fixDescription:     "Setting up vsock support",
-	fix:                fixVsock,
+	fix:                fixVSock,
 	cleanupDescription: "Removing vsock configuration",
-	cleanup:            removeVsockCrcSettings,
+	cleanup:            removeVSockCrcSettings,
 }
 
 var wsl2PreflightChecks = Check{
@@ -128,7 +128,7 @@ const (
 	vsockModuleAutoLoadConfPath  = "/etc/modules-load.d/vhost_vsock.conf"
 )
 
-func checkVsock() error {
+func checkVSock() error {
 	executable, err := os.Executable()
 	if err != nil {
 		return err
@@ -155,7 +155,7 @@ func checkVsock() error {
 	return nil
 }
 
-func fixVsock() error {
+func fixVSock() error {
 	executable, err := os.Executable()
 	if err != nil {
 		return err
@@ -205,7 +205,7 @@ func fixVsock() error {
 	return nil
 }
 
-func removeVsockCrcSettings() error {
+func removeVSockCrcSettings() error {
 	var mErr crcErrors.MultiError
 	err := crcos.RemoveFileAsRoot(fmt.Sprintf("Removing udev rule in %s", vsockUdevSystemRulesPath), vsockUdevSystemRulesPath)
 	if err != nil {
