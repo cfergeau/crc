@@ -27,10 +27,12 @@ func getHyperKitMachineDriverVersion(executablePath string) (string, error) {
  * stdout, and it needs to deal with multiline output
  */
 func getHyperKitVersion(executablePath string) (string, error) {
-	_, stderr, err := crcos.RunWithDefaultLocale(executablePath, "-v")
+	_, err := crcos.RunWithDefaultLocale(executablePath, "-v")
 	if err != nil {
 		return "", err
 	}
+	// FIXME: hack
+	stderr := ""
 	stderr, err = getFirstLine(stderr)
 	if err != nil {
 		return "", err
