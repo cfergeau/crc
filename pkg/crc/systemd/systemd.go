@@ -1,6 +1,7 @@
 package systemd
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/code-ready/crc/pkg/crc/ssh"
@@ -82,11 +83,12 @@ func (c Commander) service(name string, action actions.Action) (states.State, er
 		if state != states.Unknown {
 			return state, nil
 		}
-		// FIXME stdErr is needed... Extract it from 'err'?
-		stdErr := stdOut
-		state = states.Compare(stdErr)
-		if state == states.NotFound {
-			return state, nil
+		var execErr crcos.ExecError
+		if errors.As(err, &execErr) {
+			state = states.Compare(execErr.Stderr)
+			if state == states.NotFound {
+				return state, nil
+			}
 		}
 
 		return states.Error, fmt.Errorf("Executing systemctl action failed: %s %v", stdOut, err)
