@@ -82,6 +82,8 @@ func (c Commander) service(name string, action actions.Action) (states.State, er
 		if state != states.Unknown {
 			return state, nil
 		}
+		// FIXME stdErr is needed... Extract it from 'err'?
+		stdErr := stdOut
 		state = states.Compare(stdErr)
 		if state == states.NotFound {
 			return state, nil
