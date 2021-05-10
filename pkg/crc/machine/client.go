@@ -43,7 +43,7 @@ func (client *client) GetName() string {
 }
 
 func (client *client) useVSock() bool {
-	return client.networkMode() == network.UserNetworkingMode
+	return client.networkMode() == network.VSockNetworkingMode
 }
 
 func (client *client) networkMode() network.Mode {

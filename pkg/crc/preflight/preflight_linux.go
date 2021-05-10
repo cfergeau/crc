@@ -227,7 +227,7 @@ func removeVSockCrcSettings() error {
 
 func getAllPreflightChecks() []Check {
 	usingSystemdResolved := checkSystemdResolvedIsRunning()
-	checks := getPreflightChecksForDistro(distro(), network.SystemNetworkingMode, usingSystemdResolved == nil)
+	checks := getPreflightChecksForDistro(distro(), network.BridgedNetworkingMode, usingSystemdResolved == nil)
 	checks = append(checks, wsl2PreflightChecks)
 	checks = append(checks, vsockPreflightChecks)
 	return checks
@@ -243,7 +243,7 @@ func getPreflightChecks(_ bool, _ bool, networkMode network.Mode) []Check {
 func getNetworkChecks(networkMode network.Mode, systemdResolved bool) []Check {
 	var checks []Check
 
-	if networkMode == network.UserNetworkingMode {
+	if networkMode == network.VSockNetworkingMode {
 		return append(checks, vsockPreflightChecks)
 	}
 
@@ -264,7 +264,7 @@ func getPreflightChecksForDistro(distro *linux.OsRelease, networkMode network.Mo
 	checks = append(checks, libvirtPreflightChecks(distro)...)
 	networkChecks := getNetworkChecks(networkMode, systemdResolved)
 	checks = append(checks, networkChecks...)
-	if networkMode == network.SystemNetworkingMode {
+	if networkMode == network.BridgedNetworkingMode {
 		checks = append(checks, libvirtNetworkPreflightChecks[:]...)
 	}
 	checks = append(checks, bundleCheck)

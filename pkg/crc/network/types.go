@@ -23,25 +23,25 @@ type ResolvFileValues struct {
 type Mode string
 
 const (
-	SystemNetworkingMode Mode = "system"
-	UserNetworkingMode   Mode = "user"
+	BridgedNetworkingMode Mode = "bridged"
+	VSockNetworkingMode   Mode = "vsock"
 )
 
 func parseMode(input string) (Mode, error) {
 	switch input {
-	case string(UserNetworkingMode), "vsock":
-		return UserNetworkingMode, nil
-	case string(SystemNetworkingMode), "default":
-		return SystemNetworkingMode, nil
+	case string(VSockNetworkingMode):
+		return VSockNetworkingMode, nil
+	case string(BridgedNetworkingMode), "default":
+		return BridgedNetworkingMode, nil
 	default:
-		return SystemNetworkingMode, fmt.Errorf("Cannot parse mode '%s'", input)
+		return BridgedNetworkingMode, fmt.Errorf("Cannot parse mode '%s'", input)
 	}
 }
 func ParseMode(input string) Mode {
 	mode, err := parseMode(input)
 	if err != nil {
 		logging.Errorf("unexpected network mode %s, using default", input)
-		return SystemNetworkingMode
+		return BridgedNetworkingMode
 	}
 	return mode
 }
@@ -49,7 +49,7 @@ func ParseMode(input string) Mode {
 func ValidateMode(val interface{}) (bool, string) {
 	_, err := parseMode(cast.ToString(val))
 	if err != nil {
-		return false, fmt.Sprintf("network mode should be either %s or %s", SystemNetworkingMode, UserNetworkingMode)
+		return false, fmt.Sprintf("network mode should be either %s or %s", BridgedNetworkingMode, VSockNetworkingMode)
 	}
 	return true, ""
 }

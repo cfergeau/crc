@@ -19,7 +19,7 @@ const (
 )
 
 func runPostStartForOS(serviceConfig services.ServicePostStartConfig) error {
-	if serviceConfig.NetworkMode == network.UserNetworkingMode {
+	if serviceConfig.NetworkMode == network.VSockNetworkingMode {
 		return addOpenShiftHosts(serviceConfig)
 	}
 

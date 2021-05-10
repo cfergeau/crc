@@ -258,7 +258,7 @@ func commandLinePrefix(shell string) string {
 }
 
 func checkDaemonStarted() error {
-	if crcConfig.GetNetworkMode(config) == network.SystemNetworkingMode {
+	if crcConfig.GetNetworkMode(config) == network.BridgedNetworkingMode {
 		return nil
 	}
 	daemonClient := daemonclient.New()
