@@ -35,7 +35,7 @@ func getQcowToolVersion(executablePath string) (string, error) {
  * stdout, and it needs to deal with multiline output
  */
 func getHyperKitVersion(executablePath string) (string, error) {
-	_, stderr, err := crcos.RunWithDefaultLocale(executablePath, "-v")
+	_, stderr, err := crcos.RunWithStdErr(executablePath, "-v")
 	if err != nil {
 		return "", err
 	}

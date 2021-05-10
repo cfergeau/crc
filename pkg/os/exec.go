@@ -27,7 +27,7 @@ func (e *ExecError) Unwrap() error {
 	return e.Err
 }
 
-func runCmd(command string, args []string, env map[string]string) (string, string, error) {
+func runCmdFull(command string, args []string, env map[string]string) (string, string, error) {
 	cmd := exec.Command(command, args...) // #nosec G204
 	if len(env) != 0 {
 		cmd.Env = os.Environ()
@@ -47,6 +47,10 @@ func runCmd(command string, args []string, env map[string]string) (string, strin
 		err = &ExecError{err, stdOut.String(), stdErr.String()}
 	}
 	return stdOut.String(), stdErr.String(), err
+}
+
+func runCmd(command string, args []string, env map[string]string) (string, string, error) {
+	return runCmdFull(command, args, env)
 }
 
 func run(command string, args []string, env map[string]string) (string, string, error) {
@@ -75,6 +79,11 @@ var defaultLocaleEnv = map[string]string{"LC_ALL": "C", "LANG": "C"}
 
 func RunWithDefaultLocale(command string, args ...string) (string, string, error) {
 	return run(command, args, defaultLocaleEnv)
+}
+
+func RunWithStdErr(command string, args ...string) (string, string, error) {
+	logging.Debugf("Running '%s %s'", command, strings.Join(args, " "))
+	return runCmdFull(command, args, defaultLocaleEnv)
 }
 
 func RunWithDefaultLocalePrivate(command string, args ...string) (string, string, error) {
