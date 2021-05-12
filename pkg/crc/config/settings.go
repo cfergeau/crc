@@ -120,3 +120,11 @@ func defaultNetworkMode() network.Mode {
 func GetNetworkMode(config Storage) network.Mode {
 	return network.ParseMode(config.Get(NetworkMode).AsString())
 }
+
+func GetExperimentalFeatures(config Storage) bool {
+	return config.Get(ExperimentalFeatures).AsBool()
+}
+
+func GetAutostartTray(config Storage) bool {
+	return config.Get(AutostartTray).AsBool()
+}
