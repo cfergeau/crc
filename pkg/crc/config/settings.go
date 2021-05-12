@@ -157,3 +157,15 @@ func GetNetworkMode(config Storage) network.Mode {
 	}
 	return network.ParseMode(config.Get(NetworkMode).AsString())
 }
+
+func GetExperimentalFeatures(config Storage) bool {
+	return config.Get(ExperimentalFeatures).AsBool()
+}
+
+func GetAutostartTray(config Storage) bool {
+	return config.Get(AutostartTray).AsBool()
+}
+
+func GetBundlePath(config Storage) string {
+	return config.Get(Bundle).AsString()
+}
