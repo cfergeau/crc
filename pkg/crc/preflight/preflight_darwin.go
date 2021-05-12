@@ -3,7 +3,6 @@ package preflight
 import (
 	"fmt"
 
-	"github.com/code-ready/crc/pkg/crc/config"
 	"github.com/code-ready/crc/pkg/crc/network"
 	"github.com/code-ready/crc/pkg/crc/version"
 )
@@ -153,6 +152,6 @@ func getPreflightChecks(_ bool, trayAutostart bool, mode network.Mode) []Check {
 	return filter.Apply(getChecks(mode))
 }
 
-func optionsNew(config config.Storage, networkMode network.Mode) options {
-	return commonOptionsNew(config, networkMode)
+func optionsNew(networkMode network.Mode) options {
+	return commonOptionsNew(networkMode)
 }

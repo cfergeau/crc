@@ -23,7 +23,6 @@ import (
 	"github.com/code-ready/crc/pkg/os/linux"
 	libvirtxml "github.com/libvirt/libvirt-go-xml"
 
-	"github.com/code-ready/crc/pkg/crc/config"
 	"github.com/code-ready/crc/pkg/crc/network"
 )
 
@@ -32,9 +31,9 @@ type linuxOptions struct {
 	distro *linux.OsRelease
 }
 
-func optionsNew(config config.Storage, networkMode network.Mode) options {
+func optionsNew(networkMode network.Mode) options {
 	return &linuxOptions{
-		commonOptions: commonOptionsNew(config, networkMode).(*commonOptions),
+		commonOptions: commonOptionsNew(networkMode).(*commonOptions),
 		distro:        distro(),
 	}
 }

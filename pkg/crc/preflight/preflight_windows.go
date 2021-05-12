@@ -13,8 +13,6 @@ import (
 	"github.com/code-ready/crc/pkg/crc/network"
 	"github.com/code-ready/crc/pkg/crc/version"
 	"github.com/code-ready/crc/pkg/os/windows/powershell"
-
-	"github.com/code-ready/crc/pkg/crc/config"
 )
 
 var hypervPreflightChecks = []Check{
@@ -233,8 +231,8 @@ var adminHelperChecks = []Check{
 	cleanUpHostsFile,
 }
 
-func optionsNew(config config.Storage, networkMode network.Mode) options {
-	return commonOptionsNew(config, networkMode)
+func optionsNew(networkMode network.Mode) options {
+	return commonOptionsNew(networkMode)
 }
 
 const (

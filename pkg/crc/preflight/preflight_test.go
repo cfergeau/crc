@@ -15,8 +15,8 @@ func TestCheckPreflight(t *testing.T) {
 	cfg := config.New(config.NewEmptyInMemoryStorage())
 	doRegisterSettings(cfg, []Check{*check})
 
-	opts := optionsNew(cfg, network.UserNetworkingMode)
-	assert.NoError(t, doPreflightChecks(opts, []Check{*check}))
+	opts := optionsNew(network.UserNetworkingMode)
+	assert.NoError(t, doPreflightChecks(cfg, opts, []Check{*check}))
 	assert.True(t, calls.checked)
 	assert.False(t, calls.fixed)
 }
@@ -28,8 +28,8 @@ func TestSkipPreflight(t *testing.T) {
 	_, err := cfg.Set("skip-sample", true)
 	assert.NoError(t, err)
 
-	opts := optionsNew(cfg, network.UserNetworkingMode)
-	assert.NoError(t, doPreflightChecks(opts, []Check{*check}))
+	opts := optionsNew(network.UserNetworkingMode)
+	assert.NoError(t, doPreflightChecks(cfg, opts, []Check{*check}))
 	assert.False(t, calls.checked)
 }
 
@@ -38,8 +38,8 @@ func TestFixPreflight(t *testing.T) {
 	cfg := config.New(config.NewEmptyInMemoryStorage())
 	doRegisterSettings(cfg, []Check{*check})
 
-	opts := optionsNew(cfg, network.UserNetworkingMode)
-	assert.NoError(t, doFixPreflightChecks(opts, []Check{*check}, false))
+	opts := optionsNew(network.UserNetworkingMode)
+	assert.NoError(t, doFixPreflightChecks(cfg, opts, []Check{*check}, false))
 	assert.True(t, calls.checked)
 	assert.True(t, calls.fixed)
 }
@@ -49,8 +49,8 @@ func TestFixPreflightCheckOnly(t *testing.T) {
 	cfg := config.New(config.NewEmptyInMemoryStorage())
 	doRegisterSettings(cfg, []Check{*check})
 
-	opts := optionsNew(cfg, network.UserNetworkingMode)
-	assert.Error(t, doFixPreflightChecks(opts, []Check{*check}, true))
+	opts := optionsNew(network.UserNetworkingMode)
+	assert.Error(t, doFixPreflightChecks(cfg, opts, []Check{*check}, true))
 	assert.True(t, calls.checked)
 	assert.False(t, calls.fixed)
 }

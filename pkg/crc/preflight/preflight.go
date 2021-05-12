@@ -19,27 +19,20 @@ const (
 )
 
 type commonOptions struct {
-	config      crcConfig.Storage
 	networkMode network.Mode
-}
-
-func (opts *commonOptions) getConfig() crcConfig.Storage {
-	return opts.config
 }
 
 func (opts *commonOptions) getNetworkMode() network.Mode {
 	return opts.networkMode
 }
 
-func commonOptionsNew(config crcConfig.Storage, networkMode network.Mode) options {
+func commonOptionsNew(networkMode network.Mode) options {
 	return &commonOptions{
-		config:      config,
 		networkMode: networkMode,
 	}
 }
 
 type options interface {
-	getConfig() crcConfig.Storage
 	getNetworkMode() network.Mode
 }
 
@@ -74,13 +67,13 @@ func (check *Check) shouldSkip(config crcConfig.Storage) bool {
 	return config.Get(check.getSkipConfigName()).AsBool()
 }
 
-func (check *Check) doCheck(opts options) error {
+func (check *Check) doCheck(config crcConfig.Storage, opts options) error {
 	if check.checkDescription == "" {
 		panic(fmt.Sprintf("Should not happen, empty description for check '%s'", check.configKeySuffix))
 	} else {
 		logging.Infof("%s", check.checkDescription)
 	}
-	if check.shouldSkip(opts.getConfig()) {
+	if check.shouldSkip(config) {
 		logging.Warn("Skipping above check...")
 		return nil
 	}
@@ -115,24 +108,24 @@ func (check *Check) doCleanUp(opts options) error {
 	return check.cleanup(opts)
 }
 
-func doPreflightChecks(opts options, checks []Check) error {
+func doPreflightChecks(config crcConfig.Storage, opts options, checks []Check) error {
 	for _, check := range checks {
 		if check.flags&SetupOnly == SetupOnly || check.flags&CleanUpOnly == CleanUpOnly {
 			continue
 		}
-		if err := check.doCheck(opts); err != nil {
+		if err := check.doCheck(config, opts); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func doFixPreflightChecks(opts options, checks []Check, checkOnly bool) error {
+func doFixPreflightChecks(config crcConfig.Storage, opts options, checks []Check, checkOnly bool) error {
 	for _, check := range checks {
 		if check.flags&CleanUpOnly == CleanUpOnly {
 			continue
 		}
-		err := check.doCheck(opts)
+		err := check.doCheck(config, opts)
 		if err == nil {
 			continue
 		} else if checkOnly {
@@ -180,10 +173,10 @@ func doRegisterSettings(cfg crcConfig.Schema, checks []Check) {
 func StartPreflightChecks(config crcConfig.Storage) error {
 	experimentalFeatures := crcConfig.GetExperimentalFeatures(config)
 	mode := crcConfig.GetNetworkMode(config)
-	opts := optionsNew(config, mode)
+	opts := optionsNew(mode)
 
 	trayAutostart := crcConfig.GetAutostartTray(config)
-	if err := doPreflightChecks(opts, getPreflightChecks(experimentalFeatures, trayAutostart, mode)); err != nil {
+	if err := doPreflightChecks(config, opts, getPreflightChecks(experimentalFeatures, trayAutostart, mode)); err != nil {
 		return &errors.PreflightError{Err: err}
 	}
 	return nil
@@ -193,10 +186,10 @@ func StartPreflightChecks(config crcConfig.Storage) error {
 func SetupHost(config crcConfig.Storage, checkOnly bool) error {
 	experimentalFeatures := crcConfig.GetExperimentalFeatures(config)
 	mode := crcConfig.GetNetworkMode(config)
-	opts := optionsNew(config, mode)
+	opts := optionsNew(mode)
 
 	trayAutostart := crcConfig.GetAutostartTray(config)
-	return doFixPreflightChecks(opts, getPreflightChecks(experimentalFeatures, trayAutostart, mode), checkOnly)
+	return doFixPreflightChecks(config, opts, getPreflightChecks(experimentalFeatures, trayAutostart, mode), checkOnly)
 }
 
 func RegisterSettings(config crcConfig.Schema) {
