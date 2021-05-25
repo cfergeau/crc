@@ -2,7 +2,7 @@ package preflight
 
 import (
 	"reflect"
-	"runtime"
+	// "runtime"
 	"testing"
 
 	"github.com/code-ready/crc/pkg/crc/config"
@@ -497,10 +497,12 @@ var checkListForDistros = []checkListForDistro{
 	},
 }
 
+/*
 func funcToString(f interface{}) string {
 	return runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()
 }
 
+*/
 func assertFuncEqual(t *testing.T, func1 interface{}, func2 interface{}) {
 	assert.Equal(t, reflect.ValueOf(func1).Pointer(), reflect.ValueOf(func2).Pointer(), "%s != %s", funcToString(func1), funcToString(func2))
 }

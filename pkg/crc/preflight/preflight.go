@@ -2,6 +2,8 @@ package preflight
 
 import (
 	"fmt"
+	"reflect"
+	"runtime"
 
 	crcConfig "github.com/code-ready/crc/pkg/crc/config"
 	"github.com/code-ready/crc/pkg/crc/errors"
@@ -115,6 +117,7 @@ func (check *Check) doFix(opts options) error {
 }
 
 func (check *Check) doCleanUp(opts options) error {
+	printCheck(*check)
 	if check.cleanupDescription == "" {
 		panic(fmt.Sprintf("Should not happen, empty description for cleanup '%s'", check.configKeySuffix))
 	}
@@ -129,6 +132,7 @@ func doPreflightChecks(config crcConfig.Storage, opts options, checks []Check) e
 		if check.flags&SetupOnly == SetupOnly || check.flags&CleanUpOnly == CleanUpOnly {
 			continue
 		}
+		printCheck(check)
 		if err := check.doCheck(config, opts); err != nil {
 			return err
 		}
@@ -141,6 +145,7 @@ func doFixPreflightChecks(config crcConfig.Storage, opts options, checks []Check
 		if check.flags&CleanUpOnly == CleanUpOnly || check.flags&StartUpOnly == StartUpOnly {
 			continue
 		}
+		printCheck(check)
 		err := check.doCheck(config, opts)
 		if err == nil {
 			continue
@@ -224,4 +229,28 @@ func CleanUpHost() error {
 	// which are behind the experiment flag. This way cleanup
 	// perform action in a sane way.
 	return doCleanUpPreflightChecks(&commonOptions{}, getAllPreflightChecks())
+}
+
+func funcToString(f interface{}) string {
+	return runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()
+}
+
+func printCheck(check Check) {
+	if check.configKeySuffix != "" {
+		logging.Infof("check %p: configKey: %s", &check, check.configKeySuffix)
+		return
+	}
+	if check.check != nil {
+		logging.Infof("check %p: checkFunc: %s", &check, funcToString(check.check))
+		return
+	}
+	if check.fix != nil {
+		logging.Infof("check %p: fixFunc: %s", &check, funcToString(check.fix))
+		return
+	}
+	if check.cleanup != nil {
+		logging.Infof("check %p: cleanupFunc: %s", &check, funcToString(check.cleanup))
+		return
+	}
+	logging.Infof("check %p: %v", &check, check)
 }
