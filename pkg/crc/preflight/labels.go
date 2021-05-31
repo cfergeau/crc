@@ -11,6 +11,7 @@ type LabelName uint32
 const (
 	Os LabelName = iota
 	NetworkMode
+	Command // next commit
 
 	// Keep it last
 	lastLabelName // will be used in OS-specific go files to extend LabelName
@@ -27,6 +28,11 @@ const (
 	// network mode
 	User
 	System
+
+	// command
+	// CleanupOnly
+	// SetupOnly
+	// StartOnly
 
 	// Keep it last
 	lastLabelValue // will be used in OS-specific go files to extend LabelValue

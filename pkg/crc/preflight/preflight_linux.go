@@ -95,6 +95,7 @@ func libvirtPreflightChecks(distro *linux.OsRelease) []Check {
 			flags:              CleanUpOnly,
 
 			labels: labels{Os: Linux},
+			//labels: labels{Os: Linux, Command: CleanupOnly},
 		},
 	}
 	return checks

@@ -119,6 +119,7 @@ var hypervPreflightChecks = []Check{
 		flags:              CleanUpOnly,
 
 		labels: labels{Os: Windows},
+		//labels: labels{Os: Windows, Command: CleanupOnly},
 	},
 	{
 		cleanupDescription: "Removing the crc VM if exists",
@@ -126,6 +127,7 @@ var hypervPreflightChecks = []Check{
 		flags:              CleanUpOnly,
 
 		labels: labels{Os: Windows},
+		//labels: labels{Os: Windows, Command: CleanupOnly},
 	},
 }
 
@@ -140,6 +142,7 @@ var traySetupChecks = []Check{
 		flags:              SetupOnly,
 
 		labels: labels{Os: Windows, Tray: Enabled},
+		//labels: labels{Os: Windows, Command: SetupOnly, Tray: Enabled},
 	},
 	{
 		checkDescription: "Checking if tray executable is present",
@@ -149,6 +152,7 @@ var traySetupChecks = []Check{
 		flags:            SetupOnly,
 
 		labels: labels{Os: Windows, Tray: Enabled},
+		//labels: labels{Os: Windows, Command: SetupOnly, Tray: Enabled},
 	},
 	{
 		checkDescription: "Checking if tray is running",
@@ -165,6 +169,7 @@ var traySetupChecks = []Check{
 		flags:              CleanUpOnly,
 
 		labels: labels{Os: Windows, Tray: Enabled},
+		//labels: labels{Os: Windows, Command: SetupOnly, Tray: Enabled},
 	},
 }
 

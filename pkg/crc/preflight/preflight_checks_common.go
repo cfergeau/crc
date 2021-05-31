@@ -29,6 +29,7 @@ var bundleCheck = Check{
 	flags:            SetupOnly,
 
 	labels: None,
+	//labels: labels{Command: SetupOnly},
 }
 
 var genericPreflightChecks = []Check{
@@ -75,6 +76,7 @@ var genericPreflightChecks = []Check{
 		flags:              CleanUpOnly,
 
 		labels: None,
+		//labels: labels{Command: CleanupOnly},
 	},
 	{
 		cleanupDescription: "Removing older logs",
@@ -82,6 +84,7 @@ var genericPreflightChecks = []Check{
 		flags:              CleanUpOnly,
 
 		labels: None,
+		//labels: labels{Command: CleanupOnly},
 	},
 	{
 		cleanupDescription: "Removing pull secret from the keyring",
@@ -89,6 +92,7 @@ var genericPreflightChecks = []Check{
 		flags:              CleanUpOnly,
 
 		labels: None,
+		//labels: labels{Command: CleanupOnly},
 	},
 }
 
@@ -98,6 +102,7 @@ var cleanUpHostsFile = Check{
 	flags:              CleanUpOnly,
 
 	labels: None,
+	//labels: labels{Command: CleanupOnly},
 }
 
 func checkSupportedCPUArch(_ options) error {
