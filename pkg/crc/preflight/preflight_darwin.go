@@ -52,6 +52,7 @@ var hyperkitPreflightChecks = []Check{
 		flags:              CleanUpOnly,
 
 		labels: labels{Os: Darwin},
+		//labels: labels{Os: Darwin, Command:CleanupOnly},
 	},
 }
 
@@ -80,6 +81,7 @@ var daemonSetupChecks = []Check{
 		cleanup:            unLoadDaemonAgent,
 
 		labels: labels{Os: Darwin},
+		//labels: labels{Os: Darwin, Command:SetupOnly},
 	},
 }
 
@@ -94,6 +96,7 @@ var traySetupChecks = []Check{
 		cleanup:            removeTrayPlistFile,
 
 		labels: labels{Os: Darwin, Tray: Enabled},
+		//labels: labels{Os: Darwin, Tray: Enabled, Command:SetupOnly},
 	},
 	{
 		checkDescription:   "Check if CodeReady Containers tray is running",
@@ -105,6 +108,7 @@ var traySetupChecks = []Check{
 		cleanup:            unLoadTrayAgent,
 
 		labels: labels{Os: Darwin, Tray: Enabled},
+		//labels: labels{Os: Darwin, Tray: Enabled, Command:SetupOnly},
 	},
 }
 

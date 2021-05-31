@@ -20,6 +20,7 @@ var hypervPreflightChecks = []Check{
 		flags:            StartUpOnly,
 
 		labels: labels{Os: Windows},
+		//labels: labels{Os: Windows, Command: StartUpOnly},
 	},
 	{
 		configKeySuffix:  "check-windows-version",
@@ -28,6 +29,7 @@ var hypervPreflightChecks = []Check{
 		flags:            StartUpOnly,
 
 		labels: labels{Os: Windows},
+		//labels: labels{Os: Windows, Command: StartUpOnly},
 	},
 	{
 		configKeySuffix:  "check-windows-edition",
@@ -36,6 +38,7 @@ var hypervPreflightChecks = []Check{
 		flags:            StartUpOnly,
 
 		labels: labels{Os: Windows},
+		//labels: labels{Os: Windows, Command: StartUpOnly},
 	},
 	{
 		configKeySuffix:  "check-hyperv-installed",
@@ -44,6 +47,7 @@ var hypervPreflightChecks = []Check{
 		flags:            StartUpOnly,
 
 		labels: labels{Os: Windows},
+		//labels: labels{Os: Windows, Command: StartUpOnly},
 	},
 	{
 		configKeySuffix:  "check-crc-users-group-exists",
@@ -57,6 +61,7 @@ var hypervPreflightChecks = []Check{
 		flags: StartUpOnly,
 
 		labels: labels{Os: Windows},
+		//labels: labels{Os: Windows, Command: StartUpOnly},
 	},
 	{
 		configKeySuffix:  "check-user-in-hyperv-group",
@@ -74,6 +79,7 @@ var hypervPreflightChecks = []Check{
 		flags:            StartUpOnly,
 
 		labels: labels{Os: Windows},
+		//labels: labels{Os: Windows, Command: StartUpOnly},
 	},
 	{
 		configKeySuffix:  "check-hyperv-switch",
@@ -82,6 +88,7 @@ var hypervPreflightChecks = []Check{
 		flags:            StartUpOnly,
 
 		labels: labels{Os: Windows},
+		//labels: labels{Os: Windows, Command: StartUpOnly},
 	},
 	{
 		cleanupDescription: "Removing dns server from interface",
@@ -89,6 +96,7 @@ var hypervPreflightChecks = []Check{
 		flags:              CleanUpOnly,
 
 		labels: labels{Os: Windows},
+		//labels: labels{Os: Windows, Command: CleanUpOnly},
 	},
 	{
 		cleanupDescription: "Removing crc's virtual machine",
@@ -96,6 +104,7 @@ var hypervPreflightChecks = []Check{
 		flags:              CleanUpOnly,
 
 		labels: labels{Os: Windows},
+		//labels: labels{Os: Windows, Command: CleanUpOnly},
 	},
 }
 
@@ -107,6 +116,7 @@ var vsockChecks = []Check{
 		flags:            StartUpOnly,
 
 		labels: labels{Os: Windows, NetworkMode: User},
+		//labels: labels{Os: Windows, Command: StartUpOnly},
 	},
 }
 

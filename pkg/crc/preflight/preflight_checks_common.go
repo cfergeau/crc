@@ -23,6 +23,7 @@ var bundleCheck = Check{
 	flags:            SetupOnly,
 
 	labels: None,
+	//labels: labels{Command: SetupOnly},
 }
 
 var genericCleanupChecks = []Check{
@@ -32,6 +33,7 @@ var genericCleanupChecks = []Check{
 		flags:              CleanUpOnly,
 
 		labels: None,
+		//labels: labels{Command: CleanUpOnly},
 	},
 	{
 		cleanupDescription: "Removing older logs",
@@ -39,6 +41,7 @@ var genericCleanupChecks = []Check{
 		flags:              CleanUpOnly,
 
 		labels: None,
+		//labels: labels{Command: CleanUpOnly},
 	},
 	{
 		cleanupDescription: "Removing pull secret from the keyring",
@@ -46,6 +49,7 @@ var genericCleanupChecks = []Check{
 		flags:              CleanUpOnly,
 
 		labels: None,
+		//labels: labels{Command: CleanUpOnly},
 	},
 	{
 		cleanupDescription: "Removing hosts file records added by CRC",
@@ -53,6 +57,7 @@ var genericCleanupChecks = []Check{
 		flags:              CleanUpOnly,
 
 		labels: None,
+		//labels: labels{Command: CleanUpOnly},
 	},
 }
 

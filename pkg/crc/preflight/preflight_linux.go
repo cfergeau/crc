@@ -105,6 +105,7 @@ var libvirtPreflightChecks = []Check{
 		flags:              CleanUpOnly,
 
 		labels: labels{Os: Linux},
+		//labels: labels{Os: Linux, Command: CleanupOnly},
 	},
 	{
 		cleanupDescription: "Removing crc's virtual machine",
@@ -112,6 +113,7 @@ var libvirtPreflightChecks = []Check{
 		flags:              CleanUpOnly,
 
 		labels: labels{Os: Linux},
+		//labels: labels{Os: Linux, Command: CleanupOnly},
 	},
 	{
 		configKeySuffix:    "check-daemon-systemd-unit",
@@ -124,6 +126,7 @@ var libvirtPreflightChecks = []Check{
 		flags:              SetupOnly,
 
 		labels: labels{Os: Linux, SystemdUser: Supported},
+		//labels: labels{Os: Linux, Command: SetupOnly},
 	},
 	{
 		configKeySuffix:    "check-daemon-systemd-sockets",
