@@ -141,8 +141,8 @@ type startResult struct {
 
 func (s *startResult) prettyPrintTo(writer io.Writer) error {
 	if s.Error != nil {
-		var e *crcErrors.PreflightError
-		if errors.As(s.Error, &e) {
+		var e exec.CodeExitError
+		if errors.As(s.Error, &e) && e.Code == preflightFailedExitCode {
 			logging.Warn("Preflight checks failed during `crc start`, please try to run `crc setup` first in case you haven't done so yet")
 		}
 		return s.Error

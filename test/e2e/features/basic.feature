@@ -39,6 +39,8 @@ Feature: Basic test
     @linux
     Scenario: CRC setup on Linux
         When executing "crc setup --check-only" fails
+        Then executing "crc start" fails
+        And stderr should contain "Preflight checks failed during `crc start`, please try to run `crc setup` first in case you haven't done so yet"
         And executing "crc setup" succeeds
         And stderr should contain "Checking if CRC bundle is extracted in '$HOME/.crc'"
         And stderr should contain "Checking if running as non-root"
