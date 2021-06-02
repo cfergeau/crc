@@ -274,8 +274,11 @@ const (
 
 const (
 	// tray
-	Enabled LabelValue = iota + lastLabelValue
-	Disabled
+	// Enabled LabelValue = iota + lastLabelValue
+	// Disabled
+
+	// avoid 'make check' failure:  `lastLabelValue` is unused (deadcode)
+	_ LabelValue = iota + lastLabelValue
 )
 
 func (filter preflightFilter) SetTray(enable bool) {
@@ -294,7 +297,12 @@ func (filter preflightFilter) SetTray(enable bool) {
 // Passing 'UserNetworkingMode' to getPreflightChecks currently achieves this
 // as there are no system networking specific checks
 func getAllPreflightChecks() []Check {
-	return getPreflightChecks(true, true, network.UserNetworkingMode)
+	filter := newFilter()
+	filter.SetExperimental(true)
+	filter.SetNetworkMode(network.UserNetworkingMode)
+	filter.SetTray(true)
+
+	return getFilteredChecks(filter)
 }
 
 func getChecks() []Check {
@@ -308,10 +316,6 @@ func getChecks() []Check {
 	return checks
 }
 
-func getPreflightChecks(_ bool, trayAutoStart bool, networkMode network.Mode) []Check {
-	filter := newFilter()
-	filter.SetNetworkMode(networkMode)
-	filter.SetTray(trayAutoStart)
-
+func getFilteredChecks(filter preflightFilter) []Check {
 	return filter.Apply(getChecks())
 }
