@@ -15,9 +15,9 @@ func TestCountConfigurationOptions(t *testing.T) {
 }
 
 func TestCountPreflights(t *testing.T) {
-	assert.Len(t, getPreflightChecks(false, false, network.SystemNetworkingMode), 15)
-	assert.Len(t, getPreflightChecks(true, true, network.SystemNetworkingMode), 15)
+	assert.Len(t, getFilteredChecks(newTestFilter(false, false, network.SystemNetworkingMode)), 15)
+	assert.Len(t, getFilteredChecks(newTestFilter(true, true, network.SystemNetworkingMode)), 15)
 
-	assert.Len(t, getPreflightChecks(false, false, network.UserNetworkingMode), 16)
-	assert.Len(t, getPreflightChecks(true, true, network.UserNetworkingMode), 16)
+	assert.Len(t, getFilteredChecks(newTestFilter(false, false, network.UserNetworkingMode)), 16)
+	assert.Len(t, getFilteredChecks(newTestFilter(true, true, network.UserNetworkingMode)), 16)
 }

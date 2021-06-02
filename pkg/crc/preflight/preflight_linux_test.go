@@ -508,7 +508,12 @@ func assertFuncEqual(t *testing.T, func1 interface{}, func2 interface{}) {
 }
 
 func assertExpectedPreflights(t *testing.T, distro *crcos.OsRelease, networkMode network.Mode, systemdResolved bool) {
-	preflights := getPreflightChecksForDistro(distro, networkMode, systemdResolved)
+	filter := newTestFilter(false, false, networkMode)
+	filter.SetDistro(distro)
+	filter.SetSystemdResolved(systemdResolved)
+
+	preflights := getFilteredChecksForDistro(filter, distro)
+
 	var expected checkListForDistro
 	for _, expected = range checkListForDistros {
 		if expected.distro == distro && expected.networkMode == networkMode && expected.systemdResolved == systemdResolved {

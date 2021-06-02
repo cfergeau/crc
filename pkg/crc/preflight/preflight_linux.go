@@ -8,7 +8,6 @@ import (
 
 	crcErrors "github.com/code-ready/crc/pkg/crc/errors"
 	"github.com/code-ready/crc/pkg/crc/logging"
-	"github.com/code-ready/crc/pkg/crc/network"
 	crcos "github.com/code-ready/crc/pkg/os"
 	"github.com/code-ready/crc/pkg/os/linux"
 
@@ -340,6 +339,10 @@ func (filter preflightFilter) SetSystemdUser(distro *linux.OsRelease) {
 	}
 }
 
+func (filter preflightFilter) SetTray(_ bool) {
+	// no tray on linux
+}
+
 // We want all preflight checks
 // - matching the current distro
 // - matching the networking daemon in use (NetworkManager or systemd-resolved) regardless of user/system networking
@@ -351,16 +354,32 @@ func getAllPreflightChecks() []Check {
 	filter.SetDistro(distro())
 	filter.SetSystemdUser(distro())
 
-	return filter.Apply(getChecks())
+	return getFilteredChecks(filter)
 }
 
+/*
 func getPreflightChecks(_ bool, _ bool, networkMode network.Mode) []Check {
 	usingSystemdResolved := (checkSystemdServiceRunning("systemd-resolved.service") == nil)
 
 	return getPreflightChecksForDistro(distro(), networkMode, usingSystemdResolved)
 }
+*/
 
+func getFilteredChecks(filter preflightFilter) []Check {
+	usingSystemdResolved := (checkSystemdServiceRunning("systemd-resolved.service") == nil)
+	filter.SetSystemdResolved(usingSystemdResolved)
+	return getFilteredChecksForDistro(filter, distro())
+}
+
+func getFilteredChecksForDistro(filter preflightFilter, distro *linux.OsRelease) []Check {
+	filter.SetDistro(distro)
+
+	return filter.Apply(getChecks())
+}
+
+/*
 func getPreflightChecksForDistro(distro *linux.OsRelease, networkMode network.Mode, usingSystemdResolved bool) []Check {
+>>>>>>> 79047bd5 (wip)
 	filter := newFilter()
 	filter.SetDistro(distro)
 	filter.SetSystemdUser(distro)
@@ -369,6 +388,7 @@ func getPreflightChecksForDistro(distro *linux.OsRelease, networkMode network.Mo
 
 	return filter.Apply(getChecks())
 }
+*/
 
 func getChecks() []Check {
 	var checks []Check

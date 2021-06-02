@@ -192,30 +192,43 @@ func doRegisterSettings(cfg crcConfig.Schema, checks []Check) {
 
 // StartPreflightChecks performs the preflight checks before starting the cluster
 func StartPreflightChecks(config crcConfig.Storage) error {
-	experimentalFeatures := crcConfig.GetExperimentalFeatures(config)
+	filter := newFilterFromConfig(config)
+
 	mode := crcConfig.GetNetworkMode(config)
 	bundlePath := crcConfig.GetBundlePath(config)
 	preset := crcConfig.GetPreset(config)
 	opts := optionsNew(mode, bundlePath, preset)
 
-	trayAutostart := crcConfig.GetAutostartTray(config)
-	if err := doPreflightChecks(config, opts, getPreflightChecks(experimentalFeatures, trayAutostart, mode)); err != nil {
+	if err := doPreflightChecks(config, opts, getFilteredChecks(filter)); err != nil {
 		return &errors.PreflightError{Err: err}
 	}
 	return nil
 }
 
+func newFilterFromConfig(config crcConfig.Storage) preflightFilter {
+	experimentalFeatures := config.Get(crcConfig.ExperimentalFeatures).AsBool()
+	networkMode := crcConfig.GetNetworkMode(config)
+	trayAutostart := config.Get(crcConfig.AutostartTray).AsBool()
+
+	filter := newFilter()
+	filter.SetNetworkMode(networkMode)
+	filter.SetExperimental(experimentalFeatures)
+	filter.SetTray(trayAutostart)
+
+	return filter
+}
+
 // SetupHost performs the prerequisite checks and setups the host to run the cluster
 func SetupHost(config crcConfig.Storage, checkOnly bool) error {
-	experimentalFeatures := crcConfig.GetExperimentalFeatures(config)
+	filter := newFilterFromConfig(config)
+
 	mode := crcConfig.GetNetworkMode(config)
 	bundlePath := crcConfig.GetBundlePath(config)
 	logging.Infof("Using bundle path %s", bundlePath)
 	preset := crcConfig.GetPreset(config)
 	opts := optionsNew(mode, bundlePath, preset)
 
-	trayAutostart := crcConfig.GetAutostartTray(config)
-	return doFixPreflightChecks(config, opts, getPreflightChecks(experimentalFeatures, trayAutostart, mode), checkOnly)
+	return doFixPreflightChecks(config, opts, getFilteredChecks(filter), checkOnly)
 }
 
 func RegisterSettings(config crcConfig.Schema) {

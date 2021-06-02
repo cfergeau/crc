@@ -11,6 +11,7 @@ type LabelName uint32
 const (
 	Os LabelName = iota
 	NetworkMode
+	ExperimentalFeatures
 	Command // next commit
 
 	// Keep it last
@@ -29,6 +30,10 @@ const (
 	// network mode
 	User
 	System
+
+	// experimental
+	Enabled
+	Disabled
 
 	// command
 	// CleanupOnly
@@ -69,6 +74,13 @@ func (filter preflightFilter) SetNetworkMode(networkMode network.Mode) {
 	case network.UserNetworkingMode:
 		filter[NetworkMode] = User
 	}
+}
+
+func (filter preflightFilter) SetExperimental(enabled bool) {
+	if enabled {
+		filter[ExperimentalFeatures] = Enabled
+	}
+	filter[ExperimentalFeatures] = Disabled
 }
 
 /* This will iterate over 'checks' and only keep the checks which match the filter:

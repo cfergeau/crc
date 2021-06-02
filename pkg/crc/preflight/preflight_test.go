@@ -77,3 +77,13 @@ func sampleCheck(checkErr, fixErr error) (*Check, *status) {
 type status struct {
 	checked, fixed bool
 }
+
+// Used by the windows and darwin tests
+func newTestFilter(experimental bool, trayAutostart bool, networkMode network.Mode) preflightFilter {
+	filter := newFilter()
+	filter.SetNetworkMode(networkMode)
+	filter.SetExperimental(experimental)
+	filter.SetTray(trayAutostart)
+
+	return filter
+}

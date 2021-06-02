@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/network"
 	"github.com/code-ready/crc/pkg/crc/preset"
 	"github.com/code-ready/crc/pkg/os/windows/powershell"
@@ -152,6 +153,27 @@ func checkVsock(_ options) error {
 	return nil
 }
 
+const (
+	Tray LabelName = iota + lastLabelName
+)
+
+const (
+	// tray
+	// Enabled LabelValue = iota + lastLabelValue
+	// Disabled
+
+	// avoid 'make check' failure:  `lastLabelValue` is unused (deadcode)
+	_ LabelValue = iota + lastLabelValue
+)
+
+func (filter preflightFilter) SetTray(enable bool) {
+	if constants.IsRelease() && enable {
+		filter[Tray] = Enabled
+	} else {
+		filter[Tray] = Disabled
+	}
+}
+
 // We want all preflight checks including
 // - experimental checks
 // - tray checks when using an installer, regardless of tray enabled or not
@@ -160,7 +182,13 @@ func checkVsock(_ options) error {
 // Passing 'UserNetworkingMode' to getPreflightChecks currently achieves this
 // as there are no system networking specific checks
 func getAllPreflightChecks() []Check {
-	return getPreflightChecks(true, true, network.UserNetworkingMode)
+	filter := newFilter()
+	filter.SetExperimental(true)
+	filter.SetNetworkMode(network.UserNetworkingMode)
+	filter.SetTray(true)
+
+	// return getPreflightChecks(true, true, network.UserNetworkingMode)
+	return getFilteredChecks(filter)
 }
 
 func getChecks() []Check {
@@ -172,9 +200,6 @@ func getChecks() []Check {
 	return checks
 }
 
-func getPreflightChecks(_ bool, trayAutoStart bool, networkMode network.Mode) []Check {
-	filter := newFilter()
-	filter.SetNetworkMode(networkMode)
-
+func getFilteredChecks(filter preflightFilter) []Check {
 	return filter.Apply(getChecks())
 }
