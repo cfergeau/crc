@@ -77,6 +77,7 @@ func runPrerun(cmd *cobra.Command) error {
 		logFile = constants.DaemonLogFilePath
 	}
 	logging.InitLogrus(logging.LogLevel, logFile)
+	logging.Infof("hello %d", 1)
 	if err := setProxyDefaults(); err != nil {
 		return err
 	}

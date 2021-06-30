@@ -16,7 +16,7 @@ var (
 	logfile        *os.File
 	LogLevel       string
 	Memory         = newInMemoryHook(100)
-	messagePrinter = message.NewPrinter(language.English)
+	messagePrinter = message.NewPrinter(language.Russian)
 )
 
 func OpenLogFile(path string) (*os.File, error) {
@@ -67,6 +67,8 @@ func InitLogrus(logLevel, logFilePath string) {
 		DisableTimestamp:       true,
 		DisableLevelTruncation: false,
 	}))
+	message.SetString(language.French, "hello %d", "coucou %d")
+	message.SetString(language.Russian, "hello %d", "привет %d")
 }
 
 func Info(args ...interface{}) {
