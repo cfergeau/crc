@@ -8,12 +8,15 @@ import (
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/sirupsen/logrus"
 	terminal "golang.org/x/term"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 )
 
 var (
-	logfile       *os.File
-	LogLevel      string
-	Memory        = newInMemoryHook(100)
+	logfile        *os.File
+	LogLevel       string
+	Memory         = newInMemoryHook(100)
+	messagePrinter = message.NewPrinter(language.English)
 )
 
 func OpenLogFile(path string) (*os.File, error) {
@@ -71,7 +74,7 @@ func Info(args ...interface{}) {
 }
 
 func Infof(s string, args ...interface{}) {
-	logrus.Infof(s, args...)
+	logrus.Infof(messagePrinter.Sprintf(s, args...))
 }
 
 func Warn(args ...interface{}) {
