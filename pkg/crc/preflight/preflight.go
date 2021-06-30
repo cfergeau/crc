@@ -52,7 +52,7 @@ func (check *Check) doCheck(config crcConfig.Storage) error {
 	if check.checkDescription == "" {
 		panic(fmt.Sprintf("Should not happen, empty description for check '%s'", check.configKeySuffix))
 	} else {
-		logging.Infof("%s", check.checkDescription)
+		logging.Infof("check %s", check.checkDescription)
 	}
 	if check.shouldSkip(config) {
 		logging.Warn("Skipping above check...")
@@ -74,7 +74,7 @@ func (check *Check) doFix() error {
 		return fmt.Errorf(check.fixDescription)
 	}
 
-	logging.Infof("%s", check.fixDescription)
+	logging.Infof("fix %s", check.fixDescription)
 
 	return check.fix()
 }
@@ -84,7 +84,7 @@ func (check *Check) doCleanUp() error {
 		panic(fmt.Sprintf("Should not happen, empty description for cleanup '%s'", check.configKeySuffix))
 	}
 
-	logging.Infof("%s", check.cleanupDescription)
+	logging.Infof("cleanup %s", check.cleanupDescription)
 
 	return check.cleanup()
 }

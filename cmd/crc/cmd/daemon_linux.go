@@ -21,7 +21,7 @@ func vsockListener() (net.Listener, error) {
 func httpListener() (net.Listener, error) {
 	_ = os.Remove(constants.DaemonHTTPSocketPath)
 	ln, err := net.Listen("unix", constants.DaemonHTTPSocketPath)
-	logging.Infof("listening %s", constants.DaemonHTTPSocketPath)
+	logging.Infof("listening2 %s", constants.DaemonHTTPSocketPath)
 	if err != nil {
 		return nil, err
 	}
