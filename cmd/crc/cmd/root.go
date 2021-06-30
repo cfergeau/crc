@@ -24,6 +24,7 @@ import (
 	"github.com/code-ready/crc/pkg/crc/segment"
 	"github.com/code-ready/crc/pkg/crc/telemetry"
 	"github.com/spf13/cobra"
+	_ "golang.org/x/text/message"
 	"k8s.io/client-go/util/exec"
 )
 
