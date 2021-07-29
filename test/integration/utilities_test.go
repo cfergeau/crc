@@ -80,6 +80,8 @@ func Exec(cmd *exec.Cmd, timeout <-chan time.Time) (string, string, error) {
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &stdout, &stderr
 
+	cmd.Args = append(cmd.Args, "--log-level")
+	cmd.Args = append(cmd.Args, "debug")
 	logrus.Infof("Running '%s %s'", cmd.Path, strings.Join(cmd.Args[1:], " ")) // skip arg[0] as it is printed separately
 	if err := cmd.Start(); err != nil {
 		return "", "", fmt.Errorf("error starting %v:\nCommand stdout:\n%v\nstderr:\n%v\nerror:\n%v", cmd, cmd.Stdout, cmd.Stderr, err)
