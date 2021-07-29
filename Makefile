@@ -179,11 +179,11 @@ ifndef BUNDLE_PATH
 export BUNDLE_PATH = $(HOME)/Downloads/crc_libvirt_$(BUNDLE_VERSION).$(BUNDLE_EXTENSION)
 endif
 integration:
-	@go test -timeout=60m $(REPOPATH)/test/integration -v
+	@go test -timeout=60m $(REPOPATH)/test/integration -v -ginkgo.noColor
 
 .PHONY: e2e ## Run e2e tests
 e2e:
-GODOG_OPTS = --godog.tags=$(GOOS)
+GODOG_OPTS = --godog.tags=$(GOOS) -godog.no-colors
 ifndef PULL_SECRET_FILE
 	PULL_SECRET_FILE = --pull-secret-file=$(HOME)/Downloads/crc-pull-secret
 endif
@@ -194,7 +194,7 @@ ifndef CRC_BINARY
 	CRC_BINARY = --crc-binary=$(GOPATH)/bin
 endif
 e2e:
-	@go test --timeout=180m $(REPOPATH)/test/e2e -v $(PULL_SECRET_FILE) $(BUNDLE_LOCATION) $(CRC_BINARY) --bundle-version=$(BUNDLE_VERSION) $(GODOG_OPTS) $(CLEANUP_HOME) $(INSTALLER_PATH) $(USER_PASSWORD) 
+	@go test --timeout=180m $(REPOPATH)/test/e2e -v $(PULL_SECRET_FILE) $(BUNDLE_LOCATION) $(CRC_BINARY) --bundle-version=$(BUNDLE_VERSION) $(GODOG_OPTS) $(CLEANUP_HOME) $(INSTALLER_PATH) $(USER_PASSWORD)
 
 .PHONY: fmt
 fmt:
