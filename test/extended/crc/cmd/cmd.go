@@ -53,7 +53,7 @@ func (c Command) WithdisableNTP() Command {
 }
 
 func (c Command) ToString() string {
-	cmd := append(c.env(), "crc", c.command)
+	cmd := append(c.env(), "crc", "--log-level", "debug", c.command)
 	return strings.Join(cmd, " ")
 }
 
