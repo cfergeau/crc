@@ -149,6 +149,10 @@ if [[ "$UID" = 0 ]]; then
 	prepare_ci_user
 	runuser -l crc_ci -c "/bin/bash centos_ci.sh"
 else
+	rpm -qa
+	cat /etc/os-release
+	systemctl
+	systemctl --user
 	source ~/jenkins-env # Source environment variables for minishift_ci user
 	export XDG_RUNTIME_DIR="/run/user/$UID"
 	export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
