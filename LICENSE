@@ -189,3 +189,364 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+
+This product bundles Azure/go-ansiterm, which is available under the MIT
+license. For details, see vendor/github.com/Azure/go-ansiterm/.
+
+This product bundles Masterminds/semver, which is available under the ???
+license. For details, see vendor/github.com/Masterminds/semver/.
+
+This product bundles Microsoft/go-winio, which is available under the MIT
+license. For details, see vendor/github.com/Microsoft/go-winio/.
+
+This product bundles RangelReale/osincli, which is available under the ???
+license. For details, see vendor/github.com/RangelReale/osincli/.
+
+This product bundles VividCortex/ewma, which is available under the MIT
+license. For details, see vendor/github.com/VividCortex/ewma/.
+
+This product bundles YourFin/binappend, which is available under the MIT
+license. For details, see vendor/github.com/YourFin/binappend/.
+
+This product bundles apcera/gssapi, which is available under the Apache
+license. For details, see vendor/github.com/apcera/gssapi/.
+
+This product bundles apparentlymart/go-cidr, which is available under the ???
+license. For details, see vendor/github.com/apparentlymart/go-cidr/.
+
+This product bundles asaskevich/govalidator, which is available under the MIT
+license. For details, see vendor/github.com/asaskevich/govalidator/.
+
+This product bundles cavaliercoder/grab, which is available under the ???
+license. For details, see vendor/github.com/cavaliercoder/grab/.
+
+This product bundles cheggaaa/pb, which is available under the ??? license. For
+details, see vendor/github.com/cheggaaa/pb/.
+
+This product bundles code-ready/admin-helper, which is available under the MIT
+license. For details, see vendor/github.com/code-ready/admin-helper/.
+
+This product bundles code-ready/gvisor-tap-vsock, which is available under the
+Apache License, version 2.0. For details, see
+vendor/github.com/code-ready/gvisor-tap-vsock/.
+
+This product bundles code-ready/machine, which is available under the Apache
+License, version 2.0. For details, see vendor/github.com/code-ready/machine/.
+
+This product bundles cucumber/gherkin-go, which is available under the MIT
+license. For details, see vendor/github.com/cucumber/gherkin-go/.
+
+This product bundles cucumber/godog, which is available under the MIT license.
+For details, see vendor/github.com/cucumber/godog/.
+
+This product bundles cucumber/messages-go, which is available under the MIT
+license. For details, see vendor/github.com/cucumber/messages-go/.
+
+This product bundles danieljoos/wincred, which is available under the MIT
+license. For details, see vendor/github.com/danieljoos/wincred/.
+
+This product bundles davecgh/go-spew, which is available under the ISC license.
+For details, see vendor/github.com/davecgh/go-spew/.
+
+This product bundles dimchansky/utfbom, which is available under the Apache
+License, version 2.0. For details, see vendor/github.com/dimchansky/utfbom/.
+
+This product bundles docker/docker, which is available under the Apache
+License, version 2.0. For details, see vendor/github.com/docker/docker/.
+
+This product bundles docker/go-units, which is available under the Apache
+License, version 2.0. For details, see vendor/github.com/docker/go-units/.
+
+This product bundles docker/spdystream, which is available under the Apache
+License, version 2.0. For details, see vendor/github.com/docker/spdystream/.
+
+This product bundles fatih/color, which is available under the MIT license. For
+details, see vendor/github.com/fatih/color/.
+
+This product bundles felixge/httpsnoop, which is available under the ???
+license. For details, see vendor/github.com/felixge/httpsnoop/.
+
+This product bundles fsnotify/fsnotify, which is available under the ???
+license. For details, see vendor/github.com/fsnotify/fsnotify/.
+
+This product bundles go-logr/logr, which is available under the Apache License,
+version 2.0. For details, see vendor/github.com/go-logr/logr/.
+
+This product bundles godbus/dbus, which is available under the ??? license. For
+details, see vendor/github.com/godbus/dbus/.
+
+This product bundles gofrs/uuid, which is available under the ??? license. For
+details, see vendor/github.com/gofrs/uuid/.
+
+This product bundles gogo/protobuf, which is available under the ??? license.
+For details, see vendor/github.com/gogo/protobuf/.
+
+This product bundles golang.org/x/crypto, which is available under the ???
+license. For details, see vendor/golang.org/x/crypto/.
+
+This product bundles golang.org/x/net, which is available under the ???
+license. For details, see vendor/golang.org/x/net/.
+
+This product bundles golang.org/x/oauth2, which is available under the ???
+license. For details, see vendor/golang.org/x/oauth2/.
+
+This product bundles golang.org/x/sync, which is available under the ???
+license. For details, see vendor/golang.org/x/sync/.
+
+This product bundles golang.org/x/sys, which is available under the ???
+license. For details, see vendor/golang.org/x/sys/.
+
+This product bundles golang.org/x/term, which is available under the ???
+license. For details, see vendor/golang.org/x/term/.
+
+This product bundles golang.org/x/text, which is available under the ???
+license. For details, see vendor/golang.org/x/text/.
+
+This product bundles golang.org/x/time, which is available under the ???
+license. For details, see vendor/golang.org/x/time/.
+
+This product bundles golang/protobuf, which is available under the ??? license.
+For details, see vendor/github.com/golang/protobuf/.
+
+This product bundles golang/snappy, which is available under the ??? license.
+For details, see vendor/github.com/golang/snappy/.
+
+This product bundles goodhosts/hostsfile, which is available under the Apache
+License, version 2.0. For details, see vendor/github.com/goodhosts/hostsfile/.
+
+This product bundles google.golang.org/appengine, which is available under the
+Apache License, version 2.0. For details, see
+vendor/google.golang.org/appengine/.
+
+This product bundles google.golang.org/protobuf, which is available under the
+??? license. For details, see vendor/google.golang.org/protobuf/.
+
+This product bundles google/btree, which is available under the Apache License,
+version 2.0. For details, see vendor/github.com/google/btree/.
+
+This product bundles google/gofuzz, which is available under the Apache
+License, version 2.0. For details, see vendor/github.com/google/gofuzz/.
+
+This product bundles google/gopacket, which is available under the ??? license.
+For details, see vendor/github.com/google/gopacket/.
+
+This product bundles google/tcpproxy, which is available under the Apache
+License, version 2.0. For details, see vendor/github.com/google/tcpproxy/.
+
+This product bundles googleapis/gnostic, which is available under the Apache
+License, version 2.0 license. For details, see
+vendor/github.com/googleapis/gnostic/.
+
+This product bundles gopkg.in/AlecAivazis/survey.v1, which is available under
+the MIT license. For details, see vendor/gopkg.in/AlecAivazis/survey.v1/.
+
+This product bundles gopkg.in/AlecAivazis/survey.v1/terminal, which is
+available under the MIT license. For details, see
+vendor/gopkg.in/AlecAivazis/survey.v1/terminal/.
+
+This product bundles gopkg.in/inf.v0, which is available under the ??? license.
+For details, see vendor/gopkg.in/inf.v0/.
+
+This product bundles gopkg.in/ini.v1, which is available under the Apache
+License, version 2.0. For details, see vendor/gopkg.in/ini.v1/.
+
+This product bundles gopkg.in/tomb.v1, which is available under the ???
+license. For details, see vendor/gopkg.in/tomb.v1/.
+
+This product bundles gopkg.in/yaml.v2, which is available under the ???
+license. For details, see vendor/gopkg.in/yaml.v2/.
+
+This product bundles gopkg.in/yaml.v2, which is available under the Apache
+License, version 2.0. For details, see vendor/gopkg.in/yaml.v2/.
+
+This product bundles gopkg.in/yaml.v3, which is available under the MIT and
+Apache licenses. For details, see vendor/gopkg.in/yaml.v3/.
+
+This product bundles gorilla/handlers, which is available under the ???
+license. For details, see vendor/github.com/gorilla/handlers/.
+
+This product bundles gvisor.dev/gvisor, which is available under the Apache
+License, version 2.0. For details, see vendor/gvisor.dev/gvisor/.
+
+This product bundles h2non/filetype, which is available under the MIT license.
+For details, see vendor/github.com/h2non/filetype/.
+
+This product bundles hashicorp/hcl, which is available under the Mozilla Public
+License, version 2.0. For details, see vendor/github.com/hashicorp/hcl/.
+
+This product bundles hectane/go-acl, which is available under the MIT license.
+For details, see vendor/github.com/hectane/go-acl/.
+
+This product bundles imdario/mergo, which is available under the ??? license.
+For details, see vendor/github.com/imdario/mergo/.
+
+This product bundles inconshreveable/mousetrap, which is available under the
+Apache License, version 2.0. For details, see
+vendor/github.com/inconshreveable/mousetrap/.
+
+This product bundles json-iterator/go, which is available under the MIT
+license. For details, see vendor/github.com/json-iterator/go/.
+
+This product bundles k8s.io/api, which is available under the Apache License,
+version 2.0. For details, see vendor/k8s.io/api/.
+
+This product bundles k8s.io/apimachinery, which is available under the Apache
+License, version 2.0. For details, see vendor/k8s.io/apimachinery/.
+
+This product bundles k8s.io/client-go, which is available under the Apache
+License, version 2.0. For details, see vendor/k8s.io/client-go/.
+
+This product bundles k8s.io/klog/v2, which is available under the Apache
+License, version 2.0. For details, see vendor/k8s.io/klog/v2/.
+
+This product bundles k8s.io/kubectl, which is available under the Apache
+License, version 2.0. For details, see vendor/k8s.io/kubectl/.
+
+This product bundles k8s.io/utils, which is available under the Apache License,
+version 2.0. For details, see vendor/k8s.io/utils/.
+
+This product bundles kballard/go-shellquote, which is available under the ???
+license. For details, see vendor/github.com/kballard/go-shellquote/.
+
+This product bundles klauspost/compress, which is available under the ???
+license. For details, see vendor/github.com/klauspost/compress/.
+
+This product bundles klauspost/cpuid, which is available under the ??? license.
+For details, see vendor/github.com/cpuid/v2/.
+
+This product bundles kofalt/go-memoize, which is available under the MIT
+license. For details, see vendor/github.com/kofalt/go-memoize/.
+
+This product bundles libvirt/libvirt-go-xml, which is available under the MIT
+license. For details, see vendor/github.com/libvirt/libvirt-go-xml/.
+
+This product bundles linuxkit/virtsock, which is available under the ???
+license. For details, see vendor/github.com/linuxkit/virtsock/.
+
+This product bundles magiconair/properties, which is available under the ???
+license. For details, see vendor/github.com/magiconair/properties/.
+
+This product bundles mattn/go-colorable, which is available under the MIT
+license. For details, see vendor/github.com/mattn/go-colorable/.
+
+This product bundles mattn/go-isatty, which is available under the MIT license.
+For details, see vendor/github.com/mattn/go-isatty/.
+
+This product bundles mattn/go-runewidth, which is available under the MIT
+license. For details, see vendor/github.com/mattn/go-runewidth/.
+
+This product bundles mdlayher/vsock, which is available under the MIT license.
+For details, see vendor/github.com/mdlayher/vsock/.
+
+This product bundles mgutz/ansi, which is available under the MIT license. For
+details, see vendor/github.com/mgutz/ansi/.
+
+This product bundles miekg/dns, which is available under the ??? license. For
+details, see vendor/github.com/miekg/dns/.
+
+This product bundles mitchellh/go-wordwrap, which is available under the MIT
+license. For details, see vendor/github.com/mitchellh/go-wordwrap/.
+
+This product bundles mitchellh/mapstructure, which is available under the MIT
+license. For details, see vendor/github.com/mitchellh/mapstructure/.
+
+This product bundles moby/term, which is available under the Apache license.
+For details, see vendor/github.com/moby/term/.
+
+This product bundles modern-go/concurrent, which is available under the Apache
+license. For details, see vendor/github.com/modern-go/concurrent/.
+
+This product bundles modern-go/reflect2, which is available under the Apache
+license. For details, see vendor/github.com/modern-go/reflect2/.
+
+This product bundles nxadm/tail, which is available under the MIT license. For
+details, see vendor/github.com/nxadm/tail/.
+
+This product bundles onsi/ginkgo, which is available under the ??? license. For
+details, see vendor/github.com/onsi/ginkgo/.
+
+This product bundles onsi/gomega, which is available under the ??? license. For
+details, see vendor/github.com/onsi/gomega/.
+
+This product bundles openshift/api, which is available under the Apache
+License, version 2.0. For details, see vendor/github.com/openshift/api/.
+
+This product bundles openshift/client-go, which is available under the Apache
+License, version 2.0. For details, see vendor/github.com/openshift/client-go/.
+
+This product bundles openshift/library-go, which is available under the Apache
+License, version 2.0. For details, see vendor/github.com/openshift/library-go/.
+
+This product bundles openshift/oc, which is available under the Apache License,
+version 2.0. For details, see vendor/github.com/openshift/oc/.
+
+This product bundles patrickmn/go-cache, which is available under the ???
+license. For details, see vendor/github.com/patrickmn/go-cache/.
+
+This product bundles pbnjay/memory, which is available under the "3-clause BSD"
+license. For details, see vendor/github.com/pbnjay/memory/.
+
+This product bundles pborman/uuid, which is available under the ??? license.
+For details, see vendor/github.com/pborman/uuid/.
+
+This product bundles pelletier/go-toml, which is available under the MIT
+license. For details, see vendor/github.com/pelletier/go-toml/.
+
+This product bundles pkg/browser, which is available under the ??? license. For
+details, see vendor/github.com/pkg/browser/.
+
+This product bundles pkg/errors, which is available under the ??? license. For
+details, see vendor/github.com/pkg/errors/.
+
+This product bundles pmezard/go-difflib, which is available under the ???
+license. For details, see vendor/github.com/pmezard/go-difflib/.
+
+This product bundles rivo/uniseg, which is available under the MIT license. For
+details, see vendor/github.com/rivo/uniseg/.
+
+This product bundles segmentio/backo-go, which is available under the MIT
+license. For details, see vendor/github.com/segmentio/backo-go/.
+
+This product bundles sigs.k8s.io/structured-merge-diff/v4, which is available
+under the Apache License, version 2.0. For details, see
+vendor/sigs.k8s.io/structured-merge-diff/v4/.
+
+This product bundles sigs.k8s.io/yaml, which is available under the MIT
+license. For details, see vendor/sigs.k8s.io/yaml/.
+
+This product bundles sirupsen/logrus, which is available under the MIT license.
+For details, see vendor/github.com/sirupsen/logrus/.
+
+This product bundles spf13/afero, which is available under the Apache license.
+For details, see vendor/github.com/spf13/afero/.
+
+This product bundles spf13/cast, which is available under the MIT license. For
+details, see vendor/github.com/spf13/cast/.
+
+This product bundles spf13/cobra, which is available under the Apache license.
+For details, see vendor/github.com/spf13/cobra/.
+
+This product bundles spf13/jwalterweatherman, which is available under the MIT
+license. For details, see vendor/github.com/spf13/jwalterweatherman/.
+
+This product bundles spf13/pflag, which is available under the ??? license. For
+details, see vendor/github.com/spf13/pflag/.
+
+This product bundles spf13/viper, which is available under the MIT license. For
+details, see vendor/github.com/spf13/viper/.
+
+This product bundles stretchr/testify, which is available under the MIT
+license. For details, see vendor/github.com/stretchr/testify/.
+
+This product bundles subosito/gotenv, which is available under the MIT license.
+For details, see vendor/github.com/subosito/gotenv/.
+
+This product bundles xi2/xz, which is available under the ??? license. For
+details, see vendor/github.com/xi2/xz/.
+
+This product bundles xtgo/uuid, which is available under the ??? license. For
+details, see vendor/github.com/xtgo/uuid/.
+
+This product bundles zalando/go-keyring, which is available under the MIT
+license. For details, see vendor/github.com/zalando/go-keyring/.
