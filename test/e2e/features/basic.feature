@@ -37,7 +37,7 @@ Feature: Basic test
 
     @linux
     Scenario: CRC setup on Linux
-        When executing "crc setup --check-only" fails
+        When execute crc setup --check-only command fails
         Then execute crc start command fails
         And execute crc setup command succeeds
         And stderr should contain "Checking if CRC bundle is extracted in '$HOME/.crc'"
@@ -60,14 +60,14 @@ Feature: Basic test
     @linux
     Scenario: Missing CRC setup
 	Given executing "rm ~/.crc/bin/crc-driver-libvirt" succeeds
-        Then executing "crc setup --check-only" fails
+        Then execute crc setup --check-only command fails
         And starting CRC with default bundle fails
 	And stderr should contain "Preflight checks failed during `crc start`, please try to run `crc setup` first in case you haven't done so yet"
-	And executing "crc setup" succeeds
+	And execute crc setup command succeeds
 
     @darwin
     Scenario: CRC setup on Mac
-        When executing "crc setup --check-only" fails
+        When execute crc setup --check-only command fails
         And execute crc setup command succeeds
         And stderr should contain "Checking if running as non-root"
         And stderr should contain "Checking if HyperKit is installed"
@@ -114,12 +114,12 @@ Feature: Basic test
 
     @darwin @linux @windows
     Scenario: CRC console URL
-        When executing "crc console --url" succeeds
+        When execute crc console --url command succeeds
         Then stdout should contain "https://console-openshift-console.apps-crc.testing"
 
     @darwin @linux @windows
     Scenario: CRC console credentials
-        When executing "crc console --credentials" succeeds
+        When execute crc console --credentials command succeeds
         Then stdout should contain "To login as a regular user, run 'oc login -u developer -p developer"
         And stdout should contain "To login as an admin, run 'oc login -u kubeadmin -p "
 
@@ -148,7 +148,7 @@ Feature: Basic test
         # This will remove the pull secret from the instance and from the cluster
         # You need to provide pull secret file again if you want to start this cluster
         # from a stopped state.
-        Given executing "crc bundle generate -f" succeeds
+        Given execute crc bundle generate -f command succeeds
 
     @darwin @windows
     Scenario: CRC stop
@@ -168,7 +168,7 @@ Feature: Basic test
 
     @darwin @linux @windows
     Scenario: CRC delete
-        When executing "crc delete -f" succeeds
+        When execute crc delete -f command succeeds
         Then stdout should contain "Deleted the OpenShift cluster"
 
     @linux

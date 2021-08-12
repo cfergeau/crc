@@ -9,8 +9,8 @@ Feature: Behind proxy test
 
     Scenario: Start CRC
         Given execute crc setup command succeeds
-        And  executing "crc config set http-proxy http://192.168.130.1:3128" succeeds
-        Then executing "crc config set https-proxy http://192.168.130.1:3128" succeeds
+        And  execute crc config set http-proxy http://192.168.130.1:3128 command succeeds
+        Then execute crc config set https-proxy http://192.168.130.1:3128 command succeeds
         When starting CRC with default bundle succeeds
         Then stdout should contain "Started the OpenShift cluster"
         And executing "eval $(crc oc-env)" succeeds
@@ -23,10 +23,10 @@ Feature: Behind proxy test
         And executing "unset HTTP_PROXY HTTPS_PROXY NO_PROXY" succeeds
 
     Scenario: CRC delete and remove proxy settings from config
-        When executing "crc delete -f" succeeds
+        When execute crc delete -f" succeeds
         Then stdout should contain "Deleted the OpenShift cluster"
-        And  executing "crc config unset http-proxy" succeeds
-        And executing "crc config unset https-proxy" succeeds
+        And  execute crc config unset http-proxy command succeeds
+        And execute crc config unset https-proxy command succeeds
         And execute crc cleanup command succeeds
         
 

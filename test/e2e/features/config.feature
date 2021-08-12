@@ -61,11 +61,11 @@ Feature: Test configuration settings
     Scenario Outline: CRC config checks (skips)
         When setting config property "<property>" to value "<value1>" succeeds
         And "JSON" config file "crc.json" in CRC home folder contains key "<property>" with value matching "<value1>"
-        When executing "crc setup" succeeds
+        When execute crc setup command succeeds
         Then stderr should contain "Skipping above check..."
         When setting config property "<property>" to value "<value2>" succeeds
         Then "JSON" config file "crc.json" in CRC home folder contains key "<property>" with value matching "<value2>"
-        When executing "crc setup" succeeds
+        When execute crc setup command succeeds
         Then stderr should not contain "Skipping above check..."
         When unsetting config property "<property>" succeeds
         Then "JSON" config file "crc.json" in CRC home folder does not contain key "<property>"
@@ -121,8 +121,8 @@ Feature: Test configuration settings
 
     @linux
     Scenario: Running `crc setup` with checks enabled restores destroyed network
-        When executing "crc config set skip-check-crc-network false" succeeds
-        And executing "crc config set skip-check-crc-network-active false" succeeds
+        When execute crc config set skip-check-crc-network false command succeeds
+        And execute crc config set skip-check-crc-network-active false command succeeds
         Then execute crc setup command succeeds
         And executing "sudo virsh net-list --name" succeeds
         And stdout contains "crc"
@@ -134,8 +134,8 @@ Feature: Test configuration settings
         And executing "sudo virsh net-list --name" succeeds
         Then stdout should not contain "crc"
         # Disable checks
-        When executing "crc config set skip-check-crc-network true" succeeds
-        And executing "crc config set skip-check-crc-network-active true" succeeds
+        When execute crc config set skip-check-crc-network true command succeeds
+        And execute crc config set skip-check-crc-network-active true command succeeds
         # Start CRC
         Then starting CRC with default bundle fails
         And stderr contains "Network not found: no network with matching name 'crc'"

@@ -25,6 +25,6 @@ Feature: Certificate rotation test
         And executing "sudo timedatectl set-ntp on" succeeds
 
     Scenario: CRC delete and cleanup
-        When executing "crc delete -f" succeeds
+        When execute crc delete -f command succeeds
         Then stdout should contain "Deleted the OpenShift cluster"
         When execute crc cleanup command succeeds
