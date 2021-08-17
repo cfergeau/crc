@@ -5,6 +5,7 @@ import (
 
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/network"
+	crcversion "github.com/code-ready/crc/pkg/crc/version"
 )
 
 // SetupHost performs the prerequisite checks and setups the host to run the cluster
@@ -142,6 +143,7 @@ func getChecks(mode network.Mode, bundlePath, preset string) []Check {
 	checks := []Check{}
 
 	checks = append(checks, nonWinPreflightChecks...)
+	checks = append(checks, genericPreflightChecks...)
 	checks = append(checks, genericCleanupChecks...)
 	checks = append(checks, hyperkitPreflightChecks(mode)...)
 	checks = append(checks, daemonSetupChecks...)
@@ -158,4 +160,11 @@ func getPreflightChecks(_ bool, trayAutostart bool, mode network.Mode, bundlePat
 	filter.SetTray(trayAutostart)
 
 	return filter.Apply(getChecks(mode, bundlePath, preset))
+}
+
+func daemonNotRunningMessage() string {
+	if crcversion.IsInstaller() {
+		return "Is '/Applications/CodeReady Containers.app' running? Cannot reach daemon API"
+	}
+	return genericDaemonNotRunningMessage
 }

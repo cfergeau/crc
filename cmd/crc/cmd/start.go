@@ -14,7 +14,6 @@ import (
 	"github.com/code-ready/crc/pkg/crc/cluster"
 	crcConfig "github.com/code-ready/crc/pkg/crc/config"
 	"github.com/code-ready/crc/pkg/crc/constants"
-	"github.com/code-ready/crc/pkg/crc/daemonclient"
 	crcErrors "github.com/code-ready/crc/pkg/crc/errors"
 	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/crc/pkg/crc/machine/types"
@@ -24,7 +23,6 @@ import (
 	crcversion "github.com/code-ready/crc/pkg/crc/version"
 	crcos "github.com/code-ready/crc/pkg/os"
 	"github.com/code-ready/crc/pkg/os/shell"
-	pkgerrors "github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -81,10 +79,6 @@ func runStart(ctx context.Context) (*types.StartResult, error) {
 	isRunning, _ := client.IsRunning()
 
 	if !isRunning {
-		if err := checkDaemonStarted(); err != nil {
-			return nil, err
-		}
-
 		if err := preflight.StartPreflightChecks(config); err != nil {
 			return nil, crcos.CodeExitError{
 				Err:  err,
@@ -297,21 +291,4 @@ func commandLinePrefix(shell string) string {
 		return ">"
 	}
 	return "$"
-}
-
-const genericDaemonNotRunningMessage = "Is 'crc daemon' running? Cannot reach daemon API"
-
-func checkDaemonStarted() error {
-	if crcConfig.GetNetworkMode(config) == network.SystemNetworkingMode {
-		return nil
-	}
-	daemonClient := daemonclient.New()
-	version, err := daemonClient.APIClient.Version()
-	if err != nil {
-		return pkgerrors.Wrap(err, daemonNotRunningMessage())
-	}
-	if version.CrcVersion != crcversion.GetCRCVersion() {
-		return fmt.Errorf("The executable version (%s) doesn't match the daemon version (%s)", crcversion.GetCRCVersion(), version.CrcVersion)
-	}
-	return nil
 }

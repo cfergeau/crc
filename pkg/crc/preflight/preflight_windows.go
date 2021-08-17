@@ -8,6 +8,7 @@ import (
 
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/network"
+	crcversion "github.com/code-ready/crc/pkg/crc/version"
 	"github.com/code-ready/crc/pkg/os/windows/powershell"
 	"github.com/code-ready/crc/pkg/os/windows/win32"
 )
@@ -151,6 +152,7 @@ func getAllPreflightChecks() []Check {
 
 func getChecks(bundlePath, preset string) []Check {
 	checks := []Check{}
+	checks = append(checks, genericPreflightChecks...)
 	checks = append(checks, hypervPreflightChecks...)
 	checks = append(checks, vsockChecks...)
 	checks = append(checks, bundleCheck(bundlePath, preset))
@@ -163,4 +165,11 @@ func getPreflightChecks(_ bool, trayAutoStart bool, networkMode network.Mode, bu
 	filter.SetNetworkMode(networkMode)
 
 	return filter.Apply(getChecks(bundlePath, preset))
+}
+
+func daemonNotRunningMessage() string {
+	if crcversion.IsInstaller() {
+		return "Is CodeReady Containers tray application running? Cannot reach daemon API"
+	}
+	return genericDaemonNotRunningMessage
 }

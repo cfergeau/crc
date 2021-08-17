@@ -376,6 +376,7 @@ func getChecks(distro *linux.OsRelease, bundlePath, preset string) []Check {
 	var checks []Check
 	checks = append(checks, nonWinPreflightChecks...)
 	checks = append(checks, wsl2PreflightCheck)
+	checks = append(checks, genericPreflightChecks...)
 	checks = append(checks, genericCleanupChecks...)
 	checks = append(checks, libvirtPreflightChecks(distro)...)
 	checks = append(checks, ubuntuPreflightChecks...)
@@ -415,4 +416,8 @@ func distro() *linux.OsRelease {
 		}
 	}
 	return distro
+}
+
+func daemonNotRunningMessage() string {
+	return genericDaemonNotRunningMessage
 }

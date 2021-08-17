@@ -8,9 +8,11 @@ import (
 	"github.com/code-ready/crc/pkg/crc/adminhelper"
 	"github.com/code-ready/crc/pkg/crc/cluster"
 	"github.com/code-ready/crc/pkg/crc/constants"
+	"github.com/code-ready/crc/pkg/crc/daemonclient"
 	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/crc/pkg/crc/machine/bundle"
 	"github.com/code-ready/crc/pkg/crc/validation"
+	crcversion "github.com/code-ready/crc/pkg/crc/version"
 	"github.com/pkg/errors"
 )
 
@@ -55,6 +57,17 @@ var genericCleanupChecks = []Check{
 		flags:              CleanUpOnly,
 
 		labels: None,
+	},
+}
+
+var genericPreflightChecks = []Check{
+	{
+		configKeySuffix:  "check-daemon-running",
+		checkDescription: "Checking if the crc daemon is running",
+		check:            checkDaemonRunning,
+		flags:            StartUpOnly,
+
+		labels: labels{NetworkMode: User, DaemonStartup: Manual},
 	},
 }
 
@@ -138,6 +151,20 @@ func removeOldLogs() error {
 		if err := os.RemoveAll(f); err != nil {
 			return fmt.Errorf("Failed to delete %s: %w", f, err)
 		}
+	}
+	return nil
+}
+
+const genericDaemonNotRunningMessage = "Is 'crc daemon' running? Cannot reach daemon API"
+
+func checkDaemonRunning() error {
+	daemonClient := daemonclient.New()
+	version, err := daemonClient.APIClient.Version()
+	if err != nil {
+		return errors.Wrap(err, daemonNotRunningMessage())
+	}
+	if version.CrcVersion != crcversion.GetCRCVersion() {
+		return fmt.Errorf("The executable version (%s) doesn't match the daemon version (%s)", crcversion.GetCRCVersion(), version.CrcVersion)
 	}
 	return nil
 }
