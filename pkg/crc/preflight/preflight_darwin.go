@@ -5,7 +5,6 @@ import (
 
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/network"
-	"github.com/code-ready/crc/pkg/crc/version"
 )
 
 // SetupHost performs the prerequisite checks and setups the host to run the cluster
@@ -95,7 +94,7 @@ var traySetupChecks = []Check{
 		cleanupDescription: "Removing launchd configuration for tray",
 		cleanup:            removeTrayPlistFile,
 
-		labels: labels{Os: Darwin, Tray: Enabled},
+		labels: labels{Os: Darwin, BuildType: Installer, Tray: Enabled},
 	},
 	{
 		checkDescription:   "Check if CodeReady Containers tray is running",
@@ -106,7 +105,7 @@ var traySetupChecks = []Check{
 		cleanupDescription: "Unload CodeReady Containers tray",
 		cleanup:            unLoadTrayAgent,
 
-		labels: labels{Os: Darwin, Tray: Enabled},
+		labels: labels{Os: Darwin, BuildType: Installer, Tray: Enabled},
 	},
 }
 
@@ -121,7 +120,7 @@ const (
 )
 
 func (filter preflightFilter) SetTray(enable bool) {
-	if version.IsInstaller() && enable {
+	if enable {
 		filter[Tray] = Enabled
 	} else {
 		filter[Tray] = Disabled
