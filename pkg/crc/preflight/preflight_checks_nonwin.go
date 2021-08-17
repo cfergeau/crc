@@ -14,7 +14,6 @@ import (
 	"github.com/code-ready/crc/pkg/crc/logging"
 	crcPreset "github.com/code-ready/crc/pkg/crc/preset"
 	"github.com/code-ready/crc/pkg/crc/validation"
-	"github.com/code-ready/crc/pkg/crc/version"
 	crcos "github.com/code-ready/crc/pkg/os"
 	"github.com/docker/go-units"
 	"github.com/pkg/errors"
@@ -41,7 +40,7 @@ var genericPreflightChecks = []Check{
 		fixDescription:   "Caching crc-admin-helper executable",
 		fix:              fixAdminHelperExecutableCached,
 
-		labels: None,
+		labels: labels{BuildType: Standalone},
 	},
 	{
 		configKeySuffix:  "check-obsolete-admin-helper",
@@ -121,10 +120,6 @@ func checkSuid(path string) error {
 
 // Check if helper executable is cached or not
 func checkAdminHelperExecutableCached() error {
-	if version.IsInstaller() {
-		return nil
-	}
-
 	helper := cache.NewAdminHelperCache()
 	if !helper.IsCached() {
 		return errors.New("crc-admin-helper executable is not cached")
@@ -137,10 +132,6 @@ func checkAdminHelperExecutableCached() error {
 }
 
 func fixAdminHelperExecutableCached() error {
-	if version.IsInstaller() {
-		return nil
-	}
-
 	helper := cache.NewAdminHelperCache()
 	if err := helper.EnsureIsCached(); err != nil {
 		return errors.Wrap(err, "Unable to download crc-admin-helper executable")

@@ -13,7 +13,6 @@ import (
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/crc/pkg/crc/network"
-	"github.com/code-ready/crc/pkg/crc/version"
 	crcos "github.com/code-ready/crc/pkg/os"
 	"github.com/klauspost/cpuid/v2"
 	"golang.org/x/sys/unix"
@@ -35,10 +34,6 @@ func checkM1CPU() error {
 
 func checkHyperKitInstalled(networkMode network.Mode) func() error {
 	return func() error {
-		if version.IsInstaller() {
-			return nil
-		}
-
 		h := cache.NewHyperKitCache()
 		if !h.IsCached() {
 			return fmt.Errorf("%s executable is not cached", h.GetExecutableName())
@@ -60,10 +55,6 @@ func checkHyperKitInstalled(networkMode network.Mode) func() error {
 
 func fixHyperKitInstallation(networkMode network.Mode) func() error {
 	return func() error {
-		if version.IsInstaller() {
-			return nil
-		}
-
 		h := cache.NewHyperKitCache()
 
 		logging.Debugf("Installing %s", h.GetExecutableName())
@@ -80,10 +71,6 @@ func fixHyperKitInstallation(networkMode network.Mode) func() error {
 
 func checkMachineDriverHyperKitInstalled(networkMode network.Mode) func() error {
 	return func() error {
-		if version.IsInstaller() {
-			return nil
-		}
-
 		hyperkitDriver := cache.NewMachineDriverHyperKitCache()
 
 		logging.Debugf("Checking if %s is installed", hyperkitDriver.GetExecutableName())
@@ -103,10 +90,6 @@ func checkMachineDriverHyperKitInstalled(networkMode network.Mode) func() error 
 
 func fixMachineDriverHyperKitInstalled(networkMode network.Mode) func() error {
 	return func() error {
-		if version.IsInstaller() {
-			return nil
-		}
-
 		hyperkitDriver := cache.NewMachineDriverHyperKitCache()
 
 		logging.Debugf("Installing %s", hyperkitDriver.GetExecutableName())
@@ -122,10 +105,6 @@ func fixMachineDriverHyperKitInstalled(networkMode network.Mode) func() error {
 }
 
 func checkQcowToolInstalled() error {
-	if version.IsInstaller() {
-		return nil
-	}
-
 	qcowTool := cache.NewQcowToolCache()
 
 	logging.Debugf("Checking if %s is installed", qcowTool.GetExecutableName())
@@ -137,9 +116,6 @@ func checkQcowToolInstalled() error {
 }
 
 func fixQcowToolInstalled() error {
-	if version.IsInstaller() {
-		return nil
-	}
 	qcowTool := cache.NewQcowToolCache()
 
 	logging.Debugf("Installing %s", qcowTool.GetExecutableName())

@@ -4,6 +4,7 @@ import (
 	"runtime"
 
 	"github.com/code-ready/crc/pkg/crc/network"
+	"github.com/code-ready/crc/pkg/crc/version"
 )
 
 type LabelName uint32
@@ -11,6 +12,7 @@ type LabelName uint32
 const (
 	Os LabelName = iota
 	NetworkMode
+	BuildType
 
 	// Keep it last
 	// will be used in OS-specific go files to extend LabelName
@@ -29,6 +31,10 @@ const (
 	User
 	System
 
+	// build type
+	Installer
+	Standalone
+
 	// Keep it last
 	// will be used in OS-specific go files to extend LabelValue
 	lastLabelValue // nolint
@@ -43,16 +49,24 @@ type labels map[LabelName]LabelValue
 type preflightFilter map[LabelName]LabelValue
 
 func newFilter() preflightFilter {
+	filter := preflightFilter{}
+	filter.setBuildType()
+	filter.setOs()
+
+	return filter
+}
+
+func (filter preflightFilter) setOs() {
 	switch runtime.GOOS {
 	case "darwin":
-		return preflightFilter{Os: Darwin}
+		filter[Os] = Darwin
 	case "linux":
-		return preflightFilter{Os: Linux}
+		filter[Os] = Linux
 	case "windows":
-		return preflightFilter{Os: Windows}
+		filter[Os] = Windows
 	default:
 		// In case of different platform (Should not happen)
-		return preflightFilter{Os: Linux}
+		filter[Os] = Linux
 	}
 }
 
@@ -63,6 +77,13 @@ func (filter preflightFilter) SetNetworkMode(networkMode network.Mode) {
 	case network.UserNetworkingMode:
 		filter[NetworkMode] = User
 	}
+}
+
+func (filter preflightFilter) setBuildType() {
+	if version.IsInstaller() {
+		filter[BuildType] = Installer
+	}
+	filter[BuildType] = Standalone
 }
 
 /* This will iterate over 'checks' and only keep the checks which match the filter:

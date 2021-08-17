@@ -27,7 +27,7 @@ func hyperkitPreflightChecks(networkMode network.Mode) []Check {
 			fixDescription:   "Setting up virtualization with HyperKit",
 			fix:              fixHyperKitInstallation(networkMode),
 
-			labels: labels{Os: Darwin},
+			labels: labels{Os: Darwin, BuildType: Standalone},
 		},
 		{
 			configKeySuffix:  "check-qcow-tool-installed",
@@ -36,7 +36,7 @@ func hyperkitPreflightChecks(networkMode network.Mode) []Check {
 			fixDescription:   "Installing qcow-tool",
 			fix:              fixQcowToolInstalled,
 
-			labels: labels{Os: Darwin},
+			labels: labels{Os: Darwin, BuildType: Standalone},
 		},
 		{
 			configKeySuffix:  "check-hyperkit-driver",
@@ -45,7 +45,7 @@ func hyperkitPreflightChecks(networkMode network.Mode) []Check {
 			fixDescription:   "Installing crc-machine-hyperkit",
 			fix:              fixMachineDriverHyperKitInstalled(networkMode),
 
-			labels: labels{Os: Darwin},
+			labels: labels{Os: Darwin, BuildType: Standalone},
 		},
 		{
 			cleanupDescription: "Stopping CRC Hyperkit process",
