@@ -124,7 +124,7 @@ func libvirtPreflightChecks(distro *linux.OsRelease) []Check {
 			cleanup:            removeDaemonSystemdService,
 			flags:              SetupOnly,
 
-			labels: labels{Os: Linux, SystemdUser: Supported},
+			labels: labels{Os: Linux, SystemdUser: Supported, DaemonStartup: SocketActivated},
 		},
 		{
 			configKeySuffix:    "check-daemon-systemd-sockets",
@@ -135,13 +135,13 @@ func libvirtPreflightChecks(distro *linux.OsRelease) []Check {
 			cleanupDescription: "Removing crc daemon systemd socket units",
 			cleanup:            removeDaemonSystemdSockets,
 
-			labels: labels{Os: Linux, SystemdUser: Supported},
+			labels: labels{Os: Linux, SystemdUser: Supported, DaemonStartup: SocketActivated},
 		},
 		{
 			checkDescription: "Checking if crc daemon will be autostarted",
 			check:            warnNoDaemonAutostart,
 
-			labels: labels{Os: Linux, NetworkMode: User, SystemdUser: Unsupported},
+			labels: labels{Os: Linux, NetworkMode: User, SystemdUser: Unsupported, DaemonStartup: SocketActivated},
 		},
 	}
 	return checks
@@ -350,6 +350,7 @@ func getAllPreflightChecks() []Check {
 	filter.SetSystemdResolved(usingSystemdResolved == nil)
 	filter.SetDistro(distro())
 	filter.SetSystemdUser(distro())
+	filter.SetDaemonStartup(SocketActivated)
 
 	return filter.Apply(getChecks(distro(), "", ""))
 }
@@ -366,6 +367,7 @@ func getPreflightChecksForDistro(distro *linux.OsRelease, networkMode network.Mo
 	filter.SetSystemdUser(distro)
 	filter.SetNetworkMode(networkMode)
 	filter.SetSystemdResolved(usingSystemdResolved)
+	filter.SetDaemonStartup(SocketActivated)
 
 	return filter.Apply(getChecks(distro, bundlePath, preset))
 }

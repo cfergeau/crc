@@ -13,6 +13,7 @@ const (
 	Os LabelName = iota
 	NetworkMode
 	BuildType
+	DaemonStartup
 
 	// Keep it last
 	// will be used in OS-specific go files to extend LabelName
@@ -34,6 +35,9 @@ const (
 	// build type
 	Installer
 	Standalone
+	// daemon startup
+	Manual
+	SocketActivated
 
 	// Keep it last
 	// will be used in OS-specific go files to extend LabelValue
@@ -52,6 +56,7 @@ func newFilter() preflightFilter {
 	filter := preflightFilter{}
 	filter.setBuildType()
 	filter.setOs()
+	filter.SetDaemonStartup(Manual)
 
 	return filter
 }
@@ -68,6 +73,10 @@ func (filter preflightFilter) setOs() {
 		// In case of different platform (Should not happen)
 		filter[Os] = Linux
 	}
+}
+
+func (filter preflightFilter) SetDaemonStartup(startupMode LabelValue) {
+	filter[DaemonStartup] = startupMode
 }
 
 func (filter preflightFilter) SetNetworkMode(networkMode network.Mode) {
