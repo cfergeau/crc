@@ -30,9 +30,6 @@ var nonWinPreflightChecks = []Check{
 		// no need for an "os" label as this is only built on relevant OSes through the use of golang build tags
 		labels: None,
 	},
-}
-
-var genericPreflightChecks = []Check{
 	{
 		configKeySuffix:  "check-admin-helper-cached",
 		checkDescription: "Checking if crc-admin-helper executable is cached",
