@@ -58,11 +58,11 @@ Feature: Basic test
 
     @linux
     Scenario: Missing CRC setup
-	Given executing "rm ~/.crc/bin/crc-driver-libvirt" succeeds
+        Given executing "rm ~/.crc/bin/crc-driver-libvirt" succeeds
         Then executing "crc setup --check-only" fails
         And starting CRC with default bundle fails
-	And stderr should contain "Preflight checks failed during `crc start`, please try to run `crc setup` first in case you haven't done so yet"
-	And executing "crc setup" succeeds
+        And stderr should contain "Preflight checks failed during `crc start`, please try to run `crc setup` first in case you haven't done so yet"
+        And executing "crc setup" succeeds
 
     @darwin
     Scenario: CRC setup on Mac
