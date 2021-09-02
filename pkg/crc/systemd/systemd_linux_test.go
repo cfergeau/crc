@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/code-ready/crc/pkg/crc/systemd/states"
+	crcos "github.com/code-ready/crc/pkg/os"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -160,10 +161,9 @@ func (r *mockSystemdRunner) status(s states.State) (string, string, error) {
 		stdout = statusListening
 	case states.Stopped:
 		stdout = statusStopped
-		err = errors.New("exit code: 3 - see EXIT STATUS in man systemctl")
+		err = &crcos.ExecError{Stdout: statusStopped, Err: errors.New("exit code: 3 - see EXIT STATUS in man systemctl")}
 	case states.NotFound:
-		stderr = statusNotFound
-		err = errors.New("exit code: 4 - see EXIT STATUS in man systemctl")
+		err = &crcos.ExecError{Stderr: statusNotFound, Err: errors.New("exit code: 4 - see EXIT STATUS in man systemctl")}
 	}
 
 	return stdout, stderr, err

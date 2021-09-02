@@ -1,6 +1,7 @@
 package systemd
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/code-ready/crc/pkg/crc/ssh"
@@ -58,24 +59,24 @@ func (c Commander) Status(name string) (states.State, error) {
 }
 
 func (c Commander) DaemonReload() error {
-	stdOut, stdErr, err := c.commandRunner.RunPrivileged("Executing systemctl daemon-reload command", "systemctl", "daemon-reload")
+	_, _, err := c.commandRunner.RunPrivileged("Executing systemctl daemon-reload command", "systemctl", "daemon-reload")
 	if err != nil {
-		return fmt.Errorf("Executing systemctl daemon-reload failed: %s %v: %s", stdOut, err, stdErr)
+		return fmt.Errorf("Executing systemctl daemon-reload failed: %v", err)
 	}
 	return nil
 }
 
 func (c Commander) service(name string, action actions.Action) (states.State, error) {
 	var (
-		stdOut, stdErr string
-		err            error
+		stdOut string
+		err    error
 	)
 
 	if action.IsPriviledged() {
 		msg := fmt.Sprintf("Executing systemctl %s %s", action.String(), name)
-		stdOut, stdErr, err = c.commandRunner.RunPrivileged(msg, "systemctl", action.String(), name)
+		stdOut, _, err = c.commandRunner.RunPrivileged(msg, "systemctl", action.String(), name)
 	} else {
-		stdOut, stdErr, err = c.commandRunner.Run("systemctl", action.String(), name)
+		stdOut, _, err = c.commandRunner.Run("systemctl", action.String(), name)
 	}
 
 	if err != nil {
@@ -83,12 +84,15 @@ func (c Commander) service(name string, action actions.Action) (states.State, er
 		if state != states.Unknown {
 			return state, nil
 		}
-		state = states.Compare(stdErr)
-		if state == states.NotFound {
-			return state, nil
+		var execErr *crcos.ExecError
+		if errors.As(err, &execErr) {
+			state = states.Compare(execErr.Stderr)
+			if state == states.NotFound {
+				return state, nil
+			}
 		}
 
-		return states.Error, fmt.Errorf("Executing systemctl action failed: %s %v: %s", stdOut, err, stdErr)
+		return states.Error, fmt.Errorf("Executing systemctl action failed: %v", err)
 	}
 
 	return states.Compare(stdOut), nil
