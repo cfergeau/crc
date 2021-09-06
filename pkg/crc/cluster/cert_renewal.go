@@ -30,7 +30,7 @@ func approvePendingCSRs(ctx context.Context, ocConfig oc.Config, expectedSignerN
 				continue
 			}
 			logging.Debugf("Approving csr %s (signerName: %s)", csr.ObjectMeta.Name, expectedSignerName)
-			_, _, err := ocConfig.RunOcCommand("adm", "certificate", "approve", csr.ObjectMeta.Name)
+			_, err := ocConfig.RunOcCommand("adm", "certificate", "approve", csr.ObjectMeta.Name)
 			if err != nil {
 				return fmt.Errorf("Not able to approve csr (%v)", err)
 			}

@@ -10,7 +10,7 @@ import (
 )
 
 func StartMonitoring(ocConfig oc.Config) error {
-	data, _, err := ocConfig.RunOcCommand("get", "clusterversion/version", "-o", "json")
+	data, err := ocConfig.RunOcCommand("get", "clusterversion/version", "-o", "json")
 	if err != nil {
 		return err
 	}
@@ -24,7 +24,7 @@ func StartMonitoring(ocConfig oc.Config) error {
 	indexForClusterMonitoringCVOKind := getIndexInOverridesForObjectName(cv, "monitoring")
 
 	if indexForClusterMonitoringDeploymentKind != -1 && indexForClusterMonitoringCVOKind != -1 {
-		_, _, err = ocConfig.RunOcCommand("patch", "clusterversion/version",
+		_, err = ocConfig.RunOcCommand("patch", "clusterversion/version",
 			"--type", "json",
 			"--patch", fmt.Sprintf(`'[{"op":"remove", "path":"/spec/overrides/%d"},{"op":"remove", "path":"/spec/overrides/%d"}]'`,
 				indexForClusterMonitoringDeploymentKind, indexForClusterMonitoringCVOKind-1))

@@ -100,7 +100,7 @@ func (client *client) updateVMConfig(startConfig types.StartConfig, vm *virtualM
 func growRootFileSystem(sshRunner *crcssh.Runner) error {
 	// With 4.7, this is quite a manual process until https://github.com/openshift/installer/pull/4746 gets fixed
 	// See https://github.com/code-ready/crc/issues/2104 for details
-	rootPart, _, err := sshRunner.Run("realpath", "/dev/disk/by-label/root")
+	rootPart, err := sshRunner.Run("realpath", "/dev/disk/by-label/root")
 	if err != nil {
 		return err
 	}
@@ -109,7 +109,7 @@ func growRootFileSystem(sshRunner *crcssh.Runner) error {
 		return fmt.Errorf("Unexpected root device: %s", rootPart)
 	}
 	// with '/dev/[sv]da4' as input, run 'growpart /dev/[sv]da 4'
-	if _, _, err := sshRunner.RunPrivileged(fmt.Sprintf("Growing %s partition", rootPart), "/usr/bin/growpart", rootPart[:len("/dev/.da")], rootPart[len(rootPart)-1:]); err != nil {
+	if _, err := sshRunner.RunPrivileged(fmt.Sprintf("Growing %s partition", rootPart), "/usr/bin/growpart", rootPart[:len("/dev/.da")], rootPart[len(rootPart)-1:]); err != nil {
 		var exitErr *ssh.ExitError
 		if !errors.As(err, &exitErr) {
 			return err
@@ -123,10 +123,10 @@ func growRootFileSystem(sshRunner *crcssh.Runner) error {
 	}
 
 	logging.Infof("Resizing %s filesystem", rootPart)
-	if _, _, err := sshRunner.RunPrivileged("Remounting /sysroot read/write", "mount -o remount,rw /sysroot"); err != nil {
+	if _, err := sshRunner.RunPrivileged("Remounting /sysroot read/write", "mount -o remount,rw /sysroot"); err != nil {
 		return err
 	}
-	if _, _, err = sshRunner.RunPrivileged(fmt.Sprintf("Growing %s filesystem", rootPart), "xfs_growfs", rootPart); err != nil {
+	if _, err = sshRunner.RunPrivileged(fmt.Sprintf("Growing %s filesystem", rootPart), "xfs_growfs", rootPart); err != nil {
 		return err
 	}
 
@@ -298,12 +298,12 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 	// Start network time synchronization if `CRC_DEBUG_ENABLE_STOP_NTP` is not set
 	if stopNtp, _ := strconv.ParseBool(os.Getenv("CRC_DEBUG_ENABLE_STOP_NTP")); stopNtp {
 		logging.Info("Stopping network time synchronization in CodeReady Containers VM")
-		if _, _, err := sshRunner.RunPrivileged("Turning off the ntp server", "timedatectl set-ntp off"); err != nil {
+		if _, err := sshRunner.RunPrivileged("Turning off the ntp server", "timedatectl set-ntp off"); err != nil {
 			return nil, errors.Wrap(err, "Failed to stop network time synchronization")
 		}
 		logging.Info("Setting clock to vm clock (UTC timezone)")
 		dateCmd := fmt.Sprintf("date -s '%s'", time.Now().Format(time.UnixDate))
-		if _, _, err := sshRunner.RunPrivileged("Setting clock same as host", dateCmd); err != nil {
+		if _, err := sshRunner.RunPrivileged("Setting clock same as host", dateCmd); err != nil {
 			return nil, errors.Wrap(err, "Failed to set clock to same as host")
 		}
 	}
@@ -315,7 +315,7 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 		}
 	}
 
-	if _, _, err := sshRunner.RunPrivileged("make root Podman socket accessible", "chmod 777 /run/podman/ /run/podman/podman.sock"); err != nil {
+	if _, err := sshRunner.RunPrivileged("make root Podman socket accessible", "chmod 777 /run/podman/ /run/podman/podman.sock"); err != nil {
 		return nil, errors.Wrap(err, "Failed to change permissions to root podman socket")
 	}
 
@@ -607,7 +607,7 @@ func updateSSHKeyPair(sshRunner *crcssh.Runner) error {
 		return err
 	}
 
-	authorizedKeys, _, err := sshRunner.Run("cat /home/core/.ssh/authorized_keys")
+	authorizedKeys, err := sshRunner.Run("cat /home/core/.ssh/authorized_keys")
 	if err == nil && strings.TrimSpace(authorizedKeys) == strings.TrimSpace(string(publicKey)) {
 		return nil
 	}
@@ -701,7 +701,7 @@ func ensureRoutesControllerIsRunning(sshRunner *crcssh.Runner, ocConfig oc.Confi
 	if err := sshRunner.CopyData(bin, "/tmp/routes-controller.json", 0444); err != nil {
 		return err
 	}
-	_, _, err = ocConfig.RunOcCommand("apply", "-f", "/tmp/routes-controller.json")
+	_, err = ocConfig.RunOcCommand("apply", "-f", "/tmp/routes-controller.json")
 	if err != nil {
 		return err
 	}
@@ -750,7 +750,7 @@ func updateCockpitConsoleBearerToken(sshRunner *crcssh.Runner) error {
 		return fmt.Errorf("failed to set token for cockpit: %w", err)
 	}
 
-	_, _, err := sshRunner.RunPrivileged("chown cockpit-bearer-token file to core", "chown core:core /home/core/cockpit-bearer-token")
+	_, err := sshRunner.RunPrivileged("chown cockpit-bearer-token file to core", "chown core:core /home/core/cockpit-bearer-token")
 	if err != nil {
 		return fmt.Errorf("failed to change ownership of cockpit-bearer-token to core user: %w", err)
 	}

@@ -61,7 +61,7 @@ type mockSystemdRunner struct {
 	failing bool
 }
 
-func (r *mockSystemdRunner) Run(command string, args ...string) (string, string, error) {
+func (r *mockSystemdRunner) Run(command string, args ...string) (string, error) {
 	assertSystemCtlCommand(r.test, "status", command, args)
 	assert.GreaterOrEqual(r.test, len(args), 2)
 
@@ -80,12 +80,12 @@ func (r *mockSystemdRunner) Run(command string, args ...string) (string, string,
 	}
 }
 
-func (r *mockSystemdRunner) RunPrivate(command string, args ...string) (string, string, error) {
+func (r *mockSystemdRunner) RunPrivate(command string, args ...string) (string, error) {
 	r.test.FailNow()
-	return "", "", fmt.Errorf("Unexpected RunPrivate() call")
+	return "", fmt.Errorf("Unexpected RunPrivate() call")
 }
 
-func (r *mockSystemdRunner) RunPrivileged(reason string, cmdAndArgs ...string) (string, string, error) {
+func (r *mockSystemdRunner) RunPrivileged(reason string, cmdAndArgs ...string) (string, error) {
 	privilegedCommands := []string{
 		"start",
 		"stop",
@@ -144,15 +144,14 @@ TriggeredBy: ● listening.socket
 	statusNotFound string = "Unit notfound.service could not be found."
 )
 
-func (r *mockSystemdRunner) status(s states.State) (string, string, error) {
+func (r *mockSystemdRunner) status(s states.State) (string, error) {
 	var (
 		err    error
 		stdout string
-		stderr string
 	)
 
 	if r.failing {
-		return "error", "", fmt.Errorf("Failed to run systemd command")
+		return "error", fmt.Errorf("Failed to run systemd command")
 	}
 	switch s {
 	case states.Running:
@@ -166,7 +165,7 @@ func (r *mockSystemdRunner) status(s states.State) (string, string, error) {
 		err = &crcos.ExecError{Stderr: statusNotFound, Err: errors.New("exit code: 4 - see EXIT STATUS in man systemctl")}
 	}
 
-	return stdout, stderr, err
+	return stdout, err
 }
 
 func assertSystemCtlCommands(t *testing.T, systemctlCommands []string, cmd string, args []string) {

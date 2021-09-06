@@ -91,22 +91,25 @@ func RunWithDefaultLocalePrivate(command string, args ...string) (string, string
 }
 
 type CommandRunner interface {
-	Run(command string, args ...string) (string, string, error)
-	RunPrivate(command string, args ...string) (string, string, error)
-	RunPrivileged(reason string, cmdAndArgs ...string) (string, string, error)
+	Run(command string, args ...string) (string, error)
+	RunPrivate(command string, args ...string) (string, error)
+	RunPrivileged(reason string, cmdAndArgs ...string) (string, error)
 }
 type localRunner struct{}
 
-func (r *localRunner) Run(command string, args ...string) (string, string, error) {
-	return RunWithDefaultLocale(command, args...)
+func (r *localRunner) Run(command string, args ...string) (string, error) {
+	stdout, _, err := RunWithDefaultLocale(command, args...)
+	return stdout, err
 }
 
-func (r *localRunner) RunPrivate(command string, args ...string) (string, string, error) {
-	return RunWithDefaultLocalePrivate(command, args...)
+func (r *localRunner) RunPrivate(command string, args ...string) (string, error) {
+	stdout, _, err := RunWithDefaultLocalePrivate(command, args...)
+	return stdout, err
 }
 
-func (r *localRunner) RunPrivileged(reason string, cmdAndArgs ...string) (string, string, error) {
-	return RunPrivileged(reason, cmdAndArgs...)
+func (r *localRunner) RunPrivileged(reason string, cmdAndArgs ...string) (string, error) {
+	stdout, _, err := RunPrivileged(reason, cmdAndArgs...)
+	return stdout, err
 }
 
 func NewLocalCommandRunner() CommandRunner {

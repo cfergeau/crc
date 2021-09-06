@@ -95,7 +95,7 @@ func CheckCRCLocalDNSReachable(ctx context.Context, serviceConfig services.Servi
 	var queryOutput string
 	var err error
 	checkLocalDNSReach := func() error {
-		queryOutput, _, err = serviceConfig.SSHRunner.Run(fmt.Sprintf("host -R 3 %s", appsURI))
+		queryOutput, err = serviceConfig.SSHRunner.Run(fmt.Sprintf("host -R 3 %s", appsURI))
 		if err != nil {
 			return &errors.RetriableError{Err: err}
 		}
@@ -129,7 +129,7 @@ func CheckCRCPublicDNSReachable(serviceConfig services.ServicePostStartConfig) (
 			curlArgs = append(curlArgs, "--proxy-cacert", proxyConfig.HTTPProxy)
 		}
 	}
-	stdout, _, err := serviceConfig.SSHRunner.Run("curl", curlArgs...)
+	stdout, err := serviceConfig.SSHRunner.Run("curl", curlArgs...)
 	return stdout, err
 }
 

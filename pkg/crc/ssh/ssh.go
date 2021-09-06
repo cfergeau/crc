@@ -33,21 +33,21 @@ func (runner *Runner) Close() {
 	runner.client.Close()
 }
 
-func (runner *Runner) Run(cmd string, args ...string) (string, string, error) {
+func (runner *Runner) Run(cmd string, args ...string) (string, error) {
 	if len(args) != 0 {
 		cmd = fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
 	}
 	return runner.runSSHCommand(cmd, false)
 }
 
-func (runner *Runner) RunPrivate(cmd string, args ...string) (string, string, error) {
+func (runner *Runner) RunPrivate(cmd string, args ...string) (string, error) {
 	if len(args) != 0 {
 		cmd = fmt.Sprintf("%s %s", cmd, strings.Join(args, " "))
 	}
 	return runner.runSSHCommand(cmd, true)
 }
 
-func (runner *Runner) RunPrivileged(reason string, cmdAndArgs ...string) (string, string, error) {
+func (runner *Runner) RunPrivileged(reason string, cmdAndArgs ...string) (string, error) {
 	logging.Debugf("Using root access: %s", reason)
 	commandline := fmt.Sprintf("sudo %s", strings.Join(cmdAndArgs, " "))
 	return runner.runSSHCommand(commandline, false)
@@ -57,7 +57,7 @@ func (runner *Runner) CopyData(data []byte, destFilename string, mode os.FileMod
 	logging.Debugf("Creating %s with permissions 0%o in the CRC VM", destFilename, mode)
 	base64Data := base64.StdEncoding.EncodeToString(data)
 	command := fmt.Sprintf("sudo install -m 0%o /dev/null %s && cat <<EOF | base64 --decode | sudo tee %s\n%s\nEOF", mode, destFilename, destFilename, base64Data)
-	_, _, err := runner.RunPrivate(command)
+	_, err := runner.RunPrivate(command)
 
 	return err
 }
@@ -70,7 +70,7 @@ func (runner *Runner) CopyFile(srcFilename string, destFilename string, mode os.
 	return runner.CopyData(data, destFilename, mode)
 }
 
-func (runner *Runner) runSSHCommand(command string, runPrivate bool) (string, string, error) {
+func (runner *Runner) runSSHCommand(command string, runPrivate bool) (string, error) {
 	if runPrivate {
 		logging.Debugf("Running SSH command: <hidden>")
 	} else {
@@ -89,19 +89,19 @@ func (runner *Runner) runSSHCommand(command string, runPrivate bool) (string, st
 	}
 
 	if err != nil {
-		return string(stdout), string(stderr), &crcos.ExecError{
+		return string(stdout), &crcos.ExecError{
 			Err:    fmt.Errorf("ssh command error: %s - %w", command, err),
 			Stdout: string(stdout),
 			Stderr: string(stderr),
 		}
 	}
 
-	return string(stdout), string(stderr), nil
+	return string(stdout), nil
 }
 
 func (runner *Runner) WaitForConnectivity(ctx context.Context, timeout time.Duration) error {
 	checkSSHConnectivity := func() error {
-		_, _, err := runner.Run("exit 0")
+		_, err := runner.Run("exit 0")
 		if err != nil {
 			return &errors.RetriableError{Err: err}
 		}
