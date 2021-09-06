@@ -50,9 +50,9 @@ func UpdateKubeAdminUserPassword(ctx context.Context, ocConfig oc.Config, newPas
 		return err
 	}
 
-	given, stderr, err := ocConfig.RunOcCommandPrivate("get", "secret", "htpass-secret", "-n", "openshift-config", "-o", `jsonpath="{.data.htpasswd}"`)
+	given, _, err := ocConfig.RunOcCommandPrivate("get", "secret", "htpass-secret", "-n", "openshift-config", "-o", `jsonpath="{.data.htpasswd}"`)
 	if err != nil {
-		return fmt.Errorf("%s:%v", stderr, err)
+		return err
 	}
 	ok, externals, err := compareHtpasswd(given, credentials)
 	if err != nil {
@@ -70,9 +70,9 @@ func UpdateKubeAdminUserPassword(ctx context.Context, ocConfig oc.Config, newPas
 	cmdArgs := []string{"patch", "secret", "htpass-secret", "-p",
 		fmt.Sprintf(`'{"data":{"htpasswd":"%s"}}'`, expected),
 		"-n", "openshift-config", "--type", "merge"}
-	_, stderr, err = ocConfig.RunOcCommandPrivate(cmdArgs...)
+	_, _, err = ocConfig.RunOcCommandPrivate(cmdArgs...)
 	if err != nil {
-		return fmt.Errorf("Failed to update kubeadmin password %v: %s", err, stderr)
+		return fmt.Errorf("Failed to update kubeadmin password %v", err)
 	}
 	return nil
 }

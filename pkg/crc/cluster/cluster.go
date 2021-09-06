@@ -91,9 +91,9 @@ func EnsureSSHKeyPresentInTheCluster(ctx context.Context, ocConfig oc.Config, ss
 	if err := WaitForOpenshiftResource(ctx, ocConfig, "machineconfigs"); err != nil {
 		return err
 	}
-	stdout, stderr, err := ocConfig.RunOcCommand("get", "machineconfigs", "99-master-ssh", "-o", `jsonpath='{.spec.config.passwd.users[0].sshAuthorizedKeys[0]}'`)
+	stdout, _, err := ocConfig.RunOcCommand("get", "machineconfigs", "99-master-ssh", "-o", `jsonpath='{.spec.config.passwd.users[0].sshAuthorizedKeys[0]}'`)
 	if err != nil {
-		return fmt.Errorf("Failed to get machine configs %v: %s", err, stderr)
+		return fmt.Errorf("Failed to get machine configs %v", err)
 	}
 	if stdout == string(sshPublicKey) {
 		return nil
@@ -102,9 +102,9 @@ func EnsureSSHKeyPresentInTheCluster(ctx context.Context, ocConfig oc.Config, ss
 	cmdArgs := []string{"patch", "machineconfig", "99-master-ssh", "-p",
 		fmt.Sprintf(`'{"spec": {"config": {"passwd": {"users": [{"name": "core", "sshAuthorizedKeys": ["%s"]}]}}}}'`, sshPublicKey),
 		"--type", "merge"}
-	_, stderr, err = ocConfig.RunOcCommand(cmdArgs...)
+	_, _, err = ocConfig.RunOcCommand(cmdArgs...)
 	if err != nil {
-		return fmt.Errorf("Failed to update ssh key %v: %s", err, stderr)
+		return fmt.Errorf("Failed to update ssh key %v", err)
 	}
 	return nil
 }
@@ -114,9 +114,9 @@ func EnsurePullSecretPresentInTheCluster(ctx context.Context, ocConfig oc.Config
 		return err
 	}
 
-	stdout, stderr, err := ocConfig.RunOcCommandPrivate("get", "secret", "pull-secret", "-n", "openshift-config", "-o", `jsonpath="{['data']['\.dockerconfigjson']}"`)
+	stdout, _, err := ocConfig.RunOcCommandPrivate("get", "secret", "pull-secret", "-n", "openshift-config", "-o", `jsonpath="{['data']['\.dockerconfigjson']}"`)
 	if err != nil {
-		return fmt.Errorf("Failed to get pull secret %v: %s", err, stderr)
+		return fmt.Errorf("Failed to get pull secret %v", err)
 	}
 	decoded, err := base64.StdEncoding.DecodeString(stdout)
 	if err != nil {
@@ -136,9 +136,9 @@ func EnsurePullSecretPresentInTheCluster(ctx context.Context, ocConfig oc.Config
 		fmt.Sprintf(`'{"data":{".dockerconfigjson":"%s"}}'`, base64OfPullSec),
 		"-n", "openshift-config", "--type", "merge"}
 
-	_, stderr, err = ocConfig.RunOcCommandPrivate(cmdArgs...)
+	_, _, err = ocConfig.RunOcCommandPrivate(cmdArgs...)
 	if err != nil {
-		return fmt.Errorf("Failed to add Pull secret %v: %s", err, stderr)
+		return fmt.Errorf("Failed to add Pull secret %v", err)
 	}
 	return nil
 }
@@ -148,9 +148,9 @@ func EnsureGeneratedClientCAPresentInTheCluster(ctx context.Context, ocConfig oc
 	if err := WaitForOpenshiftResource(ctx, ocConfig, "configmaps"); err != nil {
 		return err
 	}
-	clusterClientCA, stderr, err := ocConfig.RunOcCommand("get", "configmaps", "admin-kubeconfig-client-ca", "-n", "openshift-config", "-o", `jsonpath="{.data.ca-bundle\.crt}"`)
+	clusterClientCA, _, err := ocConfig.RunOcCommand("get", "configmaps", "admin-kubeconfig-client-ca", "-n", "openshift-config", "-o", `jsonpath="{.data.ca-bundle\.crt}"`)
 	if err != nil {
-		return fmt.Errorf("Failed to get config map %v: %s", err, stderr)
+		return fmt.Errorf("Failed to get config map %v", err)
 	}
 
 	ok, err := crctls.VerifyCertificateAgainstRootCA(clusterClientCA, adminCert)
@@ -165,9 +165,9 @@ func EnsureGeneratedClientCAPresentInTheCluster(ctx context.Context, ocConfig oc
 	jsonPath := fmt.Sprintf(`'{"data": {"ca-bundle.crt": %q}}'`, selfSignedCAPem)
 	cmdArgs := []string{"patch", "configmap", "admin-kubeconfig-client-ca",
 		"-n", "openshift-config", "--patch", jsonPath}
-	_, stderr, err = ocConfig.RunOcCommand(cmdArgs...)
+	_, _, err = ocConfig.RunOcCommand(cmdArgs...)
 	if err != nil {
-		return fmt.Errorf("Failed to patch admin-kubeconfig-client-ca config map with new CA` %v: %s", err, stderr)
+		return fmt.Errorf("Failed to patch admin-kubeconfig-client-ca config map with new CA` %v", err)
 	}
 	if err := sshRunner.CopyFile(constants.KubeconfigFilePath, ocConfig.KubeconfigPath, 0644); err != nil {
 		return fmt.Errorf("Failed to copy generated kubeconfig file to VM: %v", err)
@@ -182,9 +182,9 @@ func RemovePullSecretFromCluster(ctx context.Context, ocConfig oc.Config, sshRun
 		`'{"data":{".dockerconfigjson":"e30K"}}'`,
 		"-n", "openshift-config", "--type", "merge"}
 
-	_, stderr, err := ocConfig.RunOcCommand(cmdArgs...)
+	_, _, err := ocConfig.RunOcCommand(cmdArgs...)
 	if err != nil {
-		return fmt.Errorf("Failed to remove Pull secret %w: %s", err, stderr)
+		return fmt.Errorf("Failed to remove Pull secret %w", err)
 	}
 	return waitForPullSecretRemovedFromInstanceDisk(ctx, sshRunner)
 }
@@ -209,9 +209,9 @@ func RemoveOldRenderedMachineConfig(ocConfig oc.Config) error {
 	// This check is only make sure if there is any machineconfig resource or not because
 	// in 4.7 we disabled mco and also deleted all the machineconfig/machineconfig-pools.
 	// For 4.8 we don't disable mco and it does contain the machineconfigs.
-	stdout, stderr, err := ocConfig.RunOcCommand("get mc --sort-by=.metadata.creationTimestamp --no-headers -oname")
+	stdout, _, err := ocConfig.RunOcCommand("get mc --sort-by=.metadata.creationTimestamp --no-headers -oname")
 	if err != nil {
-		return fmt.Errorf("failed to get machineconfig resource %w: %s", err, stderr)
+		return fmt.Errorf("failed to get machineconfig resource %w", err)
 	}
 	sortedMachineConfigsWithTime := strings.Split(stdout, "\n")
 	if len(sortedMachineConfigsWithTime) == 0 {
@@ -241,9 +241,9 @@ func RemoveOldRenderedMachineConfig(ocConfig oc.Config) error {
 	}
 
 	if deleteRenderedMachineConfig != "" {
-		_, stderr, err = ocConfig.RunOcCommand(fmt.Sprintf("delete %s", deleteRenderedMachineConfig))
+		_, _, err = ocConfig.RunOcCommand(fmt.Sprintf("delete %s", deleteRenderedMachineConfig))
 		if err != nil {
-			return fmt.Errorf("Failed to remove machineconfigpools %w: %s", err, stderr)
+			return fmt.Errorf("Failed to remove machineconfigpools %w", err)
 		}
 	}
 	return nil
@@ -254,9 +254,9 @@ func EnsureClusterIDIsNotEmpty(ctx context.Context, ocConfig oc.Config) error {
 		return err
 	}
 
-	stdout, stderr, err := ocConfig.RunOcCommand("get", "clusterversion", "version", "-o", `jsonpath="{['spec']['clusterID']}"`)
+	stdout, _, err := ocConfig.RunOcCommand("get", "clusterversion", "version", "-o", `jsonpath="{['spec']['clusterID']}"`)
 	if err != nil {
-		return fmt.Errorf("Failed to get clusterversion %v: %s", err, stderr)
+		return fmt.Errorf("Failed to get clusterversion %v", err)
 	}
 	if strings.TrimSpace(stdout) != "" {
 		return nil
@@ -267,9 +267,9 @@ func EnsureClusterIDIsNotEmpty(ctx context.Context, ocConfig oc.Config) error {
 	cmdArgs := []string{"patch", "clusterversion", "version", "-p",
 		fmt.Sprintf(`'{"spec":{"clusterID":"%s"}}'`, clusterID), "--type", "merge"}
 
-	_, stderr, err = ocConfig.RunOcCommand(cmdArgs...)
+	_, _, err = ocConfig.RunOcCommand(cmdArgs...)
 	if err != nil {
-		return fmt.Errorf("Failed to update cluster ID %v: %s", err, stderr)
+		return fmt.Errorf("Failed to update cluster ID %v", err)
 	}
 
 	return nil
@@ -319,8 +319,8 @@ func AddProxyConfigToCluster(ctx context.Context, sshRunner *ssh.Runner, ocConfi
 	logging.Debugf("Patch string %s", string(patchEncode))
 
 	cmdArgs := []string{"patch", "proxy", "cluster", "-p", fmt.Sprintf("'%s'", string(patchEncode)), "-n", "openshift-config", "--type", "merge"}
-	if _, stderr, err := ocConfig.RunOcCommandPrivate(cmdArgs...); err != nil {
-		return fmt.Errorf("Failed to add proxy details %v: %s", err, stderr)
+	if _, _, err := ocConfig.RunOcCommandPrivate(cmdArgs...); err != nil {
+		return fmt.Errorf("Failed to add proxy details %v", err)
 	}
 	return nil
 }
@@ -347,8 +347,8 @@ func addProxyCACertToCluster(sshRunner *ssh.Runner, ocConfig oc.Config, proxy *n
 		return err
 	}
 	cmdArgs := []string{"apply", "-f", proxyConfigMapFileName}
-	if _, stderr, err := ocConfig.RunOcCommandPrivate(cmdArgs...); err != nil {
-		return fmt.Errorf("Failed to add proxy cert details %v: %s", err, stderr)
+	if _, _, err := ocConfig.RunOcCommandPrivate(cmdArgs...); err != nil {
+		return fmt.Errorf("Failed to add proxy cert details %v", err)
 	}
 	return nil
 }
@@ -413,9 +413,9 @@ func WaitForRequestHeaderClientCaFile(ctx context.Context, sshRunner *ssh.Runner
 func WaitForAPIServer(ctx context.Context, ocConfig oc.Config) error {
 	logging.Info("Waiting for kube-apiserver availability... [takes around 2min]")
 	waitForAPIServer := func() error {
-		stdout, stderr, err := ocConfig.WithFailFast().RunOcCommand("get", "nodes")
+		stdout, _, err := ocConfig.WithFailFast().RunOcCommand("get", "nodes")
 		if err != nil {
-			logging.Debug(stderr)
+			logging.Debug(err)
 			return &errors.RetriableError{Err: err}
 		}
 		logging.Debug(stdout)
@@ -431,9 +431,9 @@ func DeleteOpenshiftAPIServerPods(ctx context.Context, ocConfig oc.Config) error
 
 	deleteOpenshiftAPIServerPods := func() error {
 		cmdArgs := []string{"delete", "pod", "--all", "--force", "-n", "openshift-apiserver"}
-		_, stderr, err := ocConfig.WithFailFast().RunOcCommand(cmdArgs...)
+		_, _, err := ocConfig.WithFailFast().RunOcCommand(cmdArgs...)
 		if err != nil {
-			return &errors.RetriableError{Err: fmt.Errorf("Failed to delete pod from openshift-apiserver namespace %v: %s", err, stderr)}
+			return &errors.RetriableError{Err: fmt.Errorf("Failed to delete pod from openshift-apiserver namespace %v", err)}
 		}
 		return nil
 	}

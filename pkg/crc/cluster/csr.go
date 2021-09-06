@@ -16,9 +16,9 @@ import (
 func WaitForOpenshiftResource(ctx context.Context, ocConfig oc.Config, resource string) error {
 	logging.Debugf("Waiting for availability of resource type '%s'", resource)
 	waitForAPIServer := func() error {
-		stdout, stderr, err := ocConfig.WithFailFast().RunOcCommand("get", resource)
+		stdout, _, err := ocConfig.WithFailFast().RunOcCommand("get", resource)
 		if err != nil {
-			logging.Debug(stderr)
+			logging.Debug(err)
 			return &crcerrors.RetriableError{Err: err}
 		}
 		logging.Debug(stdout)
@@ -34,9 +34,9 @@ func deleteCSR(ctx context.Context, ocConfig oc.Config, expectedSignerName strin
 	}
 	for _, csr := range csrs.Items {
 		logging.Debugf("Deleting csr %s (signerName: %s)", csr.ObjectMeta.Name, expectedSignerName)
-		_, stderr, err := ocConfig.RunOcCommand("delete", "csr", csr.ObjectMeta.Name)
+		_, _, err := ocConfig.RunOcCommand("delete", "csr", csr.ObjectMeta.Name)
 		if err != nil {
-			return errors.Wrapf(err, "Not able to delete csr (%s)", stderr)
+			return errors.Wrapf(err, "Not able to delete csr")
 		}
 	}
 	return nil
@@ -47,9 +47,9 @@ func getCSRList(ctx context.Context, ocConfig oc.Config, expectedSignerName stri
 	if err := WaitForOpenshiftResource(ctx, ocConfig, "csr"); err != nil {
 		return nil, err
 	}
-	output, stderr, err := ocConfig.WithFailFast().RunOcCommand("get", "csr", "-ojson")
+	output, _, err := ocConfig.WithFailFast().RunOcCommand("get", "csr", "-ojson")
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get all certificate signing requests: %v %s", err, stderr)
+		return nil, fmt.Errorf("Failed to get all certificate signing requests: %v", err)
 	}
 	err = json.Unmarshal([]byte(output), &csrs)
 	if err != nil {
