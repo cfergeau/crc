@@ -56,6 +56,7 @@ func run(command string, args []string, env map[string]string) (string, string, 
 
 func runPrivate(command string, args []string, env map[string]string) (string, string, error) {
 	logging.Debugf("Running '%s <hidden arguments>'", command)
+	// todo: filter out ExecError
 	return runCmd(command, args, env)
 }
 
