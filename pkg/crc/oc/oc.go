@@ -71,10 +71,6 @@ func (oc Config) RunOcCommandPrivate(args ...string) (string, string, error) {
 	return oc.runCommand(true, args...)
 }
 
-type SSHRunner struct {
-	Runner *ssh.Runner
-}
-
 func UseOCWithSSH(sshRunner *ssh.Runner) Config {
 	return Config{
 		Runner:           sshRunner,
