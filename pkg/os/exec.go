@@ -3,12 +3,29 @@ package os
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
 
 	"github.com/code-ready/crc/pkg/crc/logging"
 )
+
+type ExecError struct {
+	Err    error
+	Stdout string
+	Stderr string
+	// Command string
+	// Errno int
+}
+
+func (e *ExecError) Error() string {
+	return fmt.Sprintf("%s %v: %s", e.Stdout, e.Err, e.Stderr)
+}
+
+func (e *ExecError) Unwrap() error {
+	return e.Err
+}
 
 func runCmd(command string, args []string, env map[string]string) (string, string, error) {
 	cmd := exec.Command(command, args...) // #nosec G204
@@ -27,6 +44,7 @@ func runCmd(command string, args []string, env map[string]string) (string, strin
 		logging.Debugf("Command failed: %v", err)
 		logging.Debugf("stdout: %s", stdOut.String())
 		logging.Debugf("stderr: %s", stdErr.String())
+		err = &ExecError{err, stdOut.String(), stdErr.String()}
 	}
 	return stdOut.String(), stdErr.String(), err
 }
