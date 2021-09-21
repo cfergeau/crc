@@ -40,17 +40,17 @@ func RegisterSettings(cfg *Config) {
 	}
 
 	// Start command settings in config
-	cfg.AddSetting(Bundle, constants.DefaultBundlePath, ValidateBundlePath, SuccessfullyApplied,
+	cfg.AddSetting(Bundle, constants.DefaultBundlePath, validateBundlePath, SuccessfullyApplied,
 		fmt.Sprintf("Bundle path (string, default '%s')", constants.DefaultBundlePath))
-	cfg.AddSetting(CPUs, constants.DefaultCPUs, ValidateCPUs, RequiresRestartMsg,
+	cfg.AddSetting(CPUs, constants.DefaultCPUs, validateCPUs, requiresRestartMsg,
 		fmt.Sprintf("Number of CPU cores (must be greater than or equal to '%d')", constants.DefaultCPUs))
-	cfg.AddSetting(Memory, constants.DefaultMemory, ValidateMemory, RequiresRestartMsg,
+	cfg.AddSetting(Memory, constants.DefaultMemory, validateMemory, requiresRestartMsg,
 		fmt.Sprintf("Memory size in MiB (must be greater than or equal to '%d')", constants.DefaultMemory))
-	cfg.AddSetting(DiskSize, constants.DefaultDiskSize, ValidateDiskSize, RequiresRestartMsg,
+	cfg.AddSetting(DiskSize, constants.DefaultDiskSize, validateDiskSize, requiresRestartMsg,
 		fmt.Sprintf("Total size in GiB of the disk (must be greater than or equal to '%d')", constants.DefaultDiskSize))
-	cfg.AddSetting(NameServer, "", ValidateIPAddress, SuccessfullyApplied,
+	cfg.AddSetting(NameServer, "", validateIPAddress, SuccessfullyApplied,
 		"IPv4 address of nameserver (string, like '1.1.1.1 or 8.8.8.8')")
-	cfg.AddSetting(PullSecretFile, "", ValidatePath, SuccessfullyApplied,
+	cfg.AddSetting(PullSecretFile, "", validatePath, SuccessfullyApplied,
 		fmt.Sprintf("Path of image pull secret (download from %s)", constants.CrcLandingPageURL))
 	cfg.AddSetting(DisableUpdateCheck, false, ValidateBool, SuccessfullyApplied,
 		"Disable update check (true/false, default: false)")
@@ -68,23 +68,23 @@ func RegisterSettings(cfg *Config) {
 	cfg.AddSetting(AutostartTray, true, validateTrayAutostart, disableEnableTrayAutostart,
 		"Automatically start the tray (true/false, default: true)")
 	// Proxy Configuration
-	cfg.AddSetting(HTTPProxy, "", ValidateHTTPProxy, SuccessfullyApplied,
+	cfg.AddSetting(HTTPProxy, "", validateHTTPProxy, SuccessfullyApplied,
 		"HTTP proxy URL (string, like 'http://my-proxy.com:8443')")
-	cfg.AddSetting(HTTPSProxy, "", ValidateHTTPSProxy, SuccessfullyApplied,
+	cfg.AddSetting(HTTPSProxy, "", validateHTTPSProxy, SuccessfullyApplied,
 		"HTTPS proxy URL (string, like 'https://my-proxy.com:8443')")
-	cfg.AddSetting(NoProxy, "", ValidateNoProxy, SuccessfullyApplied,
+	cfg.AddSetting(NoProxy, "", validateNoProxy, SuccessfullyApplied,
 		"Hosts, ipv4 addresses or CIDR which do not use a proxy (string, comma-separated list such as '127.0.0.1,192.168.100.1/24')")
-	cfg.AddSetting(ProxyCAFile, "", ValidatePath, SuccessfullyApplied,
+	cfg.AddSetting(ProxyCAFile, "", validatePath, SuccessfullyApplied,
 		"Path to an HTTPS proxy certificate authority (CA)")
 
 	cfg.AddSetting(EnableClusterMonitoring, false, ValidateBool, SuccessfullyApplied,
 		"Enable cluster monitoring Operator (true/false, default: false)")
 
 	// Telemeter Configuration
-	cfg.AddSetting(ConsentTelemetry, "", ValidateYesNo, SuccessfullyApplied,
+	cfg.AddSetting(ConsentTelemetry, "", validateYesNo, SuccessfullyApplied,
 		"Consent to collection of anonymous usage data (yes/no)")
 
-	cfg.AddSetting(KubeAdminPassword, "", ValidateString, SuccessfullyApplied,
+	cfg.AddSetting(KubeAdminPassword, "", validateString, SuccessfullyApplied,
 		"User defined kubeadmin password")
 }
 

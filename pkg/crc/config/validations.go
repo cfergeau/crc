@@ -25,7 +25,7 @@ func ValidateBool(value interface{}) error {
 	return nil
 }
 
-func ValidateString(value interface{}) error {
+func validateString(value interface{}) error {
 	if _, err := cast.ToStringE(value); err != nil {
 		return validationError("must be a valid string")
 	}
@@ -33,7 +33,7 @@ func ValidateString(value interface{}) error {
 }
 
 // ValidateDiskSize checks if provided disk size is valid in the config
-func ValidateDiskSize(value interface{}) error {
+func validateDiskSize(value interface{}) error {
 	diskSize, err := cast.ToIntE(value)
 	if err != nil {
 		return validationError("could not convert '%s' to integer", value)
@@ -46,7 +46,7 @@ func ValidateDiskSize(value interface{}) error {
 }
 
 // ValidateCPUs checks if provided cpus count is valid in the config
-func ValidateCPUs(value interface{}) error {
+func validateCPUs(value interface{}) error {
 	v, err := cast.ToIntE(value)
 	if err != nil {
 		return validationError("requires integer value >= %d", constants.DefaultCPUs)
@@ -58,7 +58,7 @@ func ValidateCPUs(value interface{}) error {
 }
 
 // ValidateMemory checks if provided memory is valid in the config
-func ValidateMemory(value interface{}) error {
+func validateMemory(value interface{}) error {
 	v, err := cast.ToIntE(value)
 	if err != nil {
 		return validationError("requires integer value in MiB >= %d", constants.DefaultMemory)
@@ -70,7 +70,7 @@ func ValidateMemory(value interface{}) error {
 }
 
 // ValidateBundlePath checks if the provided bundle path is valid
-func ValidateBundlePath(value interface{}) error {
+func validateBundlePath(value interface{}) error {
 	if err := validation.ValidateBundlePath(cast.ToString(value)); err != nil {
 		return validationError(err.Error())
 	}
@@ -78,7 +78,7 @@ func ValidateBundlePath(value interface{}) error {
 }
 
 // ValidateIP checks if provided IP is valid
-func ValidateIPAddress(value interface{}) error {
+func validateIPAddress(value interface{}) error {
 	if err := validation.ValidateIPAddress(cast.ToString(value)); err != nil {
 		return validationError(err.Error())
 	}
@@ -86,7 +86,7 @@ func ValidateIPAddress(value interface{}) error {
 }
 
 // ValidatePath checks if provided path is exist
-func ValidatePath(value interface{}) error {
+func validatePath(value interface{}) error {
 	if err := validation.ValidatePath(cast.ToString(value)); err != nil {
 		return validationError(err.Error())
 	}
@@ -94,7 +94,7 @@ func ValidatePath(value interface{}) error {
 }
 
 // ValidateHTTPProxy checks if given URI is valid for a HTTP proxy
-func ValidateHTTPProxy(value interface{}) error {
+func validateHTTPProxy(value interface{}) error {
 	if err := network.ValidateProxyURL(cast.ToString(value), false); err != nil {
 		return validationError(err.Error())
 	}
@@ -102,7 +102,7 @@ func ValidateHTTPProxy(value interface{}) error {
 }
 
 // ValidateHTTPSProxy checks if given URI is valid for a HTTPS proxy
-func ValidateHTTPSProxy(value interface{}) error {
+func validateHTTPSProxy(value interface{}) error {
 	if err := network.ValidateProxyURL(cast.ToString(value), true); err != nil {
 		return validationError(err.Error())
 	}
@@ -110,14 +110,14 @@ func ValidateHTTPSProxy(value interface{}) error {
 }
 
 // ValidateNoProxy checks if the NoProxy string has the correct format
-func ValidateNoProxy(value interface{}) error {
+func validateNoProxy(value interface{}) error {
 	if strings.Contains(cast.ToString(value), " ") {
 		return validationError("NoProxy string can't contain spaces")
 	}
 	return nil
 }
 
-func ValidateYesNo(value interface{}) error {
+func validateYesNo(value interface{}) error {
 	if cast.ToString(value) == "yes" || cast.ToString(value) == "no" {
 		return nil
 	}

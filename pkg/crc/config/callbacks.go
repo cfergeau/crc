@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cast"
 )
 
-func RequiresRestartMsg(key string, _ interface{}) string {
+func requiresRestartMsg(key string, _ interface{}) string {
 	return fmt.Sprintf("Changes to configuration property '%s' are only applied when the CRC instance is started.\n"+
 		"If you already have a running CRC instance, then for this configuration change to take effect, "+
 		"stop the CRC instance with 'crc stop' and restart it with 'crc start'.", key)
