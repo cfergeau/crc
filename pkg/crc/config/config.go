@@ -47,7 +47,7 @@ func (c *Config) AllSettings() []Setting {
 
 // AddSetting returns a filled struct of ConfigSetting
 // takes the config name and default value as arguments
-func (c *Config) AddSetting(name string, defValue interface{}, validationFn ValidationFnType, callbackFn SetFn, help string) {
+func (c *Config) AddSetting(name string, defValue interface{}, validationFn validationFnType, callbackFn SetFn, help string) {
 	c.settingsByName[name] = Setting{
 		Name:         name,
 		defaultValue: defValue,

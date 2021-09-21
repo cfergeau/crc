@@ -10,13 +10,13 @@ type Storage interface {
 }
 
 type Schema interface {
-	AddSetting(name string, defValue interface{}, validationFn ValidationFnType, callbackFn SetFn, help string)
+	AddSetting(name string, defValue interface{}, validationFn validationFnType, callbackFn SetFn, help string)
 }
 
 type Setting struct {
 	Name         string
 	defaultValue interface{}
-	validationFn ValidationFnType
+	validationFn validationFnType
 	callbackFn   SetFn
 	Help         string
 }
@@ -40,7 +40,7 @@ func (v SettingValue) AsInt() int {
 }
 
 // validationFnType takes the key, value as args and checks if valid
-type ValidationFnType func(interface{}) (bool, string)
+type validationFnType func(interface{}) (bool, string)
 type SetFn func(string, interface{}) string
 
 // RawStorage stores any key-value pair without validation
