@@ -64,13 +64,12 @@ func (c *Config) Set(key string, value interface{}) (string, error) {
 		return "", fmt.Errorf(configPropDoesntExistMsg, key)
 	}
 
-	ok, expectedValue := c.settingsByName[key].validationFn(value)
-	if !ok {
-		return "", fmt.Errorf(invalidProp, value, key, expectedValue)
+	err := c.settingsByName[key].validationFn(value)
+	if err != nil {
+		return "", fmt.Errorf(invalidProp, value, key, err.Error())
 	}
 
 	var castValue interface{}
-	var err error
 	switch setting.defaultValue.(type) {
 	case int:
 		castValue, err = cast.ToIntE(value)

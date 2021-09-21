@@ -10,111 +10,115 @@ import (
 	"github.com/spf13/cast"
 )
 
-// ValidateBool is a fail safe in the case user
-// makes a typo for boolean config values
-func ValidateBool(value interface{}) (bool, string) {
-	if _, err := cast.ToBoolE(value); err != nil {
-		return false, "must be true or false"
-	}
-
-	return true, ""
+func validationError(format string, args ...interface{}) error {
+	return fmt.Errorf(format, args...)
 }
 
-func ValidateString(value interface{}) (bool, string) {
-	if _, err := cast.ToStringE(value); err != nil {
-		return false, "must be a valid string"
+// ValidateBool is a fail safe in the case user
+// makes a typo for boolean config values
+func ValidateBool(value interface{}) error {
+	if _, err := cast.ToBoolE(value); err != nil {
+		return validationError("must be true or false")
 	}
-	return true, ""
+
+	return nil
+}
+
+func ValidateString(value interface{}) error {
+	if _, err := cast.ToStringE(value); err != nil {
+		return validationError("must be a valid string")
+	}
+	return nil
 }
 
 // ValidateDiskSize checks if provided disk size is valid in the config
-func ValidateDiskSize(value interface{}) (bool, string) {
+func ValidateDiskSize(value interface{}) error {
 	diskSize, err := cast.ToIntE(value)
 	if err != nil {
-		return false, fmt.Sprintf("could not convert '%s' to integer", value)
+		return validationError("could not convert '%s' to integer", value)
 	}
 	if err := validation.ValidateDiskSize(diskSize); err != nil {
-		return false, err.Error()
+		return validationError(err.Error())
 	}
 
-	return true, ""
+	return nil
 }
 
 // ValidateCPUs checks if provided cpus count is valid in the config
-func ValidateCPUs(value interface{}) (bool, string) {
+func ValidateCPUs(value interface{}) error {
 	v, err := cast.ToIntE(value)
 	if err != nil {
-		return false, fmt.Sprintf("requires integer value >= %d", constants.DefaultCPUs)
+		return validationError("requires integer value >= %d", constants.DefaultCPUs)
 	}
 	if err := validation.ValidateCPUs(v); err != nil {
-		return false, err.Error()
+		return validationError(err.Error())
 	}
-	return true, ""
+	return nil
 }
 
 // ValidateMemory checks if provided memory is valid in the config
-func ValidateMemory(value interface{}) (bool, string) {
+func ValidateMemory(value interface{}) error {
 	v, err := cast.ToIntE(value)
 	if err != nil {
-		return false, fmt.Sprintf("requires integer value in MiB >= %d", constants.DefaultMemory)
+		return validationError("requires integer value in MiB >= %d", constants.DefaultMemory)
 	}
 	if err := validation.ValidateMemory(v); err != nil {
-		return false, err.Error()
+		return validationError(err.Error())
 	}
-	return true, ""
+	return nil
 }
 
 // ValidateBundlePath checks if the provided bundle path is valid
-func ValidateBundlePath(value interface{}) (bool, string) {
+func ValidateBundlePath(value interface{}) error {
 	if err := validation.ValidateBundlePath(cast.ToString(value)); err != nil {
-		return false, err.Error()
+		return validationError(err.Error())
 	}
-	return true, ""
+	return nil
 }
 
 // ValidateIP checks if provided IP is valid
-func ValidateIPAddress(value interface{}) (bool, string) {
+func ValidateIPAddress(value interface{}) error {
 	if err := validation.ValidateIPAddress(cast.ToString(value)); err != nil {
-		return false, err.Error()
+		return validationError(err.Error())
 	}
-	return true, ""
+	return nil
 }
 
 // ValidatePath checks if provided path is exist
-func ValidatePath(value interface{}) (bool, string) {
+func ValidatePath(value interface{}) error {
 	if err := validation.ValidatePath(cast.ToString(value)); err != nil {
-		return false, err.Error()
+		return validationError(err.Error())
 	}
-	return true, ""
+	return nil
 }
 
 // ValidateHTTPProxy checks if given URI is valid for a HTTP proxy
-func ValidateHTTPProxy(value interface{}) (bool, string) {
+func ValidateHTTPProxy(value interface{}) error {
 	if err := network.ValidateProxyURL(cast.ToString(value), false); err != nil {
-		return false, err.Error()
+		return validationError(err.Error())
 	}
-	return true, ""
+	return nil
 }
 
 // ValidateHTTPSProxy checks if given URI is valid for a HTTPS proxy
-func ValidateHTTPSProxy(value interface{}) (bool, string) {
+func ValidateHTTPSProxy(value interface{}) error {
 	if err := network.ValidateProxyURL(cast.ToString(value), true); err != nil {
-		return false, err.Error()
+		return validationError(err.Error())
 	}
-	return true, ""
+	return nil
 }
 
 // ValidateNoProxy checks if the NoProxy string has the correct format
-func ValidateNoProxy(value interface{}) (bool, string) {
+func ValidateNoProxy(value interface{}) error {
 	if strings.Contains(cast.ToString(value), " ") {
-		return false, "NoProxy string can't contain spaces"
+		return validationError("NoProxy string can't contain spaces")
 	}
-	return true, ""
+	return nil
 }
 
-func ValidateYesNo(value interface{}) (bool, string) {
+func ValidateYesNo(value interface{}) error {
 	if cast.ToString(value) == "yes" || cast.ToString(value) == "no" {
-		return true, ""
+		return nil
 	}
-	return false, "must be yes or no"
+	return validationError("must be yes or no")
 }

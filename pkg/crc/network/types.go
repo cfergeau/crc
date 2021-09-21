@@ -46,12 +46,12 @@ func ParseMode(input string) Mode {
 	return mode
 }
 
-func ValidateMode(val interface{}) (bool, string) {
+func ValidateMode(val interface{}) error {
 	_, err := parseMode(cast.ToString(val))
 	if err != nil {
-		return false, fmt.Sprintf("network mode should be either %s or %s", SystemNetworkingMode, UserNetworkingMode)
+		return fmt.Errorf("network mode should be either %s or %s", SystemNetworkingMode, UserNetworkingMode)
 	}
-	return true, ""
+	return nil
 }
 
 func SuccessfullyAppliedMode(_ string, _ interface{}) string {

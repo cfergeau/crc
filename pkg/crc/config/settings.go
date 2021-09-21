@@ -33,17 +33,17 @@ const (
 )
 
 func RegisterSettings(cfg *Config) {
-	validateTrayAutostart := func(value interface{}) (bool, string) {
+	validateTrayAutostart := func(value interface{}) error {
 		if runtime.GOOS == "linux" {
-			return false, "Tray autostart is only supported on macOS and windows"
+			return validationError("Tray autostart is only supported on macOS and windows")
 		}
 		return ValidateBool(value)
 	}
 
-	validateHostNetworkAccess := func(value interface{}) (bool, string) {
+	validateHostNetworkAccess := func(value interface{}) error {
 		mode := GetNetworkMode(cfg)
 		if mode != network.UserNetworkingMode {
-			return false, fmt.Sprintf("%s can only be used with %s set to '%s'",
+			return validationError("%s can only be used with %s set to '%s'",
 				HostNetworkAccess, NetworkMode, network.UserNetworkingMode)
 		}
 		return ValidateBool(value)
