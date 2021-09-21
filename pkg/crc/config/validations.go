@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"runtime"
 	"strings"
 
 	"github.com/code-ready/crc/pkg/crc/constants"
@@ -121,4 +122,11 @@ func ValidateYesNo(value interface{}) error {
 		return nil
 	}
 	return validationError("must be yes or no")
+}
+
+func validateTrayAutostart(value interface{}) error {
+	if runtime.GOOS == "linux" {
+		return validationError("Tray autostart is only supported on macOS and windows")
+	}
+	return ValidateBool(value)
 }

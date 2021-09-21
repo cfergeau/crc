@@ -15,3 +15,16 @@ func RequiresRestartMsg(key string, _ interface{}) string {
 func SuccessfullyApplied(key string, value interface{}) string {
 	return fmt.Sprintf("Successfully configured %s to %s", key, cast.ToString(value))
 }
+
+func disableEnableTrayAutostart(key string, value interface{}) string {
+	if cast.ToBool(value) {
+		return fmt.Sprintf(
+			"Successfully configured '%s' to '%s'. Run 'crc setup' for it to take effect.",
+			key, cast.ToString(value),
+		)
+	}
+	return fmt.Sprintf(
+		"Successfully configured '%s' to '%s'. Run 'crc cleanup' and then 'crc setup' for it to take effect.",
+		key, cast.ToString(value),
+	)
+}

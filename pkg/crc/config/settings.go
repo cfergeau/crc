@@ -2,13 +2,10 @@ package config
 
 import (
 	"fmt"
-	"runtime"
 
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/network"
 	"github.com/code-ready/crc/pkg/crc/version"
-
-	"github.com/spf13/cast"
 )
 
 const (
@@ -33,13 +30,6 @@ const (
 )
 
 func RegisterSettings(cfg *Config) {
-	validateTrayAutostart := func(value interface{}) error {
-		if runtime.GOOS == "linux" {
-			return validationError("Tray autostart is only supported on macOS and windows")
-		}
-		return ValidateBool(value)
-	}
-
 	validateHostNetworkAccess := func(value interface{}) error {
 		mode := GetNetworkMode(cfg)
 		if mode != network.UserNetworkingMode {
@@ -47,19 +37,6 @@ func RegisterSettings(cfg *Config) {
 				HostNetworkAccess, NetworkMode, network.UserNetworkingMode)
 		}
 		return ValidateBool(value)
-	}
-
-	disableEnableTrayAutostart := func(key string, value interface{}) string {
-		if cast.ToBool(value) {
-			return fmt.Sprintf(
-				"Successfully configured '%s' to '%s'. Run 'crc setup' for it to take effect.",
-				key, cast.ToString(value),
-			)
-		}
-		return fmt.Sprintf(
-			"Successfully configured '%s' to '%s'. Run 'crc cleanup' and then 'crc setup' for it to take effect.",
-			key, cast.ToString(value),
-		)
 	}
 
 	// Start command settings in config
