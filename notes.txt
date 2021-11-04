@@ -1,0 +1,40 @@
+- implement a real progress bar
+Downloading 1 files...
+Downloading /home/teuf/.crc/cache/crc_libvirt_4.9.0.crcbundle 505MB / 2GB (17%) - 10.07MB/s ETA: 4m12s 
+is fugly (no nice blue "INFO" before it, inconsistent with the progress bar we show when uncompressing,  "1 files", ...)
+
+see e42127f4fb6ccda01cc511c05adc6d64bddbaaf6 can this be reused?
+
+- download to a temp file and rename once download is done. Cleanup temp files if there are any (be robust against ctrl+c during download)
+
+- check sha256sum before unpacking?
+
+- fallback to download when failing to unpack the bundle archive
+
+- need to check the bundle URL version matches the version expected by the binary
+
+- when crc setup -b ... is used, persist the value that was passed somehow for use with crc start?
+-> this is less of an issue when using presets
+
+- Enabled the podman socket.
+-> should be INFO ...
+
+-  after crc start:
+
+Use the 'podman' command line interface:
+  $ eval $(crc podman-env)
+
+?? What do I do aftr that? Use 'podman' ? 'podman-remote' ? something else?
+
+
+- create smaller VM?
+
+-in cmd/, postrun takes half a second -> this is the time it takes to send the telemetry
+
+
+"Changes to configuration property 'preset' are only applied when the CRC instance is created."
+"If you already have a running CRC instance, then for this configuration change to take effect, delete the CRC instance with 'crc delete' and start it with 'crc start'."
+
+-> is this delete/start which is needed, or delete/setup/start (in case bundle is missing?)?
+
+- disk resizing gets triggered when using podman?
