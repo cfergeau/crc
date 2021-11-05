@@ -2,6 +2,7 @@ package machine
 
 import (
 	"context"
+	"time"
 
 	"github.com/code-ready/crc/pkg/crc/cluster"
 	"github.com/code-ready/crc/pkg/crc/constants"
@@ -15,8 +16,14 @@ import (
 )
 
 func (client *client) Status() (*types.ClusterStatusResult, error) {
+	logging.Infof("beginning of status")
+	start := time.Now()
 	libMachineAPIClient, cleanup := createLibMachineClient()
 	defer cleanup()
+	elapsed := time.Now().Sub(start)
+	logging.Infof("createLibMachineClient took %d us", elapsed.Microseconds())
+
+	start = time.Now()
 
 	exists, err := libMachineAPIClient.Exists(client.name)
 	if err != nil {
@@ -28,20 +35,32 @@ func (client *client) Status() (*types.ClusterStatusResult, error) {
 			OpenshiftStatus: types.OpenshiftStopped,
 		}, nil
 	}
+	elapsed = time.Now().Sub(start)
+	logging.Infof("libmachineAPIClient.Exists took %d us", elapsed.Microseconds())
+	start = time.Now()
 
 	host, err := libMachineAPIClient.Load(client.name)
 	if err != nil {
 		return nil, errors.Wrap(err, "Cannot load machine")
 	}
+	elapsed = time.Now().Sub(start)
+	logging.Infof("libmachineAPIClient.Load took %d us", elapsed.Microseconds())
+	start = time.Now()
 	vmStatus, err := host.Driver.GetState()
 	if err != nil {
 		return nil, errors.Wrap(err, "Cannot get machine state")
 	}
+	elapsed = time.Now().Sub(start)
+	logging.Infof("host.Driver.GetState() took %d us", elapsed.Microseconds())
+	start = time.Now()
 
 	crcBundleMetadata, err := getBundleMetadataFromDriver(host.Driver)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error loading bundle metadata")
 	}
+	elapsed = time.Now().Sub(start)
+	logging.Infof("getBundleMetadataFromDriver() took %d us", elapsed.Microseconds())
+	start = time.Now()
 
 	if vmStatus != libmachinestate.Running {
 		return &types.ClusterStatusResult{
