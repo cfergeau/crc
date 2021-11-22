@@ -33,92 +33,82 @@ func checkM1CPU(_ options) error {
 	return nil
 }
 
-func checkHyperKitInstalled(networkMode network.Mode) CheckFunc {
-	return func(_ options) error {
-		if version.IsInstaller() {
-			return nil
-		}
-
-		h := cache.NewHyperKitCache()
-		if !h.IsCached() {
-			return fmt.Errorf("%s executable is not cached", h.GetExecutableName())
-		}
-		hyperkitPath := h.GetExecutablePath()
-		err := unix.Access(hyperkitPath, unix.X_OK)
-		if err != nil {
-			return fmt.Errorf("%s not executable", hyperkitPath)
-		}
-		if err := h.CheckVersion(); err != nil {
-			return err
-		}
-		if networkMode == network.UserNetworkingMode {
-			return nil
-		}
-		return checkSuid(hyperkitPath)
+func checkHyperKitInstalled(opts options) error {
+	if version.IsInstaller() {
+		return nil
 	}
+
+	h := cache.NewHyperKitCache()
+	if !h.IsCached() {
+		return fmt.Errorf("%s executable is not cached", h.GetExecutableName())
+	}
+	hyperkitPath := h.GetExecutablePath()
+	err := unix.Access(hyperkitPath, unix.X_OK)
+	if err != nil {
+		return fmt.Errorf("%s not executable", hyperkitPath)
+	}
+	if err := h.CheckVersion(); err != nil {
+		return err
+	}
+	if opts.getNetworkMode() == network.UserNetworkingMode {
+		return nil
+	}
+	return checkSuid(hyperkitPath)
 }
 
-func fixHyperKitInstallation(networkMode network.Mode) FixFunc {
-	return func(_ options) error {
-		if version.IsInstaller() {
-			return nil
-		}
-
-		h := cache.NewHyperKitCache()
-
-		logging.Debugf("Installing %s", h.GetExecutableName())
-
-		if err := h.EnsureIsCached(); err != nil {
-			return fmt.Errorf("Unable to download %s : %v", h.GetExecutableName(), err)
-		}
-		if networkMode == network.UserNetworkingMode {
-			return nil
-		}
-		return setSuid(h.GetExecutablePath())
+func fixHyperKitInstallation(opts options) error {
+	if version.IsInstaller() {
+		return nil
 	}
+	h := cache.NewHyperKitCache()
+
+	logging.Debugf("Installing %s", h.GetExecutableName())
+
+	if err := h.EnsureIsCached(); err != nil {
+		return fmt.Errorf("Unable to download %s : %v", h.GetExecutableName(), err)
+	}
+	if opts.getNetworkMode() == network.UserNetworkingMode {
+		return nil
+	}
+	return setSuid(h.GetExecutablePath())
 }
 
-func checkMachineDriverHyperKitInstalled(networkMode network.Mode) CheckFunc {
-	return func(_ options) error {
-		if version.IsInstaller() {
-			return nil
-		}
-
-		hyperkitDriver := cache.NewMachineDriverHyperKitCache()
-
-		logging.Debugf("Checking if %s is installed", hyperkitDriver.GetExecutableName())
-		if !hyperkitDriver.IsCached() {
-			return fmt.Errorf("%s executable is not cached", hyperkitDriver.GetExecutableName())
-		}
-
-		if err := hyperkitDriver.CheckVersion(); err != nil {
-			return err
-		}
-		if networkMode == network.UserNetworkingMode {
-			return nil
-		}
-		return checkSuid(hyperkitDriver.GetExecutablePath())
+func checkMachineDriverHyperKitInstalled(opts options) error {
+	if version.IsInstaller() {
+		return nil
 	}
+
+	hyperkitDriver := cache.NewMachineDriverHyperKitCache()
+
+	logging.Debugf("Checking if %s is installed", hyperkitDriver.GetExecutableName())
+	if !hyperkitDriver.IsCached() {
+		return fmt.Errorf("%s executable is not cached", hyperkitDriver.GetExecutableName())
+	}
+
+	if err := hyperkitDriver.CheckVersion(); err != nil {
+		return err
+	}
+	if opts.getNetworkMode() == network.UserNetworkingMode {
+		return nil
+	}
+	return checkSuid(hyperkitDriver.GetExecutablePath())
 }
 
-func fixMachineDriverHyperKitInstalled(networkMode network.Mode) FixFunc {
-	return func(_ options) error {
-		if version.IsInstaller() {
-			return nil
-		}
-
-		hyperkitDriver := cache.NewMachineDriverHyperKitCache()
-
-		logging.Debugf("Installing %s", hyperkitDriver.GetExecutableName())
-
-		if err := hyperkitDriver.EnsureIsCached(); err != nil {
-			return fmt.Errorf("Unable to download %s : %v", hyperkitDriver.GetExecutableName(), err)
-		}
-		if networkMode == network.UserNetworkingMode {
-			return nil
-		}
-		return setSuid(hyperkitDriver.GetExecutablePath())
+func fixMachineDriverHyperKitInstalled(opts options) error {
+	if version.IsInstaller() {
+		return nil
 	}
+	hyperkitDriver := cache.NewMachineDriverHyperKitCache()
+
+	logging.Debugf("Installing %s", hyperkitDriver.GetExecutableName())
+
+	if err := hyperkitDriver.EnsureIsCached(); err != nil {
+		return fmt.Errorf("Unable to download %s : %v", hyperkitDriver.GetExecutableName(), err)
+	}
+	if opts.getNetworkMode() == network.UserNetworkingMode {
+		return nil
+	}
+	return setSuid(hyperkitDriver.GetExecutablePath())
 }
 
 func checkQcowToolInstalled(_ options) error {

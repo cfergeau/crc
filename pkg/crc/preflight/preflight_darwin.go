@@ -3,60 +3,56 @@ package preflight
 import (
 	"fmt"
 
-	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/network"
 	"github.com/code-ready/crc/pkg/crc/preset"
-	crcpreset "github.com/code-ready/crc/pkg/crc/preset"
 	"github.com/code-ready/crc/pkg/crc/version"
 )
 
 // SetupHost performs the prerequisite checks and setups the host to run the cluster
-func hyperkitPreflightChecks(networkMode network.Mode) []Check {
-	return []Check{
-		{
-			configKeySuffix:  "check-m1-cpu",
-			checkDescription: "Checking if running emulated on a M1 CPU",
-			check:            checkM1CPU,
-			fixDescription:   "CodeReady Containers is unsupported on Apple M1 hardware",
-			flags:            NoFix,
+var hyperkitPreflightChecks = []Check{
+	{
+		configKeySuffix:  "check-m1-cpu",
+		checkDescription: "Checking if running emulated on a M1 CPU",
+		check:            checkM1CPU,
+		fixDescription:   "CodeReady Containers is unsupported on Apple M1 hardware",
+		flags:            NoFix,
 
-			labels: labels{Os: Darwin},
-		},
-		{
-			configKeySuffix:  "check-hyperkit-installed",
-			checkDescription: "Checking if HyperKit is installed",
-			check:            checkHyperKitInstalled(networkMode),
-			fixDescription:   "Setting up virtualization with HyperKit",
-			fix:              fixHyperKitInstallation(networkMode),
+		labels: labels{Os: Darwin},
+	},
+	{
+		configKeySuffix:  "check-hyperkit-installed",
+		checkDescription: "Checking if HyperKit is installed",
+		check:            checkHyperKitInstalled,
+		fixDescription:   "Setting up virtualization with HyperKit",
+		fix:              fixHyperKitInstallation,
 
-			labels: labels{Os: Darwin},
-		},
-		{
-			configKeySuffix:  "check-qcow-tool-installed",
-			checkDescription: "Checking if qcow-tool is installed",
-			check:            checkQcowToolInstalled,
-			fixDescription:   "Installing qcow-tool",
-			fix:              fixQcowToolInstalled,
+		labels: labels{Os: Darwin},
+	},
+	{
+		configKeySuffix:  "check-qcow-tool-installed",
+		checkDescription: "Checking if qcow-tool is installed",
+		check:            checkQcowToolInstalled,
+		fixDescription:   "Installing qcow-tool",
+		fix:              fixQcowToolInstalled,
 
-			labels: labels{Os: Darwin},
-		},
-		{
-			configKeySuffix:  "check-hyperkit-driver",
-			checkDescription: "Checking if crc-driver-hyperkit is installed",
-			check:            checkMachineDriverHyperKitInstalled(networkMode),
-			fixDescription:   "Installing crc-machine-hyperkit",
-			fix:              fixMachineDriverHyperKitInstalled(networkMode),
+		labels: labels{Os: Darwin},
+	},
+	{
+		configKeySuffix:  "check-hyperkit-driver",
+		checkDescription: "Checking if crc-driver-hyperkit is installed",
+		check:            checkMachineDriverHyperKitInstalled,
+		fixDescription:   "Installing crc-machine-hyperkit",
+		fix:              fixMachineDriverHyperKitInstalled,
 
-			labels: labels{Os: Darwin},
-		},
-		{
-			cleanupDescription: "Stopping CRC Hyperkit process",
-			cleanup:            stopCRCHyperkitProcess,
-			flags:              CleanUpOnly,
+		labels: labels{Os: Darwin},
+	},
+	{
+		cleanupDescription: "Stopping CRC Hyperkit process",
+		cleanup:            stopCRCHyperkitProcess,
+		flags:              CleanUpOnly,
 
-			labels: labels{Os: Darwin},
-		},
-	}
+		labels: labels{Os: Darwin},
+	},
 }
 
 var resolverPreflightChecks = []Check{
@@ -138,30 +134,30 @@ func (filter preflightFilter) SetTray(enable bool) {
 // Passing 'SystemNetworkingMode' to getPreflightChecks currently achieves this
 // as there are no user networking specific checks
 func getAllPreflightChecks() []Check {
-	return getPreflightChecks(true, true, network.SystemNetworkingMode, constants.GetDefaultBundlePath(preset.OpenShift), preset.OpenShift)
+	return getPreflightChecks(true, true, network.SystemNetworkingMode)
 }
 
-func getChecks(mode network.Mode, bundlePath string, preset crcpreset.Preset) []Check {
+func getChecks() []Check {
 	checks := []Check{}
 
 	checks = append(checks, nonWinPreflightChecks...)
-	checks = append(checks, genericPreflightChecks(preset)...)
+	checks = append(checks, genericPreflightChecks...)
 	checks = append(checks, genericCleanupChecks...)
-	checks = append(checks, hyperkitPreflightChecks(mode)...)
+	checks = append(checks, hyperkitPreflightChecks...)
 	checks = append(checks, daemonSetupChecks...)
 	checks = append(checks, resolverPreflightChecks...)
 	checks = append(checks, traySetupChecks...)
-	checks = append(checks, bundleCheck(bundlePath, preset))
+	checks = append(checks, bundleCheck)
 
 	return checks
 }
 
-func getPreflightChecks(_ bool, trayAutostart bool, mode network.Mode, bundlePath string, preset crcpreset.Preset) []Check {
+func getPreflightChecks(_ bool, trayAutostart bool, mode network.Mode) []Check {
 	filter := newFilter()
 	filter.SetNetworkMode(mode)
 	filter.SetTray(trayAutostart)
 
-	return filter.Apply(getChecks(mode, bundlePath, preset))
+	return filter.Apply(getChecks())
 }
 
 func optionsNew(networkMode network.Mode, bundlePath string, preset preset.Preset) options {

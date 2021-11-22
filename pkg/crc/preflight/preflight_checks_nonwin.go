@@ -12,7 +12,7 @@ import (
 	"github.com/code-ready/crc/pkg/crc/cache"
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/logging"
-	crcpreset "github.com/code-ready/crc/pkg/crc/preset"
+	"github.com/code-ready/crc/pkg/crc/preset"
 	"github.com/code-ready/crc/pkg/crc/validation"
 	"github.com/code-ready/crc/pkg/crc/version"
 	crcos "github.com/code-ready/crc/pkg/os"
@@ -33,45 +33,43 @@ var nonWinPreflightChecks = []Check{
 	},
 }
 
-func genericPreflightChecks(preset crcpreset.Preset) []Check {
-	return []Check{
-		{
-			configKeySuffix:  "check-admin-helper-cached",
-			checkDescription: "Checking if crc-admin-helper executable is cached",
-			check:            checkAdminHelperExecutableCached,
-			fixDescription:   "Caching crc-admin-helper executable",
-			fix:              fixAdminHelperExecutableCached,
+var genericPreflightChecks = []Check{
+	{
+		configKeySuffix:  "check-admin-helper-cached",
+		checkDescription: "Checking if crc-admin-helper executable is cached",
+		check:            checkAdminHelperExecutableCached,
+		fixDescription:   "Caching crc-admin-helper executable",
+		fix:              fixAdminHelperExecutableCached,
 
-			labels: None,
-		},
-		{
-			configKeySuffix:  "check-obsolete-admin-helper",
-			checkDescription: "Checking for obsolete admin-helper executable",
-			check:            checkOldAdminHelperExecutableCached,
-			fixDescription:   "Removing obsolete admin-helper executable",
-			fix:              fixOldAdminHelperExecutableCached,
-		},
-		{
-			configKeySuffix:  "check-supported-cpu-arch",
-			checkDescription: "Checking if running on a supported CPU architecture",
-			check:            checkSupportedCPUArch,
-			fixDescription:   "CodeReady Containers is only supported on x86_64 hardware",
-			flags:            NoFix,
+		labels: None,
+	},
+	{
+		configKeySuffix:  "check-obsolete-admin-helper",
+		checkDescription: "Checking for obsolete admin-helper executable",
+		check:            checkOldAdminHelperExecutableCached,
+		fixDescription:   "Removing obsolete admin-helper executable",
+		fix:              fixOldAdminHelperExecutableCached,
+	},
+	{
+		configKeySuffix:  "check-supported-cpu-arch",
+		checkDescription: "Checking if running on a supported CPU architecture",
+		check:            checkSupportedCPUArch,
+		fixDescription:   "CodeReady Containers is only supported on x86_64 hardware",
+		flags:            NoFix,
 
-			labels: None,
+		labels: None,
+	},
+	{
+		configKeySuffix:  "check-ram",
+		checkDescription: "Checking minimum RAM requirements",
+		check: func(opts options) error {
+			return validation.ValidateEnoughMemory(constants.GetDefaultMemory(opts.getPreset()))
 		},
-		{
-			configKeySuffix:  "check-ram",
-			checkDescription: "Checking minimum RAM requirements",
-			check: func(_ options) error {
-				return validation.ValidateEnoughMemory(constants.GetDefaultMemory(preset))
-			},
-			fixDescription: fmt.Sprintf("crc requires at least %s to run", units.HumanSize(float64(constants.GetDefaultMemory(preset)*1024*1024))),
-			flags:          NoFix,
+		fixDescription: fmt.Sprintf("crc requires at least %s to run", units.HumanSize(float64(constants.GetDefaultMemory(preset)*1024*1024))),
+		flags:          NoFix,
 
-			labels: None,
-		},
-	}
+		labels: None,
+	},
 }
 
 func checkIfRunningAsNormalUser(_ options) error {

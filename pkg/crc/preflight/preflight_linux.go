@@ -6,148 +6,142 @@ import (
 	"os"
 	"strings"
 
-	"github.com/code-ready/crc/pkg/crc/constants"
 	crcErrors "github.com/code-ready/crc/pkg/crc/errors"
 	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/crc/pkg/crc/network"
-	"github.com/code-ready/crc/pkg/crc/preset"
-	crcpreset "github.com/code-ready/crc/pkg/crc/preset"
 	crcos "github.com/code-ready/crc/pkg/os"
 	"github.com/code-ready/crc/pkg/os/linux"
 
 	"golang.org/x/sys/unix"
 )
 
-func libvirtPreflightChecks(distro *linux.OsRelease) []Check {
-	checks := []Check{
-		{
-			configKeySuffix:    "check-crc-symlink",
-			checkDescription:   "Checking if crc executable symlink exists",
-			check:              checkCrcSymlink,
-			fixDescription:     "Creating symlink for crc executable",
-			fix:                fixCrcSymlink,
-			cleanupDescription: "Removing crc executable symlink",
-			cleanup:            removeCrcSymlink,
+var libvirtPreflightChecks = []Check{
+	{
+		configKeySuffix:    "check-crc-symlink",
+		checkDescription:   "Checking if crc executable symlink exists",
+		check:              checkCrcSymlink,
+		fixDescription:     "Creating symlink for crc executable",
+		fix:                fixCrcSymlink,
+		cleanupDescription: "Removing crc executable symlink",
+		cleanup:            removeCrcSymlink,
 
-			labels: labels{Os: Linux},
-		},
-		{
-			configKeySuffix:  "check-virt-enabled",
-			checkDescription: "Checking if Virtualization is enabled",
-			check:            checkVirtualizationEnabled,
-			fixDescription:   "Setting up virtualization",
-			fix:              fixVirtualizationEnabled,
+		labels: labels{Os: Linux},
+	},
+	{
+		configKeySuffix:  "check-virt-enabled",
+		checkDescription: "Checking if Virtualization is enabled",
+		check:            checkVirtualizationEnabled,
+		fixDescription:   "Setting up virtualization",
+		fix:              fixVirtualizationEnabled,
 
-			labels: labels{Os: Linux},
-		},
-		{
-			configKeySuffix:  "check-kvm-enabled",
-			checkDescription: "Checking if KVM is enabled",
-			check:            checkKvmEnabled,
-			fixDescription:   "Setting up KVM",
-			fix:              fixKvmEnabled,
+		labels: labels{Os: Linux},
+	},
+	{
+		configKeySuffix:  "check-kvm-enabled",
+		checkDescription: "Checking if KVM is enabled",
+		check:            checkKvmEnabled,
+		fixDescription:   "Setting up KVM",
+		fix:              fixKvmEnabled,
 
-			labels: labels{Os: Linux},
-		},
-		{
-			configKeySuffix:  "check-libvirt-installed",
-			checkDescription: "Checking if libvirt is installed",
-			check:            checkLibvirtInstalled,
-			fixDescription:   "Installing libvirt service and dependencies",
-			fix:              fixLibvirtInstalled(distro),
+		labels: labels{Os: Linux},
+	},
+	{
+		configKeySuffix:  "check-libvirt-installed",
+		checkDescription: "Checking if libvirt is installed",
+		check:            checkLibvirtInstalled,
+		fixDescription:   "Installing libvirt service and dependencies",
+		fix:              fixLibvirtInstalled,
 
-			labels: labels{Os: Linux},
-		},
-		{
-			configKeySuffix:  "check-user-in-libvirt-group",
-			checkDescription: "Checking if user is part of libvirt group",
-			check:            checkUserPartOfLibvirtGroup,
-			fixDescription:   "Adding user to libvirt group",
-			fix:              fixUserPartOfLibvirtGroup,
+		labels: labels{Os: Linux},
+	},
+	{
+		configKeySuffix:  "check-user-in-libvirt-group",
+		checkDescription: "Checking if user is part of libvirt group",
+		check:            checkUserPartOfLibvirtGroup,
+		fixDescription:   "Adding user to libvirt group",
+		fix:              fixUserPartOfLibvirtGroup,
 
-			labels: labels{Os: Linux},
-		},
-		{
-			configKeySuffix:  "check-libvirt-group-active",
-			checkDescription: "Checking if active user/process is currently part of the libvirt group",
-			check:            checkCurrentGroups(distro),
-			fixDescription:   "You need to logout, re-login, and run crc setup again before the user is effectively a member of the 'libvirt' group.",
-			flags:            NoFix,
+		labels: labels{Os: Linux},
+	},
+	{
+		configKeySuffix:  "check-libvirt-group-active",
+		checkDescription: "Checking if active user/process is currently part of the libvirt group",
+		check:            checkCurrentGroups,
+		fixDescription:   "You need to logout, re-login, and run crc setup again before the user is effectively a member of the 'libvirt' group.",
+		flags:            NoFix,
 
-			labels: labels{Os: Linux},
-		},
-		{
-			configKeySuffix:  "check-libvirt-running",
-			checkDescription: "Checking if libvirt daemon is running",
-			check:            checkLibvirtServiceRunning,
-			fixDescription:   "Starting libvirt service",
-			fix:              fixLibvirtServiceRunning,
+		labels: labels{Os: Linux},
+	},
+	{
+		configKeySuffix:  "check-libvirt-running",
+		checkDescription: "Checking if libvirt daemon is running",
+		check:            checkLibvirtServiceRunning,
+		fixDescription:   "Starting libvirt service",
+		fix:              fixLibvirtServiceRunning,
 
-			labels: labels{Os: Linux},
-		},
-		{
-			configKeySuffix:  "check-libvirt-version",
-			checkDescription: "Checking if a supported libvirt version is installed",
-			check:            checkLibvirtVersion,
-			fixDescription:   fmt.Sprintf("libvirt v%s or newer is required and must be updated manually", minSupportedLibvirtVersion),
-			flags:            NoFix,
+		labels: labels{Os: Linux},
+	},
+	{
+		configKeySuffix:  "check-libvirt-version",
+		checkDescription: "Checking if a supported libvirt version is installed",
+		check:            checkLibvirtVersion,
+		fixDescription:   fmt.Sprintf("libvirt v%s or newer is required and must be updated manually", minSupportedLibvirtVersion),
+		flags:            NoFix,
 
-			labels: labels{Os: Linux},
-		},
-		{
-			configKeySuffix:  "check-libvirt-driver",
-			checkDescription: "Checking if crc-driver-libvirt is installed",
-			check:            checkMachineDriverLibvirtInstalled,
-			fixDescription:   "Installing crc-driver-libvirt",
-			fix:              fixMachineDriverLibvirtInstalled,
+		labels: labels{Os: Linux},
+	},
+	{
+		configKeySuffix:  "check-libvirt-driver",
+		checkDescription: "Checking if crc-driver-libvirt is installed",
+		check:            checkMachineDriverLibvirtInstalled,
+		fixDescription:   "Installing crc-driver-libvirt",
+		fix:              fixMachineDriverLibvirtInstalled,
 
-			labels: labels{Os: Linux},
-		},
-		{
-			cleanupDescription: "Removing crc libvirt storage pool",
-			cleanup:            removeLibvirtStoragePool,
-			flags:              CleanUpOnly,
+		labels: labels{Os: Linux},
+	},
+	{
+		cleanupDescription: "Removing crc libvirt storage pool",
+		cleanup:            removeLibvirtStoragePool,
+		flags:              CleanUpOnly,
 
-			labels: labels{Os: Linux},
-		},
-		{
-			cleanupDescription: "Removing crc's virtual machine",
-			cleanup:            removeCrcVM,
-			flags:              CleanUpOnly,
+		labels: labels{Os: Linux},
+	},
+	{
+		cleanupDescription: "Removing crc's virtual machine",
+		cleanup:            removeCrcVM,
+		flags:              CleanUpOnly,
 
-			labels: labels{Os: Linux},
-		},
-		{
-			configKeySuffix:    "check-daemon-systemd-unit",
-			checkDescription:   "Checking crc daemon systemd service",
-			check:              checkDaemonSystemdService,
-			fixDescription:     "Setting up crc daemon systemd service",
-			fix:                fixDaemonSystemdService,
-			cleanupDescription: "Removing crc daemon systemd service",
-			cleanup:            removeDaemonSystemdService,
-			flags:              SetupOnly,
+		labels: labels{Os: Linux},
+	},
+	{
+		configKeySuffix:    "check-daemon-systemd-unit",
+		checkDescription:   "Checking crc daemon systemd service",
+		check:              checkDaemonSystemdService,
+		fixDescription:     "Setting up crc daemon systemd service",
+		fix:                fixDaemonSystemdService,
+		cleanupDescription: "Removing crc daemon systemd service",
+		cleanup:            removeDaemonSystemdService,
+		flags:              SetupOnly,
 
-			labels: labels{Os: Linux, SystemdUser: Supported},
-		},
-		{
-			configKeySuffix:    "check-daemon-systemd-sockets",
-			checkDescription:   "Checking crc daemon systemd socket units",
-			check:              checkDaemonSystemdSockets,
-			fixDescription:     "Setting up crc daemon systemd socket units",
-			fix:                fixDaemonSystemdSockets,
-			cleanupDescription: "Removing crc daemon systemd socket units",
-			cleanup:            removeDaemonSystemdSockets,
+		labels: labels{Os: Linux, SystemdUser: Supported},
+	},
+	{
+		configKeySuffix:    "check-daemon-systemd-sockets",
+		checkDescription:   "Checking crc daemon systemd socket units",
+		check:              checkDaemonSystemdSockets,
+		fixDescription:     "Setting up crc daemon systemd socket units",
+		fix:                fixDaemonSystemdSockets,
+		cleanupDescription: "Removing crc daemon systemd socket units",
+		cleanup:            removeDaemonSystemdSockets,
 
-			labels: labels{Os: Linux, SystemdUser: Supported},
-		},
-		{
-			checkDescription: "Checking if crc daemon will be autostarted",
-			check:            warnNoDaemonAutostart,
+		labels: labels{Os: Linux, SystemdUser: Supported},
+	},
+	{
+		checkDescription: "Checking if crc daemon will be autostarted",
+		check:            warnNoDaemonAutostart,
 
-			labels: labels{Os: Linux, NetworkMode: User, SystemdUser: Unsupported},
-		},
-	}
-	return checks
+		labels: labels{Os: Linux, NetworkMode: User, SystemdUser: Unsupported},
+	},
 }
 
 var libvirtNetworkPreflightChecks = []Check{
@@ -354,39 +348,39 @@ func getAllPreflightChecks() []Check {
 	filter.SetDistro(distro())
 	filter.SetSystemdUser(distro())
 
-	return filter.Apply(getChecks(distro(), constants.GetDefaultBundlePath(preset.OpenShift), preset.OpenShift))
+	return filter.Apply(getChecks())
 }
 
-func getPreflightChecks(_ bool, _ bool, networkMode network.Mode, bundlePath string, preset crcpreset.Preset) []Check {
+func getPreflightChecks(_ bool, _ bool, networkMode network.Mode) []Check {
 	usingSystemdResolved := (checkSystemdServiceRunning("systemd-resolved.service") == nil)
 
-	return getPreflightChecksForDistro(distro(), networkMode, usingSystemdResolved, bundlePath, preset)
+	return getPreflightChecksForDistro(distro(), networkMode, usingSystemdResolved)
 }
 
-func getPreflightChecksForDistro(distro *linux.OsRelease, networkMode network.Mode, usingSystemdResolved bool, bundlePath string, preset crcpreset.Preset) []Check {
+func getPreflightChecksForDistro(distro *linux.OsRelease, networkMode network.Mode, usingSystemdResolved bool) []Check {
 	filter := newFilter()
 	filter.SetDistro(distro)
 	filter.SetSystemdUser(distro)
 	filter.SetNetworkMode(networkMode)
 	filter.SetSystemdResolved(usingSystemdResolved)
 
-	return filter.Apply(getChecks(distro, bundlePath, preset))
+	return filter.Apply(getChecks())
 }
 
-func getChecks(distro *linux.OsRelease, bundlePath string, preset crcpreset.Preset) []Check {
+func getChecks() []Check {
 	var checks []Check
 	checks = append(checks, nonWinPreflightChecks...)
 	checks = append(checks, wsl2PreflightCheck)
-	checks = append(checks, genericPreflightChecks(preset)...)
+	checks = append(checks, genericPreflightChecks...)
 	checks = append(checks, genericCleanupChecks...)
-	checks = append(checks, libvirtPreflightChecks(distro)...)
+	checks = append(checks, libvirtPreflightChecks...)
 	checks = append(checks, ubuntuPreflightChecks...)
 	checks = append(checks, nmPreflightChecks...)
 	checks = append(checks, systemdResolvedPreflightChecks...)
 	checks = append(checks, dnsmasqPreflightChecks...)
 	checks = append(checks, libvirtNetworkPreflightChecks...)
 	checks = append(checks, vsockPreflightCheck)
-	checks = append(checks, bundleCheck(bundlePath, preset))
+	checks = append(checks, bundleCheck)
 
 	return checks
 }

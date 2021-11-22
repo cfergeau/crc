@@ -39,6 +39,15 @@ func optionsNew(networkMode network.Mode, bundlePath string, preset preset.Prese
 	}
 }
 
+func getDistro(opts options) (*linux.OsRelease, error) {
+	linuxOptions, ok := opts.(*linuxOptions)
+	if !ok {
+		return nil, fmt.Errorf("Unexpected preflight options")
+	}
+
+	return linuxOptions.distro, nil
+}
+
 const (
 	// This is defined in https://github.com/code-ready/machine-driver-libvirt/blob/master/go.mod#L5
 	minSupportedLibvirtVersion = "3.4.0"
@@ -162,16 +171,18 @@ func checkLibvirtInstalled(_ options) error {
 	return nil
 }
 
-func fixLibvirtInstalled(distro *linux.OsRelease) FixFunc {
-	return func(_ options) error {
-		logging.Debug("Trying to install libvirt")
-		stdOut, stdErr, err := crcos.RunPrivileged("Installing virtualization packages", "/bin/sh", "-c", installLibvirtCommand(distro))
-		if err != nil {
-			return fmt.Errorf("Could not install required packages: %s %v: %s", stdOut, err, stdErr)
-		}
-		logging.Debug("libvirt was successfully installed")
-		return nil
+func fixLibvirtInstalled(opts options) error {
+	logging.Debug("Trying to install libvirt")
+	distro, err := getDistro(opts)
+	if err != nil {
+		return err
 	}
+	stdOut, stdErr, err := crcos.RunPrivileged("Installing virtualization packages", "/bin/sh", "-c", installLibvirtCommand(distro))
+	if err != nil {
+		return fmt.Errorf("Could not install required packages: %s %v: %s", stdOut, err, stdErr)
+	}
+	logging.Debug("libvirt was successfully installed")
+	return nil
 }
 
 func installLibvirtCommand(distro *linux.OsRelease) string {
@@ -252,30 +263,32 @@ func fixUserPartOfLibvirtGroup(_ options) error {
 	return err
 }
 
-func checkCurrentGroups(distro *linux.OsRelease) CheckFunc {
-	return func(_ options) error {
-		if !distroIsLike(distro, linux.Ubuntu) {
+func checkCurrentGroups(opts options) error {
+	distro, err := getDistro(opts)
+	if err != nil {
+		return err
+	}
+	if !distroIsLike(distro, linux.Ubuntu) {
+		return nil
+	}
+
+	// After adding the user to the libvirt group, they need to relogin for the new group to be used by the currrent shell
+	gids, err := os.Getgroups()
+	if err != nil {
+		return err
+	}
+	for _, gid := range gids {
+		group, err := user.LookupGroupId(fmt.Sprintf("%d", gid))
+		if err != nil {
+			logging.Debugf("Failed to lookup group id %d: %v", gid, err)
+			continue
+		}
+		if group.Name == "libvirt" {
+			logging.Debug("libvirt group is active for the current user/process")
 			return nil
 		}
-
-		// After adding the user to the libvirt group, they need to relogin for the new group to be used by the currrent shell
-		gids, err := os.Getgroups()
-		if err != nil {
-			return err
-		}
-		for _, gid := range gids {
-			group, err := user.LookupGroupId(fmt.Sprintf("%d", gid))
-			if err != nil {
-				logging.Debugf("Failed to lookup group id %d: %v", gid, err)
-				continue
-			}
-			if group.Name == "libvirt" {
-				logging.Debug("libvirt group is active for the current user/process")
-				return nil
-			}
-		}
-		return fmt.Errorf("User in the currently active process is not part of the libvirt group")
 	}
+	return fmt.Errorf("User in the currently active process is not part of the libvirt group")
 }
 
 func systemdUnitRunning(sd *systemd.Commander, unitName string) bool {
