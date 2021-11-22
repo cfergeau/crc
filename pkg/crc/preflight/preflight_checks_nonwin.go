@@ -65,7 +65,8 @@ var genericPreflightChecks = []Check{
 		check: func(opts options) error {
 			return validation.ValidateEnoughMemory(constants.GetDefaultMemory(opts.getPreset()))
 		},
-		fixDescription: fmt.Sprintf("crc requires at least %s to run", units.HumanSize(float64(constants.GetDefaultMemory(preset)*1024*1024))),
+		//fixDescription: fmt.Sprintf("crc requires at least %s to run", units.HumanSize(float64(constants.GetDefaultMemory(preset)*1024*1024))),
+		fixDescription: fmt.Sprintf("crc requires at least %s to run", units.HumanSize(float64(constants.GetDefaultMemory(preset.OpenShift)*1024*1024))),
 		flags:          NoFix,
 
 		labels: None,
