@@ -71,7 +71,7 @@ func getStatus(client machine.Client, cacheDir string) *status {
 
 	return &status{
 		Success:          true,
-		CrcStatus:        string(clusterStatus.CrcStatus),
+		CrcStatus:        clusterStatus.CrcStatus.String(),
 		OpenShiftStatus:  clusterStatus.OpenshiftStatus,
 		OpenShiftVersion: clusterStatus.OpenshiftVersion,
 		PodmanVersion:    clusterStatus.PodmanVersion,

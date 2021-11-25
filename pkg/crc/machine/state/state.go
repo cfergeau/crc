@@ -22,3 +22,7 @@ func FromMachine(input libmachinestate.State) State {
 	}
 	return Error
 }
+
+func (state State) String() string {
+	return string(state)
+}
