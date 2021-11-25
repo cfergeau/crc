@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/code-ready/crc/pkg/crc/daemonclient"
 	crcErrors "github.com/code-ready/crc/pkg/crc/errors"
 	"github.com/code-ready/crc/pkg/crc/machine"
 	"github.com/code-ready/crc/pkg/crc/machine/state"
@@ -37,14 +38,31 @@ var consoleCmd = &cobra.Command{
 	},
 }
 
-func showConsole(client machine.Client) (*types.ConsoleResult, error) {
-	if err := checkIfMachineMissing(client); err != nil {
-		// In case of machine doesn't exist then consoleResult error
-		// should be updated so that when rendering the result it have
-		// error details also.
+func remoteShowConsole() (*types.ConsoleResult, error) {
+	daemonClient := daemonclient.New()
+	consoleResult, err := daemonClient.APIClient.WebconsoleURL()
+	if err != nil {
 		return nil, err
 	}
-	return client.GetConsoleURL()
+	machineConsoleResult := types.ConsoleResult{
+		ClusterConfig: consoleResult.ClusterConfig,
+	}
+	return &machineConsoleResult, nil
+}
+
+func showConsole(client machine.Client) (*types.ConsoleResult, error) {
+
+	return remoteShowConsole()
+
+	/*
+		if err := checkIfMachineMissing(client); err != nil {
+			// In case of machine doesn't exist then consoleResult error
+			// should be updated so that when rendering the result it have
+			// error details also.
+			return nil, err
+		}
+		return client.GetConsoleURL()
+	*/
 }
 
 func runConsole(writer io.Writer, client machine.Client, consolePrintURL, consolePrintCredentials bool, outputFormat string) error {
