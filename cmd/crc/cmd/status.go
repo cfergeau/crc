@@ -8,6 +8,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/code-ready/crc/pkg/crc/constants"
+	"github.com/code-ready/crc/pkg/crc/daemonclient"
 	crcErrors "github.com/code-ready/crc/pkg/crc/errors"
 	"github.com/code-ready/crc/pkg/crc/machine"
 	"github.com/code-ready/crc/pkg/crc/machine/types"
@@ -45,8 +46,40 @@ type status struct {
 }
 
 func runStatus(writer io.Writer, client machine.Client, cacheDir, outputFormat string) error {
-	status := getStatus(client, cacheDir)
+	status := remoteGetStatus(client, cacheDir)
 	return render(status, writer, outputFormat)
+}
+
+func remoteGetStatus(_ machine.Client, cacheDir string) *status {
+	daemonClient := daemonclient.New()
+	clusterStatus, err := daemonClient.APIClient.Status()
+	if err != nil {
+		// what about clusterStatus.Error???
+		return &status{Success: false, Error: crcErrors.ToSerializableError(err)}
+	}
+
+	var size int64
+	err = filepath.Walk(cacheDir, func(_ string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			size += info.Size()
+		}
+		return err
+	})
+	if err != nil {
+		return &status{Success: false, Error: crcErrors.ToSerializableError(err)}
+	}
+
+	return &status{
+		Success:          clusterStatus.Success,
+		CrcStatus:        clusterStatus.CrcStatus,
+		OpenShiftStatus:  types.OpenshiftStatus(clusterStatus.OpenshiftStatus),
+		OpenShiftVersion: clusterStatus.OpenshiftVersion,
+		//PodmanVersion:    clusterStatus.PodmanVersion,
+		DiskUsage:  clusterStatus.DiskUse,
+		DiskSize:   clusterStatus.DiskSize,
+		CacheUsage: size,
+		CacheDir:   cacheDir,
+	}
 }
 
 func getStatus(client machine.Client, cacheDir string) *status {
