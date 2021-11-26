@@ -52,11 +52,10 @@ type status struct {
 }
 
 // FIXME: fill SSH connection details for remote host here
-const sshUserName = ""
-const sshHost = ""
+const sshUserName = "teuf"
+const sshHost = "ramen.dolet.fergeau.eu"
 const sshPort = 22
-
-var sshPrivateKey = fmt.Sprintf("/home/%s/.ssh/id_rsa", sshUserName)
+const sshPrivateKey = "/home/teuf/.ssh/id_redhat_rsa"
 
 func runStatus(writer io.Writer, client machine.Client, cacheDir, outputFormat string) error {
 	status := remoteGetStatus(client, cacheDir)
