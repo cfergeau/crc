@@ -45,6 +45,12 @@ type status struct {
 	Preset           preset.Preset                `json:"preset"`
 }
 
+// FIXME: fill SSH connection details for remote host here
+const sshUserName = ""
+const sshHost = ""
+const sshPort = 22
+const sshPrivateKey = fmt.Sprinf("/home/%s/.ssh/id_rsa", sshUserName)
+
 func runStatus(writer io.Writer, client machine.Client, cacheDir, outputFormat string) error {
 	status := remoteGetStatus(client, cacheDir)
 	return render(status, writer, outputFormat)
