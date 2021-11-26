@@ -1,0 +1,9 @@
+Lots of things still need to be solved:
+- how to pass ssh credentials for the remote host? they are currently hardcoded
+- the multiplication of inconsistent xxxxResult types is messy, hopefully a
+  good cleanup can be done ('status' struct in cmd/status.go,
+  'ClusterStatusResult' in api/client/types.go, 'ClusterStatusResult' in
+  machine/types/types.go)
+- all commands need to be converted to going through the daemon
+- the remote/local daemon can hopefully be dealt with through the daemonclient
+  API, at the moment it's done manually/hardcoded in cmd/
