@@ -71,15 +71,20 @@ func clientConfig(user string, keys []string) (*ssh.ClientConfig, error) {
 	}, nil
 }
 
+func (client *NativeClient) newSSHConnection() error {
+	var err error
+	config, err := clientConfig(client.User, client.Keys)
+	if err != nil {
+		return fmt.Errorf("Error getting config for native Go SSH: %s", err)
+	}
+	client.conn, err = ssh.Dial("tcp", net.JoinHostPort(client.Hostname, strconv.Itoa(client.Port)), config)
+
+	return err
+}
+
 func (client *NativeClient) session() (*ssh.Session, error) {
 	if client.conn == nil {
-		var err error
-		config, err := clientConfig(client.User, client.Keys)
-		if err != nil {
-			return nil, fmt.Errorf("Error getting config for native Go SSH: %s", err)
-		}
-		client.conn, err = ssh.Dial("tcp", net.JoinHostPort(client.Hostname, strconv.Itoa(client.Port)), config)
-		if err != nil {
+		if err := client.newSSHConnection(); err != nil {
 			return nil, err
 		}
 	}
