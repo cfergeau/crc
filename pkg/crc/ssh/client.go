@@ -15,6 +15,7 @@ import (
 
 type Client interface {
 	Run(command string) ([]byte, []byte, error)
+	Tunnel(addrType string, addr string) (net.Conn, error)
 	Close()
 }
 
@@ -93,6 +94,15 @@ func (client *NativeClient) session() (*ssh.Session, error) {
 		return nil, err
 	}
 	return session, err
+}
+
+func (client *NativeClient) Tunnel(addrType string, addr string) (net.Conn, error) {
+	if client.conn == nil {
+		if err := client.newSSHConnection(); err != nil {
+			return nil, err
+		}
+	}
+	return client.conn.Dial(addrType, addr)
 }
 
 func (client *NativeClient) Run(command string) ([]byte, []byte, error) {
