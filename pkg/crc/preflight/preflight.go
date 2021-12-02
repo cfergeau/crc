@@ -1,6 +1,7 @@
 package preflight
 
 import (
+	"encoding/json"
 	"fmt"
 
 	crcConfig "github.com/code-ready/crc/pkg/crc/config"
@@ -49,35 +50,85 @@ func (check *Check) shouldSkip(config crcConfig.Storage) bool {
 	return config.Get(check.getSkipConfigName()).AsBool()
 }
 
+type State string
+
+const (
+	Unknown =  State("unknown")
+	Passed =  State("passed")
+	Failed =  State("failed")
+	Skipped =  State("skipped")
+)
+
+type checkResult struct {
+	PreflightType string `json:"type"`
+	Description   string `json:"description"`
+	State         State  `json:"result"`
+	Err           error  `json:"error"`
+}
+
+func printJSONResult(res *checkResult) {
+	bin, err := json.MarshalIndent(res, "", "  ")
+	if err != nil {
+		panic("printJSONResult error")
+	}
+	fmt.Println(string(bin))
+	fmt.Println()
+}
+
 func (check *Check) doCheck(config crcConfig.Storage) error {
+	res := checkResult{
+		PreflightType: "check",
+		Description:   check.checkDescription,
+	}
+	defer printJSONResult(&res)
 	if check.checkDescription == "" {
 		panic(fmt.Sprintf("Should not happen, empty description for check '%s'", check.configKeySuffix))
 	} else {
-		logging.Infof("%s", check.checkDescription)
+		//logging.Infof("%s", check.checkDescription)
 	}
 	if check.shouldSkip(config) {
-		logging.Warn("Skipping above check...")
+		res.State = Skipped
+		//logging.Warn("Skipping above check...")
 		return nil
 	}
 
 	err := check.check()
 	if err != nil {
+		res.State = Failed
+		res.Err = err // FIXME: not sure this should be exposed
 		logging.Debug(err.Error())
+	} else {
+		res.State = Passed
 	}
 	return err
 }
 
 func (check *Check) doFix() error {
+	res := checkResult{
+		PreflightType: "fix",
+		Description:   check.fixDescription,
+	}
+	defer printJSONResult(&res)
 	if check.fixDescription == "" {
 		panic(fmt.Sprintf("Should not happen, empty description for fix '%s'", check.configKeySuffix))
 	}
 	if check.flags&NoFix == NoFix {
+		res.State = Failed
+		res.Err = fmt.Errorf(check.fixDescription)
 		return fmt.Errorf(check.fixDescription)
 	}
 
-	logging.Infof("%s", check.fixDescription)
+	//logging.Infof("%s", check.fixDescription)
 
-	return check.fix()
+	err := check.fix()
+	if err != nil {
+		res.State = Failed
+		res.Err = err
+	} else {
+		res.State = Passed
+	}
+
+	return err
 }
 
 func (check *Check) doCleanUp() error {
