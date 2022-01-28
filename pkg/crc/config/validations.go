@@ -54,15 +54,15 @@ func ValidateCPUs(value interface{}, preset crcpreset.Preset) (bool, string) {
 }
 
 // ValidateMemory checks if provided memory is valid in the config
-func ValidateMemory(value interface{}, preset crcpreset.Preset) (bool, string) {
+func ValidateMemory(value interface{}, preset crcpreset.Preset) error {
 	v, err := cast.ToIntE(value)
 	if err != nil {
-		return false, fmt.Sprintf("requires integer value in MiB >= %d", constants.GetDefaultMemory(preset))
+		return &validation.IntRangeError{value: v, minimumValue: constants.GetDefaultMemory(preset)}
 	}
 	if err := validation.ValidateMemory(v, preset); err != nil {
-		return false, err.Error()
+		return err
 	}
-	return true, ""
+	return nil
 }
 
 // ValidateBundlePath checks if the provided bundle path is valid

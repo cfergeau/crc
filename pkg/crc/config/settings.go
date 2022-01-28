@@ -68,7 +68,7 @@ func RegisterSettings(cfg *Config) {
 		return ValidateCPUs(value, GetPreset(cfg))
 	}
 
-	validateMemory := func(value interface{}) (bool, string) {
+	validateMemory := func(value interface{}) error {
 		return ValidateMemory(value, GetPreset(cfg))
 	}
 

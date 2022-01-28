@@ -10,7 +10,6 @@ import (
 
 const (
 	configPropDoesntExistMsg = "Configuration property '%s' does not exist"
-	invalidProp              = "Value '%v' for configuration property '%s' is invalid, reason: %s"
 	invalidType              = "Type %T for configuration property '%s' is invalid"
 )
 
@@ -59,6 +58,24 @@ func (c *Config) AddSetting(name string, defValue interface{}, validationFn Vali
 	}
 }
 
+type InvalidPropError struct {
+	value interface{}
+	key   string
+	err   error
+}
+
+func (err *InvalidPropError) Error() string {
+	return fmt.Sprintf("Value '%v' for configuration property '%s' is invalid, reason: %w", err.value, err.key, err.err)
+}
+
+func invalidPropError(value interface{}, key string, err error) error {
+	return &InvalidPropError{
+		value: value,
+		key:   key,
+		err:   err,
+	}
+}
+
 // Set sets the value for a given config key
 func (c *Config) Set(key string, value interface{}) (string, error) {
 	setting, ok := c.settingsByName[key]
@@ -66,25 +83,24 @@ func (c *Config) Set(key string, value interface{}) (string, error) {
 		return "", fmt.Errorf(configPropDoesntExistMsg, key)
 	}
 
-	ok, expectedValue := c.settingsByName[key].validationFn(value)
-	if !ok {
-		return "", fmt.Errorf(invalidProp, value, key, expectedValue)
+	err := c.settingsByName[key].validationFn(value)
+	if err != nil {
+		return "", invalidPropError(value, key, err)
 	}
 
 	var castValue interface{}
-	var err error
 	switch setting.defaultValue.(type) {
 	case int:
 		castValue, err = cast.ToIntE(value)
 		if err != nil {
-			return "", fmt.Errorf(invalidProp, value, key, err)
+			return "", invalidPropError(value, key, err)
 		}
 	case string:
 		castValue = cast.ToString(value)
 	case bool:
 		castValue, err = cast.ToBoolE(value)
 		if err != nil {
-			return "", fmt.Errorf(invalidProp, value, key, err)
+			return "", invalidPropError(value, key, err)
 		}
 	case preset.Preset:
 		castValue = cast.ToString(value)

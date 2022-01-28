@@ -17,6 +17,15 @@ import (
 	"github.com/pbnjay/memory"
 )
 
+type IntRangeError struct {
+	value        int
+	minimumValue int
+}
+
+func (err *IntRangeError) Error() string {
+	return fmt.Sprintf("requires integer value in MiB >= %d", err.minimumValue)
+}
+
 // ValidateCPUs checks if provided cpus count is valid
 func ValidateCPUs(value int, preset crcpreset.Preset) error {
 	if value < constants.GetDefaultCPUs(preset) {
@@ -28,7 +37,7 @@ func ValidateCPUs(value int, preset crcpreset.Preset) error {
 // ValidateMemory checks if provided Memory count is valid
 func ValidateMemory(value int, preset crcpreset.Preset) error {
 	if value < constants.GetDefaultMemory(preset) {
-		return fmt.Errorf("requires memory in MiB >= %d", constants.GetDefaultMemory(preset))
+		return &IntRangeError{value: value, minimumValue: constants.GetDefaultMemory(preset)}
 	}
 	return ValidateEnoughMemory(value)
 }
