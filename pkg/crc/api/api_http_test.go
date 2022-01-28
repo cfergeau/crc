@@ -369,6 +369,16 @@ var testCases = []testCase{
 		request:  get("config?cpus"),
 		response: jSon(`{"Success":true,"Error":"","Configs":{"cpus":4}}`),
 	},
+	{
+		request:  post("config?cpus").withBody(`{"properties":{"cpus":4}}`),
+		response: httpError(200).withBody(`{"Success":true,"Error":"","Properties":["cpus"]}`),
+	},
+	{
+		request: post("config?cpus").withBody(`{"properties":{"cpus":0,"memory":0}}`),
+		response: httpError(500).withBody(`Value '0' for configuration property 'cpus' is invalid, reason: requires CPUs >= 4
+Value '0' for configuration property 'memory' is invalid, reason: requires memory in MiB >= 9216
+`),
+	},
 }
 
 var invalidHTTPMethods = []testCase{
