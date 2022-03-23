@@ -6,18 +6,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net"
-	"os"
 	"strconv"
 	"time"
 
 	log "github.com/code-ready/crc/pkg/crc/logging"
 	"golang.org/x/crypto/ssh"
-	"golang.org/x/crypto/ssh/agent"
 )
 
 type Client interface {
 	Run(command string) ([]byte, []byte, error)
-	Tunnel(addrType string, addr string) (net.Conn, error)
 	Close()
 }
 
@@ -39,24 +36,12 @@ func NewClient(user string, host string, port int, keys ...string) (Client, erro
 	}, nil
 }
 
-func SSHAgent() ssh.AuthMethod {
-	if sshAgent, err := net.Dial("unix", os.Getenv("SSH_AUTH_SOCK")); err == nil {
-		return ssh.PublicKeysCallback(agent.NewClient(sshAgent).Signers)
-	}
-	return nil
-}
-
 func clientConfig(user string, keys []string) (*ssh.ClientConfig, error) {
 	var (
 		privateKeys []ssh.Signer
 		keyPaths    []string
 	)
 
-	if len(keys) == 0 {
-		return nil, errors.New("no ssh private keys available")
-	}
-
-	var keysWithPassphrases bool
 	for _, k := range keys {
 		key, err := ioutil.ReadFile(k)
 		if err != nil {
@@ -65,13 +50,6 @@ func clientConfig(user string, keys []string) (*ssh.ClientConfig, error) {
 
 		privateKey, err := ssh.ParsePrivateKey(key)
 		if err != nil {
-			var passphraseMissingError *ssh.PassphraseMissingError
-			if errors.As(err, &passphraseMissingError) {
-				keysWithPassphrases = true
-				// ignore errors for passphrase protected keys, they will be handled by the SSHAgent() auth
-				// keep a 'protectedPrivateKeys' list, and only add the SSHAgent() Auth if it's non-empty?
-				continue
-			}
 			return nil, err
 		}
 
@@ -79,42 +57,29 @@ func clientConfig(user string, keys []string) (*ssh.ClientConfig, error) {
 		keyPaths = append(keyPaths, k)
 	}
 
-	var authMethods []ssh.AuthMethod
-	if keysWithPassphrases {
-		log.Debugf("Using ssh agent for passphrase protected keys")
-		authMethods = append(authMethods, SSHAgent())
-	}
-	if len(privateKeys) != 0 {
-		log.Debugf("Using ssh private keys: %v", keyPaths)
-		authMethods = append(authMethods, ssh.PublicKeys(privateKeys...))
-	}
-	if len(authMethods) == 0 {
+	if len(privateKeys) == 0 {
 		return nil, errors.New("no ssh private keys available")
 	}
+	log.Debugf("Using ssh private keys: %v", keyPaths)
 
 	return &ssh.ClientConfig{
 		User: user,
-		Auth: authMethods,
+		Auth: []ssh.AuthMethod{ssh.PublicKeys(privateKeys...)},
 		// #nosec G106
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 		Timeout:         10 * time.Second,
 	}, nil
 }
 
-func (client *NativeClient) newSSHConnection() error {
-	var err error
-	config, err := clientConfig(client.User, client.Keys)
-	if err != nil {
-		return fmt.Errorf("Error getting config for native Go SSH: %s", err)
-	}
-	client.conn, err = ssh.Dial("tcp", net.JoinHostPort(client.Hostname, strconv.Itoa(client.Port)), config)
-
-	return err
-}
-
 func (client *NativeClient) session() (*ssh.Session, error) {
 	if client.conn == nil {
-		if err := client.newSSHConnection(); err != nil {
+		var err error
+		config, err := clientConfig(client.User, client.Keys)
+		if err != nil {
+			return nil, fmt.Errorf("Error getting config for native Go SSH: %s", err)
+		}
+		client.conn, err = ssh.Dial("tcp", net.JoinHostPort(client.Hostname, strconv.Itoa(client.Port)), config)
+		if err != nil {
 			return nil, err
 		}
 	}
@@ -123,15 +88,6 @@ func (client *NativeClient) session() (*ssh.Session, error) {
 		return nil, err
 	}
 	return session, err
-}
-
-func (client *NativeClient) Tunnel(addrType string, addr string) (net.Conn, error) {
-	if client.conn == nil {
-		if err := client.newSSHConnection(); err != nil {
-			return nil, err
-		}
-	}
-	return client.conn.Dial(addrType, addr)
 }
 
 func (client *NativeClient) Run(command string) ([]byte, []byte, error) {
