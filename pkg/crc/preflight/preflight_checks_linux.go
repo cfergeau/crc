@@ -599,20 +599,20 @@ func removeCrcVM() error {
 }
 
 func removeLibvirtStoragePool() error {
-	_, stderr, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "pool-info", constants.DefaultName)
+	_, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "pool-info", constants.DefaultName)
 	if err != nil {
-		logging.Debugf("%v : %s", err, stderr)
+		logging.Debugf("failed to run 'virsh pool-info crc': %v", err)
 		// Pool does not exist
 		return nil
 	}
-	_, stderr, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "pool-destroy", constants.DefaultName)
+	_, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "pool-destroy", constants.DefaultName)
 	if err != nil {
-		logging.Debugf("%v : %s", err, stderr)
+		logging.Debugf("failed to run 'virsh pool-destroy crc': %v", err)
 		// ignore error, we want to try to delete the pool regardless of success or not
 	}
-	_, stderr, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "pool-undefine", constants.DefaultName)
+	_, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "pool-undefine", constants.DefaultName)
 	if err != nil {
-		logging.Debugf("%v : %s", err, stderr)
+		logging.Debugf("failed to run 'virsh pool-undefine crc': %v", err)
 		return fmt.Errorf("Failed to undefine 'crc' libvirt storage pool")
 	}
 	logging.Debug("'crc' libvirt storage has been removed")
