@@ -6,8 +6,8 @@ import (
 	"os"
 
 	crcConfig "github.com/code-ready/crc/pkg/crc/config"
+	"github.com/code-ready/crc/pkg/crc/daemonclient"
 	"github.com/code-ready/crc/pkg/crc/logging"
-	crcversion "github.com/code-ready/crc/pkg/crc/version"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +21,11 @@ var versionCmd = &cobra.Command{
 	Short: "Print version information",
 	Long:  "Print version information",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return runPrintVersion(os.Stdout, defaultVersion(), outputFormat)
+		version, err := defaultVersion()
+		if err != nil {
+			return err
+		}
+		return runPrintVersion(os.Stdout, version, outputFormat)
 	},
 }
 
@@ -39,13 +43,18 @@ type version struct {
 	PodmanVersion    string `json:"podmanVersion"`
 }
 
-func defaultVersion() *version {
-	return &version{
-		Version:          crcversion.GetCRCVersion(),
-		Commit:           crcversion.GetCommitSha(),
-		OpenshiftVersion: crcversion.GetBundleVersion(),
-		PodmanVersion:    crcversion.GetPodmanVersion(),
+func defaultVersion() (*version, error) {
+	daemonClient := daemonclient.New()
+	versionResult, err := daemonClient.APIClient.Version()
+	if err != nil {
+		return nil, err
 	}
+	return &version{
+		Version:          versionResult.CrcVersion,
+		Commit:           versionResult.CommitSha,
+		OpenshiftVersion: versionResult.OpenshiftVersion,
+		PodmanVersion:    versionResult.PodmanVersion,
+	}, nil
 }
 
 func (v *version) prettyPrintTo(writer io.Writer) error {
