@@ -10,7 +10,6 @@ import (
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/daemonclient"
 	crcErrors "github.com/code-ready/crc/pkg/crc/errors"
-	"github.com/code-ready/crc/pkg/crc/machine"
 	"github.com/code-ready/crc/pkg/crc/machine/types"
 	"github.com/code-ready/crc/pkg/crc/preset"
 	"github.com/docker/go-units"
@@ -27,7 +26,7 @@ var statusCmd = &cobra.Command{
 	Short: "Display status of the OpenShift cluster",
 	Long:  "Show details about the OpenShift cluster",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return runStatus(os.Stdout, newMachine(), constants.MachineCacheDir, outputFormat)
+		return runStatus(os.Stdout, daemonclient.New(), constants.MachineCacheDir, outputFormat)
 	},
 }
 
@@ -45,13 +44,17 @@ type status struct {
 	Preset           preset.Preset                `json:"preset"`
 }
 
-func runStatus(writer io.Writer, client machine.Client, cacheDir, outputFormat string) error {
-	status := remoteGetStatus(client, cacheDir)
+func runStatus(writer io.Writer, daemonClient *daemonclient.Client, cacheDir, outputFormat string) error {
+	status := getStatus(daemonClient, cacheDir)
 	return render(status, writer, outputFormat)
 }
 
-func remoteGetStatus(_ machine.Client, cacheDir string) *status {
-	daemonClient := daemonclient.New()
+func getStatus(daemonClient *daemonclient.Client, cacheDir string) *status {
+	/*
+		if err := checkIfMachineMissing(client); err != nil {
+			return &status{Success: false, Error: crcErrors.ToSerializableError(err)}
+		}
+	*/
 	clusterStatus, err := daemonClient.APIClient.Status()
 	if err != nil {
 		// what about clusterStatus.Error???
@@ -70,42 +73,9 @@ func remoteGetStatus(_ machine.Client, cacheDir string) *status {
 	}
 
 	return &status{
-		Success:          clusterStatus.Success,
+		Success:          true,
 		CrcStatus:        clusterStatus.CrcStatus,
 		OpenShiftStatus:  types.OpenshiftStatus(clusterStatus.OpenshiftStatus),
-		OpenShiftVersion: clusterStatus.OpenshiftVersion,
-		//PodmanVersion:    clusterStatus.PodmanVersion,
-		DiskUsage:  clusterStatus.DiskUse,
-		DiskSize:   clusterStatus.DiskSize,
-		CacheUsage: size,
-		CacheDir:   cacheDir,
-	}
-}
-
-func getStatus(client machine.Client, cacheDir string) *status {
-	if err := checkIfMachineMissing(client); err != nil {
-		return &status{Success: false, Error: crcErrors.ToSerializableError(err)}
-	}
-
-	clusterStatus, err := client.Status()
-	if err != nil {
-		return &status{Success: false, Error: crcErrors.ToSerializableError(err)}
-	}
-	var size int64
-	err = filepath.Walk(cacheDir, func(_ string, info os.FileInfo, err error) error {
-		if !info.IsDir() {
-			size += info.Size()
-		}
-		return err
-	})
-	if err != nil {
-		return &status{Success: false, Error: crcErrors.ToSerializableError(err)}
-	}
-
-	return &status{
-		Success:          true,
-		CrcStatus:        clusterStatus.CrcStatus.String(),
-		OpenShiftStatus:  clusterStatus.OpenshiftStatus,
 		OpenShiftVersion: clusterStatus.OpenshiftVersion,
 		PodmanVersion:    clusterStatus.PodmanVersion,
 		DiskUsage:        clusterStatus.DiskUse,
