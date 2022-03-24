@@ -1,0 +1,5 @@
+unify pkg/crc/machine/types/types.go and pkg/crc/api/client/types.go
+add start arguments
+implement IP/podman-env/cleanup/setup
+pull secret handling in start
+check that VM exists in some of the commands
