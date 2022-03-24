@@ -12,11 +12,13 @@ type VersionResult struct {
 	PodmanVersion    string
 }
 
+/*
 type StartResult struct {
 	Status         string
 	ClusterConfig  types.ClusterConfig
 	KubeletStarted bool
 }
+*/
 
 type ClusterStatusResult struct {
 	CrcStatus        string

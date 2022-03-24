@@ -99,11 +99,7 @@ func (h *Handler) Start(c *context) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusOK, client.StartResult{
-		Status:         string(res.Status),
-		ClusterConfig:  res.ClusterConfig,
-		KubeletStarted: res.KubeletStarted,
-	})
+	return c.JSON(http.StatusOK, res)
 }
 
 func getStartConfig(cfg crcConfig.Storage, args client.StartConfig) types.StartConfig {

@@ -86,8 +86,7 @@ func TestStart(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(
 		t,
-		apiClient.StartResult{
-			Status:         "",
+		&types.StartResult{
 			KubeletStarted: true,
 			ClusterConfig: types.ClusterConfig{
 				ClusterType:   "openshift",
