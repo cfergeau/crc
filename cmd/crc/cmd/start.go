@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -11,7 +10,7 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/code-ready/crc/pkg/crc/cluster"
+	"github.com/code-ready/crc/pkg/crc/api/client"
 	crcConfig "github.com/code-ready/crc/pkg/crc/config"
 	"github.com/code-ready/crc/pkg/crc/constants"
 	"github.com/code-ready/crc/pkg/crc/daemonclient"
@@ -53,11 +52,20 @@ var startCmd = &cobra.Command{
 		if err := viper.BindFlagSet(cmd.Flags()); err != nil {
 			return err
 		}
-		return renderStartResult(runStart(cmd.Context()))
+		return renderStartResult(runStart())
 	},
 }
 
-func runStart(ctx context.Context) (*types.StartResult, error) {
+func isRunning(daemonClient *daemonclient.Client) (bool, error) {
+	status, err := daemonClient.APIClient.Status()
+	if err != nil {
+		return false, err
+	}
+
+	return status.CrcStatus == "Running", nil
+}
+
+func runStart() (*types.StartResult, error) {
 	if err := validateStartFlags(); err != nil {
 		return nil, err
 	}
@@ -66,25 +74,26 @@ func runStart(ctx context.Context) (*types.StartResult, error) {
 		logging.Debugf("Unable to find out if a new version is available: %v", err)
 	}
 
-	startConfig := types.StartConfig{
-		BundlePath:        config.Get(crcConfig.Bundle).AsString(),
-		Memory:            config.Get(crcConfig.Memory).AsInt(),
-		DiskSize:          config.Get(crcConfig.DiskSize).AsInt(),
-		CPUs:              config.Get(crcConfig.CPUs).AsInt(),
-		NameServer:        config.Get(crcConfig.NameServer).AsString(),
-		PullSecret:        cluster.NewInteractivePullSecretLoader(config),
-		KubeAdminPassword: config.Get(crcConfig.KubeAdminPassword).AsString(),
-		Preset:            crcConfig.GetPreset(config),
+	/*
+		startConfig := types.StartConfig{
+			BundlePath:        config.Get(crcConfig.Bundle).AsString(),
+			Memory:            config.Get(crcConfig.Memory).AsInt(),
+			DiskSize:          config.Get(crcConfig.DiskSize).AsInt(),
+			CPUs:              config.Get(crcConfig.CPUs).AsInt(),
+			NameServer:        config.Get(crcConfig.NameServer).AsString(),
+			PullSecret:        cluster.NewInteractivePullSecretLoader(config),
+			KubeAdminPassword: config.Get(crcConfig.KubeAdminPassword).AsString(),
+			Preset:            crcConfig.GetPreset(config),
+		}
+	*/
+	startConfig := client.StartConfig{
+		PullSecretFile: "",
 	}
 
-	client := newMachine()
-	isRunning, _ := client.IsRunning()
+	daemonClient := daemonclient.New()
+	isRunning, _ := isRunning(daemonClient)
 
 	if !isRunning {
-		if err := checkDaemonStarted(); err != nil {
-			return nil, err
-		}
-
 		if err := preflight.StartPreflightChecks(config); err != nil {
 			return nil, crcos.CodeExitError{
 				Err:  err,
@@ -93,7 +102,7 @@ func runStart(ctx context.Context) (*types.StartResult, error) {
 		}
 	}
 
-	return client.Start(ctx, startConfig)
+	return daemonClient.APIClient.Start(startConfig)
 }
 
 func renderStartResult(result *types.StartResult, err error) error {

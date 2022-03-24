@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/code-ready/crc/pkg/crc/machine/types"
 )
 
 type Client struct {
@@ -49,8 +51,8 @@ func (c *Client) Status() (ClusterStatusResult, error) {
 	return sr, nil
 }
 
-func (c *Client) Start(config StartConfig) (StartResult, error) {
-	var sr = StartResult{}
+func (c *Client) Start(config StartConfig) (*types.StartResult, error) {
+	var sr = &types.StartResult{}
 	var data = new(bytes.Buffer)
 
 	if config != (StartConfig{}) {
