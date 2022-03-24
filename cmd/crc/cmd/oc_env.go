@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/code-ready/crc/pkg/crc/constants"
+	"github.com/code-ready/crc/pkg/crc/daemonclient"
 	"github.com/code-ready/crc/pkg/os/shell"
 	"github.com/spf13/cobra"
 )
@@ -17,22 +18,23 @@ var ocEnvCmd = &cobra.Command{
 	Short: "Add the 'oc' executable to PATH",
 	Long:  `Add the OpenShift client executable 'oc' to PATH`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return runOcEnv(args)
+		return runOcEnv(daemonclient.New())
 	},
 }
 
-func runOcEnv(args []string) error {
+func runOcEnv(daemonClient *daemonclient.Client) error {
 	userShell, err := shell.GetShell(forceShell)
 	if err != nil {
 		return fmt.Errorf("Error running the oc-env command: %s", err.Error())
 	}
 
-	client := newMachine()
-	if err := checkIfMachineMissing(client); err != nil {
-		return err
-	}
+	/*
+		if err := checkIfMachineMissing(client); err != nil {
+			return err
+		}
+	*/
 
-	consoleResult, err := client.GetConsoleURL()
+	consoleResult, err := daemonClient.APIClient.WebconsoleURL()
 	if err != nil {
 		return err
 	}
