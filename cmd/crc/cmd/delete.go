@@ -7,10 +7,10 @@ import (
 	"os"
 
 	"github.com/code-ready/crc/pkg/crc/constants"
+	"github.com/code-ready/crc/pkg/crc/daemonclient"
 	crcErrors "github.com/code-ready/crc/pkg/crc/errors"
 	"github.com/code-ready/crc/pkg/crc/input"
 	"github.com/code-ready/crc/pkg/crc/logging"
-	"github.com/code-ready/crc/pkg/crc/machine"
 	"github.com/spf13/cobra"
 )
 
@@ -29,11 +29,11 @@ var deleteCmd = &cobra.Command{
 	Short: "Delete the instance",
 	Long:  "Delete the instance",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return runDelete(os.Stdout, newMachine(), clearCache, constants.MachineCacheDir, outputFormat != jsonFormat, globalForce, outputFormat)
+		return runDelete(os.Stdout, daemonclient.New(), clearCache, constants.MachineCacheDir, outputFormat != jsonFormat, globalForce, outputFormat)
 	},
 }
 
-func deleteMachine(client machine.Client, clearCache bool, cacheDir string, interactive, force bool) (bool, error) {
+func deleteMachine(daemonClient *daemonclient.Client, clearCache bool, cacheDir string, interactive, force bool) (bool, error) {
 	if clearCache {
 		if !interactive && !force {
 			return false, errors.New("non-interactive deletion requires --force")
@@ -44,9 +44,11 @@ func deleteMachine(client machine.Client, clearCache bool, cacheDir string, inte
 		}
 	}
 
-	if err := checkIfMachineMissing(client); err != nil {
-		return false, err
-	}
+	/*
+		if err := checkIfMachineMissing(client); err != nil {
+			return false, err
+		}
+	*/
 
 	if !interactive && !force {
 		return false, errors.New("non-interactive deletion requires --force")
@@ -56,13 +58,13 @@ func deleteMachine(client machine.Client, clearCache bool, cacheDir string, inte
 		force)
 	if yes {
 		defer logging.BackupLogFile()
-		return true, client.Delete()
+		return true, daemonClient.APIClient.Delete()
 	}
 	return false, nil
 }
 
-func runDelete(writer io.Writer, client machine.Client, clearCache bool, cacheDir string, interactive, force bool, outputFormat string) error {
-	machineDeleted, err := deleteMachine(client, clearCache, cacheDir, interactive, force)
+func runDelete(writer io.Writer, daemonClient *daemonclient.Client, clearCache bool, cacheDir string, interactive, force bool, outputFormat string) error {
+	machineDeleted, err := deleteMachine(daemonClient, clearCache, cacheDir, interactive, force)
 	return render(&deleteResult{
 		Success:        err == nil,
 		Error:          crcErrors.ToSerializableError(err),
