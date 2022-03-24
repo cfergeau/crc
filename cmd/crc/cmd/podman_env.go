@@ -5,6 +5,8 @@ import (
 	"runtime"
 
 	"github.com/code-ready/crc/pkg/crc/constants"
+	"github.com/code-ready/crc/pkg/crc/daemonclient"
+	"github.com/code-ready/crc/pkg/crc/machine/types"
 	"github.com/code-ready/crc/pkg/os/shell"
 	"github.com/spf13/cobra"
 )
@@ -18,25 +20,29 @@ var podmanEnvCmd = &cobra.Command{
 	Short: "Setup podman environment",
 	Long:  `Setup environment for 'podman' executable to access podman on CRC VM`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return runPodmanEnv()
+		return runPodmanEnv(daemonclient.New())
 	},
 }
 
-func runPodmanEnv() error {
+func runPodmanEnv(daemonClient *daemonclient.Client) error {
 	userShell, err := shell.GetShell(forceShell)
 	if err != nil {
 		return fmt.Errorf("Error running the podman-env command: %s", err.Error())
 	}
 
-	client := newMachine()
-	if err := checkIfMachineMissing(client); err != nil {
-		return err
-	}
+	/*
+		if err := checkIfMachineMissing(client); err != nil {
+			return err
+		}
+	*/
 
-	connectionDetails, err := client.ConnectionDetails()
-	if err != nil {
-		return err
-	}
+	/*
+		connectionDetails, err := daemonclient.ConnectionDetails()
+		if err != nil {
+			return err
+		}
+	*/
+	connectionDetails := &types.ConnectionDetails{}
 
 	socket := constants.RootlessPodmanSocket
 	if root {
