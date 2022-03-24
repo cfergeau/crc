@@ -74,6 +74,11 @@ func (c *Client) Stop() error {
 	return err
 }
 
+func (c *Client) PowerOff() error {
+	_, err := c.sendGetRequest("/poweroff")
+	return err
+}
+
 func (c *Client) Delete() error {
 	_, err := c.sendGetRequest("/delete")
 	return err

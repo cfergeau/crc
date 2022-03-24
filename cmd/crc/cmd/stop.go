@@ -5,10 +5,9 @@ import (
 	"io"
 	"os"
 
+	"github.com/code-ready/crc/pkg/crc/daemonclient"
 	crcErrors "github.com/code-ready/crc/pkg/crc/errors"
 	"github.com/code-ready/crc/pkg/crc/input"
-	"github.com/code-ready/crc/pkg/crc/machine"
-	"github.com/code-ready/crc/pkg/crc/machine/state"
 	"github.com/spf13/cobra"
 )
 
@@ -23,29 +22,31 @@ var stopCmd = &cobra.Command{
 	Short: "Stop the instance",
 	Long:  "Stop the instance",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return runStop(os.Stdout, newMachine(), outputFormat != jsonFormat, globalForce, outputFormat)
+		return runStop(os.Stdout, daemonclient.New(), outputFormat != jsonFormat, globalForce, outputFormat)
 	},
 }
 
-func stopMachine(client machine.Client, interactive, force bool) (bool, error) {
-	if err := checkIfMachineMissing(client); err != nil {
-		return false, err
-	}
-
-	vmState, err := client.Stop()
+func stopMachine(daemonClient *daemonclient.Client, interactive, force bool) (bool, error) {
+	/*
+		if err := checkIfMachineMissing(client); err != nil {
+			return false, err
+		}
+	*/
+	err := daemonClient.APIClient.Stop()
 	if err != nil {
 		if !interactive && !force {
 			return false, err
 		}
+		isRunning, statusErr := isRunning(daemonClient)
 		// Here we are checking the VM state and if it is still running then
 		// Ask user to forcefully power off it.
-		if vmState == state.Running {
+		if statusErr != nil || isRunning {
 			// Most of the time force kill don't work and libvirt throw
 			// Device or resource busy error. To make sure we give some
 			// graceful time to cluster before kill it.
 			yes := input.PromptUserForYesOrNo("Do you want to force power off", force)
 			if yes {
-				err := client.PowerOff()
+				err := daemonClient.APIClient.PowerOff()
 				return true, err
 			}
 		}
@@ -54,8 +55,8 @@ func stopMachine(client machine.Client, interactive, force bool) (bool, error) {
 	return false, nil
 }
 
-func runStop(writer io.Writer, client machine.Client, interactive, force bool, outputFormat string) error {
-	forced, err := stopMachine(client, interactive, force)
+func runStop(writer io.Writer, daemonClient *daemonclient.Client, interactive, force bool, outputFormat string) error {
+	forced, err := stopMachine(daemonClient, interactive, force)
 	return render(&stopResult{
 		Success: err == nil,
 		Forced:  forced,
