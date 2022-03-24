@@ -8,7 +8,6 @@ import (
 
 	"github.com/code-ready/crc/pkg/crc/daemonclient"
 	crcErrors "github.com/code-ready/crc/pkg/crc/errors"
-	"github.com/code-ready/crc/pkg/crc/machine"
 	"github.com/code-ready/crc/pkg/crc/machine/state"
 	"github.com/code-ready/crc/pkg/crc/machine/types"
 	"github.com/pkg/browser"
@@ -34,12 +33,20 @@ var consoleCmd = &cobra.Command{
 	Short:   "Open the OpenShift Web Console in the default browser",
 	Long:    `Open the OpenShift Web Console in the default browser or print its URL or credentials`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return runConsole(os.Stdout, newMachine(), consolePrintURL, consolePrintCredentials, outputFormat)
+		return runConsole(os.Stdout, daemonclient.New(), consolePrintURL, consolePrintCredentials, outputFormat)
 	},
 }
 
-func remoteShowConsole() (*types.ConsoleResult, error) {
-	daemonClient := daemonclient.New()
+func showConsole(daemonClient *daemonclient.Client) (*types.ConsoleResult, error) {
+	/*
+		if err := checkIfMachineMissing(client); err != nil {
+			// In case of machine doesn't exist then consoleResult error
+			// should be updated so that when rendering the result it have
+			// error details also.
+			return nil, err
+		}
+		return client.GetConsoleURL()
+	*/
 	consoleResult, err := daemonClient.APIClient.WebconsoleURL()
 	if err != nil {
 		return nil, err
@@ -50,23 +57,8 @@ func remoteShowConsole() (*types.ConsoleResult, error) {
 	return &machineConsoleResult, nil
 }
 
-func showConsole(client machine.Client) (*types.ConsoleResult, error) {
-
-	return remoteShowConsole()
-
-	/*
-		if err := checkIfMachineMissing(client); err != nil {
-			// In case of machine doesn't exist then consoleResult error
-			// should be updated so that when rendering the result it have
-			// error details also.
-			return nil, err
-		}
-		return client.GetConsoleURL()
-	*/
-}
-
-func runConsole(writer io.Writer, client machine.Client, consolePrintURL, consolePrintCredentials bool, outputFormat string) error {
-	result, err := showConsole(client)
+func runConsole(writer io.Writer, daemonClient *daemonclient.Client, consolePrintURL, consolePrintCredentials bool, outputFormat string) error {
+	result, err := showConsole(daemonClient)
 	return render(&consoleResult{
 		Success:                 err == nil,
 		state:                   toState(result),
