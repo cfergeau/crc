@@ -216,6 +216,18 @@ func (c *Client) sendDeleteRequest(url string, data io.Reader) ([]byte, error) {
 	return c.sendRequest(url, http.MethodDelete, data)
 }
 
+type HttpError struct {
+	URL string
+	Method string
+	StatusCode int
+	Body string
+}
+
+func (err *HttpError) Error() string {
+	//return fmt.Sprintf("Error occurred sending %s request to: %s: %d", err.Method, err.URL, err.StatusCode)
+	return err.Body
+}
+
 func (c *Client) sendRequest(url string, method string, data io.Reader) ([]byte, error) {
 	req, err := http.NewRequest(method, fmt.Sprintf("%s%s", c.base, url), data)
 	if err != nil {
@@ -229,20 +241,20 @@ func (c *Client) sendRequest(url string, method string, data io.Reader) ([]byte,
 	}
 	defer res.Body.Close()
 
-	switch method {
-	case http.MethodPost:
-		if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusCreated {
-			return nil, fmt.Errorf("Error occurred sending POST request to : %s : %d", url, res.StatusCode)
-		}
-	case http.MethodDelete, http.MethodGet:
-		if res.StatusCode != http.StatusOK {
-			return nil, fmt.Errorf("Error occurred sending %s request to : %s : %d", method, url, res.StatusCode)
-		}
-	}
-
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, fmt.Errorf("Unknown error reading response: %w", err)
 	}
+	switch method {
+	case http.MethodPost:
+		if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusCreated {
+			return nil, &HttpError{ URL: url, Method: method, StatusCode: res.StatusCode, Body: string(body)}
+		}
+	case http.MethodDelete, http.MethodGet:
+		if res.StatusCode != http.StatusOK {
+			return nil, &HttpError{ URL: url, Method: method, StatusCode: res.StatusCode, Body: string(body)}
+		}
+	}
+
 	return body, nil
 }
