@@ -198,13 +198,14 @@ func (c *Client) sendGetRequest(url string) ([]byte, error) {
 		return nil, err
 	}
 	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Error occurred sending GET request to : %s : %d", url, res.StatusCode)
-	}
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, fmt.Errorf("Unknown error reading response: %w", err)
 	}
+	if res.StatusCode != http.StatusOK {
+		return nil, &HttpError{URL: url, Method: "GET", StatusCode: res.StatusCode, Body: string(body)}
+	}
+
 	return body, nil
 }
 
@@ -217,10 +218,10 @@ func (c *Client) sendDeleteRequest(url string, data io.Reader) ([]byte, error) {
 }
 
 type HttpError struct {
-	URL string
-	Method string
+	URL        string
+	Method     string
 	StatusCode int
-	Body string
+	Body       string
 }
 
 func (err *HttpError) Error() string {
@@ -248,11 +249,11 @@ func (c *Client) sendRequest(url string, method string, data io.Reader) ([]byte,
 	switch method {
 	case http.MethodPost:
 		if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusCreated {
-			return nil, &HttpError{ URL: url, Method: method, StatusCode: res.StatusCode, Body: string(body)}
+			return nil, &HttpError{URL: url, Method: method, StatusCode: res.StatusCode, Body: string(body)}
 		}
 	case http.MethodDelete, http.MethodGet:
 		if res.StatusCode != http.StatusOK {
-			return nil, &HttpError{ URL: url, Method: method, StatusCode: res.StatusCode, Body: string(body)}
+			return nil, &HttpError{URL: url, Method: method, StatusCode: res.StatusCode, Body: string(body)}
 		}
 	}
 
