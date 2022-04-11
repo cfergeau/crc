@@ -122,6 +122,8 @@ func CheckCRCPublicDNSReachable(serviceConfig services.ServicePostStartConfig) (
 			curlArgs = append(curlArgs, "--proxy", proxyConfig.HTTPProxy)
 		}
 		if proxyConfig.HTTPSProxy != "" {
+			// if https proxy is set, the last --proxy arg will take precedence over the one previously
+			// set for http proxy
 			curlArgs = append(curlArgs, "--proxy", proxyConfig.HTTPSProxy)
 		}
 		curlArgs = append(curlArgs, "--noproxy", proxyConfig.GetNoProxyString())
