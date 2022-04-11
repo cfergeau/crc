@@ -128,7 +128,7 @@ func CheckCRCPublicDNSReachable(serviceConfig services.ServicePostStartConfig) (
 		}
 		curlArgs = append(curlArgs, "--noproxy", proxyConfig.GetNoProxyString())
 		if proxyConfig.ProxyCAFile != "" {
-			curlArgs = append(curlArgs, "--proxy-cacert", proxyConfig.HTTPProxy)
+			curlArgs = append(curlArgs, "--proxy-cacert", proxyConfig.ProxyCAFile)
 		}
 	}
 	stdout, _, err := serviceConfig.SSHRunner.Run("curl", curlArgs...)
