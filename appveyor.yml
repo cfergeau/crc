@@ -7,9 +7,9 @@ before_test:
   - choco install make
   - choco install wixtoolset
   - set PATH=C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin;%PATH%
-  - set PATH=C:\go116\bin;%WIX%bin;%PATH%
-  - set GOROOT=C:\go116
-  - make out/windows-amd64/crc-windows-installer.zip
-  - make cross
+  - set PATH=C:\go117\bin;%WIX%bin;%PATH%
+  - set GOROOT=C:\go117
+  - go version
+  - make check
 test_script:
   - make test
