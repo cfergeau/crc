@@ -4,6 +4,7 @@ on:
     branches:
       - "main"
       - "old-main"
+      - "gh-actions"
   pull_request: {}
 jobs:
   build:
