@@ -261,9 +261,6 @@ func getDaemonConfig() (*launchd.AgentConfig, error) {
 }
 
 func checkIfDaemonPlistFileExists() error {
-	if err := olderDaemonVersionRunning(); err != nil {
-		return err
-	}
 	daemonConfig, err := getDaemonConfig()
 	if err != nil {
 		return err
@@ -278,11 +275,6 @@ func checkIfDaemonPlistFileExists() error {
 }
 
 func fixDaemonPlistFileExists() error {
-	if err := olderDaemonVersionRunning(); err != nil {
-		if err := killDaemonProcess(); err != nil {
-			return err
-		}
-	}
 	daemonConfig, err := getDaemonConfig()
 	if err != nil {
 		return err
