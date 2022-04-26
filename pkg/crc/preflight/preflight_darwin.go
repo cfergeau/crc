@@ -109,6 +109,13 @@ var daemonLaunchdChecks = []Check{
 		cleanupDescription: "Unloading and removing the daemon plist file",
 		cleanup:            removeDaemonPlistFile,
 	},
+	{
+		configKeySuffix:  "check-daemon-is-serving",
+		checkDescription: "Checking if crc daemon is serving the requests",
+		check:            checkIfDaemonIsServing,
+		fixDescription:   "crc daemon is not started (try running manually `crc daemon` command in different terminal)",
+		flags:            NoFix,
+	},
 }
 
 // We want all preflight checks including

@@ -133,6 +133,13 @@ var daemonTaskChecks = []Check{
 
 		labels: labels{Os: Windows},
 	},
+	{
+		configKeySuffix:  "check-daemon-is-serving",
+		checkDescription: "Checking if crc daemon is serving the requests",
+		check:            checkIfDaemonIsServing,
+		fixDescription:   "crc daemon is not started (try running manually `crc daemon` command in different terminal)",
+		flags:            NoFix,
+	},
 }
 
 var adminHelperServiceCheks = []Check{
