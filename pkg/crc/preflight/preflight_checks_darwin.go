@@ -11,7 +11,6 @@ import (
 
 	"github.com/code-ready/crc/pkg/crc/cache"
 	"github.com/code-ready/crc/pkg/crc/constants"
-	"github.com/code-ready/crc/pkg/crc/daemonclient"
 	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/crc/pkg/crc/network"
 	"github.com/code-ready/crc/pkg/crc/version"
@@ -278,13 +277,6 @@ func checkIfDaemonPlistFileExists() error {
 	return nil
 }
 
-func daemonRunning() bool {
-	if _, err := daemonclient.GetVersionFromDaemonAPI(); err != nil {
-		return false
-	}
-	return true
-}
-
 func fixDaemonPlistFileExists() error {
 	if err := olderDaemonVersionRunning(); err != nil {
 		if err := killDaemonProcess(); err != nil {
@@ -295,7 +287,14 @@ func fixDaemonPlistFileExists() error {
 	if err != nil {
 		return err
 	}
-	return fixPlistFileExists(*daemonConfig)
+	err = fixPlistFileExists(*daemonConfig)
+	if err != nil {
+		return err
+	}
+
+	_ = waitForDaemonRunning()
+
+	return nil
 }
 
 func removeDaemonPlistFile() error {
