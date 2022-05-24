@@ -96,3 +96,7 @@ func (r *RemoteFile) Download(bundlePath string, mode os.FileMode) (string, erro
 func (r *RemoteFile) GetSha256Sum() string {
 	return r.sha256sum
 }
+
+func (r *RemoteFile) GetURIString() string {
+	return r.uri
+}
