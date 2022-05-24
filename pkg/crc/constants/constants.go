@@ -64,24 +64,24 @@ func GetAdminHelperURL() string {
 	return GetAdminHelperURLForOs(runtime.GOOS)
 }
 
-func defaultBundleForOs(preset crcpreset.Preset) map[string]string {
-	if preset == crcpreset.Podman {
-		return map[string]string{
+func GetDefaultBundles() map[crcpreset.Preset]map[string]string {
+	return map[crcpreset.Preset]map[string]string{
+		crcpreset.Podman: map[string]string{
 			"darwin":  fmt.Sprintf("crc_podman_vfkit_%s_%s.crcbundle", version.GetPodmanVersion(), runtime.GOARCH),
 			"linux":   fmt.Sprintf("crc_podman_libvirt_%s_%s.crcbundle", version.GetPodmanVersion(), runtime.GOARCH),
 			"windows": fmt.Sprintf("crc_podman_hyperv_%s_%s.crcbundle", version.GetPodmanVersion(), runtime.GOARCH),
-		}
-	}
-	return map[string]string{
-		"darwin":  fmt.Sprintf("crc_vfkit_%s_%s.crcbundle", version.GetBundleVersion(), runtime.GOARCH),
-		"linux":   fmt.Sprintf("crc_libvirt_%s_%s.crcbundle", version.GetBundleVersion(), runtime.GOARCH),
-		"windows": fmt.Sprintf("crc_hyperv_%s_%s.crcbundle", version.GetBundleVersion(), runtime.GOARCH),
+		},
+		crcpreset.OpenShift: map[string]string{
+			"darwin":  fmt.Sprintf("crc_vfkit_%s_%s.crcbundle", version.GetBundleVersion(), runtime.GOARCH),
+			"linux":   fmt.Sprintf("crc_libvirt_%s_%s.crcbundle", version.GetBundleVersion(), runtime.GOARCH),
+			"windows": fmt.Sprintf("crc_hyperv_%s_%s.crcbundle", version.GetBundleVersion(), runtime.GOARCH),
+		},
 	}
 }
 
 func GetDefaultBundle(preset crcpreset.Preset) string {
-	bundles := defaultBundleForOs(preset)
-	return bundles[runtime.GOOS]
+	bundles := GetDefaultBundles()
+	return bundles[preset][runtime.GOOS]
 }
 
 var (
