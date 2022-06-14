@@ -1,14 +1,10 @@
 ---
-kind: PersistentVolumeClaim
 apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: www-claim
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1k
+  name: www-content
+data:
+  index.html:
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -35,8 +31,8 @@ spec:
           name: www
       volumes:
       - name: www
-        persistentVolumeClaim:
-          claimName: www-claim
+        configMap:
+          name: www-content
 ---
 apiVersion: v1
 kind: Service

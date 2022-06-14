@@ -47,7 +47,6 @@ Feature: End-to-end health check
         Then stdout should contain "deployment.apps/httpd-example created"
         When executing "oc rollout status deployment httpd-example" succeeds
         Then stdout should contain "successfully rolled out"
-        And executing "oc exec deployment/httpd-example -- touch /var/www/html/index.html" succeeds
         And with up to "2" retries with wait period of "60s" http response from "http://httpd-example-testproj.apps-crc.testing" has status code "200"
 
     @darwin @linux @windows @startstop
