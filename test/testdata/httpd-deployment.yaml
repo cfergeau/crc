@@ -1,0 +1,60 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: www-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1k
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpd-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpd-example
+  template:
+    metadata:
+      labels:
+        app: httpd-example
+    spec:
+      containers:
+      - image: registry.access.redhat.com/ubi8/httpd-24
+        name: httpd-24
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /var/www/html
+          name: www
+      volumes:
+      - name: www
+        persistentVolumeClaim:
+          claimName: www-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpd-example
+spec:
+  ports:
+  - port: 8080
+  selector:
+    app: httpd-example
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: httpd-example
+spec:
+  port:
+    targetPort: 8080
+  to:
+    kind: Service
+    name: httpd-example

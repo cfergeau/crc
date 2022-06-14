@@ -41,16 +41,14 @@ Feature: End-to-end health check
             """
         And stdout should contain "You can add applications to this project with the 'new-app' command."
 
-    @darwin @linux @windows
+    @darwin @linux @windows @testdata
     Scenario: Create and test app
-        When executing "oc create deployment httpd-example --image=quay.io/bitnami/nginx --port=8080" succeeds
+        When executing "oc create -f httpd-deployment.yaml" succeeds
         Then stdout should contain "deployment.apps/httpd-example created"
         When executing "oc rollout status deployment httpd-example" succeeds
         Then stdout should contain "successfully rolled out"
-        When executing "oc expose deployment httpd-example --port 8080" succeeds
-        Then stdout should contain "httpd-example exposed"
-        When executing "oc expose svc httpd-example" succeeds
-        Then stdout should contain "httpd-example exposed"
+        And executing "oc exec deployment/httpd-example -- touch /var/www/html/index.html" succeeds
+        And with up to "2" retries with wait period of "60s" http response from "http://httpd-example-testproj.apps-crc.testing" has status code "200"
 
     @darwin @linux @windows @startstop
     Scenario: Stop and start CRC, then check app still runs
