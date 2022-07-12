@@ -35,8 +35,25 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go }}
+      - name: "Import code signing certificate"
+        uses: devbotsxyz/import-signing-certificate@main
+        with:
+          certificate-data: ${{ secrets.MACOS_APPLICATION_CERTIFICATE_DATA }}
+          certificate-passphrase: ${{ secrets.MACOS_APPLICATION_CERTIFICATE_PASSPHRASE }}
+          keychain-password: ${{ secrets.MACOS_KEYCHAIN_PASSWORD }}
+          keychain-name: "crc-keychain"
+      - name: "Import product signing certificate"
+        uses: devbotsxyz/import-signing-certificate@main
+        with:
+          certificate-data: ${{ secrets.MACOS_INSTALLER_CERTIFICATE_DATA }}
+          certificate-passphrase: ${{ secrets.MACOS_INSTALLER_CERTIFICATE_PASSPHRASE }}
+          keychain-password: ${{ secrets.MACOS_KEYCHAIN_PASSWORD }}
+          keychain-name: "crc-keychain"
       - name: Build macOS installer
-        run: make NO_CODESIGN=1 out/macos-universal/crc-macos-installer.pkg
+        env:
+          CODESIGN_IDENTITY: "Developer ID Application: Christophe Fergeau (GSP9DR7D3R)"
+          PRODUCTSIGN_IDENTITY: "Developer ID Installer: Christophe Fergeau (GSP9DR7D3R)"
+        run: make out/macos-universal/crc-macos-installer.pkg
       - name: Install crc pkg
         run: sudo installer -pkg out/macos-universal/crc-macos-installer.pkg -target /
       - name: Set podman preset as part of config
