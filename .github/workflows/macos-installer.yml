@@ -36,14 +36,14 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
       - name: "Import code signing certificate"
-        uses: devbotsxyz/import-signing-certificate@main
+        uses: cfergeau/import-signing-certificate@productsign
         with:
           certificate-data: ${{ secrets.MACOS_APPLICATION_CERTIFICATE_DATA }}
           certificate-passphrase: ${{ secrets.MACOS_APPLICATION_CERTIFICATE_PASSPHRASE }}
           keychain-password: ${{ secrets.MACOS_KEYCHAIN_PASSWORD }}
           keychain-name: "crc-keychain"
       - name: "Import product signing certificate"
-        uses: devbotsxyz/import-signing-certificate@main
+        uses: cfergeau/import-signing-certificate@productsign
         with:
           certificate-data: ${{ secrets.MACOS_INSTALLER_CERTIFICATE_DATA }}
           certificate-passphrase: ${{ secrets.MACOS_INSTALLER_CERTIFICATE_PASSPHRASE }}
