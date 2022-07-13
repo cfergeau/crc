@@ -54,6 +54,17 @@ jobs:
           CODESIGN_IDENTITY: "Developer ID Application: Christophe Fergeau (GSP9DR7D3R)"
           PRODUCTSIGN_IDENTITY: "Developer ID Installer: Christophe Fergeau (GSP9DR7D3R)"
         run: make out/macos-universal/crc-macos-installer.pkg
+      - name: "Notarize installer"
+        uses: devbotsxyz/xcode-notarize@v1
+        with:
+          product-path: "./out/macos-universal/crc-macos-installer.pkg"
+          primary-bundle-id: "com.redhat.crc"
+          appstore-connect-username: ${{ secrets.MACOS_NOTARIZATION_USERNAME }}
+          appstore-connect-password: ${{ secrets.MACOS_NOTARIZATION_PASSWORD }}
+      - name: "Staple installer"
+        uses: devbotsxyz/xcode-staple@v1
+        with:
+          product-path: "./out/macos-universal/crc-macos-installer.pkg"
       - name: Install crc pkg
         run: sudo installer -pkg out/macos-universal/crc-macos-installer.pkg -target /
       - name: Set podman preset as part of config
