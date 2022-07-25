@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	VfkitVersion = "0.0.1"
+	VfkitVersion = "0.0.2-dev"
 	VfkitCommand = "vfkit"
 )
 
 var (
-	VfkitDownloadURL = fmt.Sprintf("https://github.com/code-ready/vfkit/releases/download/v%s/%s", VfkitVersion, VfkitCommand)
+	VfkitDownloadURL = fmt.Sprintf("https://github.com/cfergeau/vfkit/releases/download/v%s/%s", VfkitVersion, VfkitCommand)
 )
