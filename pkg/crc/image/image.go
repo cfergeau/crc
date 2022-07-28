@@ -27,7 +27,7 @@ type imageHandler struct {
 }
 
 func uri(preset crcpreset.Preset) string {
-	return fmt.Sprintf("//%s/%s:%s", constants.RegistryURI, getImageName(preset), version.GetCRCVersion())
+	return fmt.Sprintf("//%s/%s:%s", constants.RegistryURI, preset.ContainerImageName(), version.GetCRCVersion())
 }
 
 func (img *imageHandler) policyContext() (*signature.PolicyContext, error) {
@@ -82,16 +82,6 @@ func getLayerPath(m *v1.Manifest, index int, mediaType string) (string, error) {
 	}
 
 	return strings.TrimPrefix(m.Layers[index].Digest.String(), "sha256:"), nil
-}
-
-func getImageName(preset crcpreset.Preset) string {
-	if preset == crcpreset.Podman {
-		return "podman-bundle"
-	}
-	if version.IsOkdBuild() {
-		return "okd-bundle"
-	}
-	return "openshift-bundle"
 }
 
 func PullBundle(preset crcpreset.Preset) error {
