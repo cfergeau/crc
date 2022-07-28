@@ -70,6 +70,10 @@ func GetBundleVersion() string {
 	return bundleVersion
 }
 
+func GetOkdVersion() string {
+	return bundleVersion
+}
+
 func GetPodmanVersion() string {
 	return podmanVersion
 }
