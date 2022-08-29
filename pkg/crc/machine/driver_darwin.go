@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/code-ready/crc/pkg/crc/constants"
+	crcErrors "github.com/code-ready/crc/pkg/crc/errors"
 	"github.com/code-ready/crc/pkg/crc/logging"
 	"github.com/code-ready/crc/pkg/crc/machine/config"
 	"github.com/code-ready/crc/pkg/crc/machine/vfkit"
@@ -47,23 +48,32 @@ func updateKernelArgs(vm *virtualMachine) error {
 	}
 	defer sshRunner.Close()
 
-	if err := sshRunner.WaitForConnectivity(context.Background(), 20*time.Second); err != nil {
-		return err
+	var newArgs string
+	getKernelArgs := func() error {
+		newArgs, _, err = sshRunner.RunPrivileged("Get kernel args", `-- sh -c 'rpm-ostree kargs'`)
+		if err != nil {
+			return &crcErrors.RetriableError{Err: err}
+		}
+		return nil
 	}
-
-	stdout, stderr, err := sshRunner.RunPrivileged("Get kernel args", `-- sh -c 'rpm-ostree kargs'`)
+	/* During testing, there were intermittent SSH connectivity issues when
+	* trying to get the kernel args, see
+	* https://github.com/code-ready/crc/pull/3302/files#r945923907
+	* https://github.com/code-ready/crc/pull/3318#discussion_r954984008
+	 */
+	err = crcErrors.Retry(context.Background(), 20*time.Second, getKernelArgs, 5*time.Second)
 	if err != nil {
-		logging.Errorf("Failed to get kernel args: %v - %s", err, stderr)
+		logging.Errorf("Failed to get kernel args: %v", err)
 		return err
 	}
-	logging.Debugf("Kernel args: %s", stdout)
+	logging.Debugf("Kernel args: %s", newArgs)
 
 	vfkitDriver, err := loadDriverConfig(vm.Host)
 	if err != nil {
 		return err
 	}
 	logging.Debugf("Current Kernel args: %s", vfkitDriver.Cmdline)
-	vfkitDriver.Cmdline = stdout
+	vfkitDriver.Cmdline = newArgs
 
 	if err := updateDriverConfig(vm.Host, vfkitDriver); err != nil {
 		return err
