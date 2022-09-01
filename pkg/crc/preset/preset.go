@@ -1,6 +1,7 @@
 package preset
 
 import (
+	"encoding/json"
 	"fmt"
 	"runtime"
 
@@ -10,12 +11,73 @@ import (
 
 type Preset interface {
 	fmt.Stringer
+	json.Marshaler
 	BundleFilename() string
 	BundleVersion() string
 	ContainerImageName() string
 	PullSecretRequired() bool
 	MinCPUs() int
 	MinMemoryMiB() int
+}
+
+func (preset OpenShiftPreset) MarshalJSON() ([]byte, error) {
+	return json.Marshal(preset.String())
+}
+
+func unmarshalPreset(presetStr string) (Preset, error) {
+	// Ignore null, like in the main JSON package.
+	if presetStr == "null" || presetStr == `""` {
+		return nil, nil
+	}
+	preset, err := ParsePresetE(presetStr)
+	if err != nil {
+		return nil, err
+	}
+	return preset, nil
+}
+
+func (preset *OpenShiftPreset) UnmarshalJSON(data []byte) error {
+	// Ignore null, like in the main JSON package.
+	if string(data) == "null" || string(data) == `""` {
+		return nil
+	}
+	if string(data) != OpenShift.String() {
+		return fmt.Errorf("failed to parse OpenShiftPreset")
+	}
+	*preset = OpenShift
+	return nil
+}
+
+func (preset *OkdPreset) UnmarshalJSON(data []byte) error {
+	// Ignore null, like in the main JSON package.
+	if string(data) == "null" || string(data) == `""` {
+		return nil
+	}
+	if string(data) != OKD.String() {
+		return fmt.Errorf("failed to parse OkdPreset")
+	}
+	*preset = OKD
+	return nil
+}
+
+func (preset *PodmanPreset) UnmarshalJSON(data []byte) error {
+	// Ignore null, like in the main JSON package.
+	if string(data) == "null" || string(data) == `""` {
+		return nil
+	}
+	if string(data) != Podman.String() {
+		return fmt.Errorf("failed to parse PodmanPreset")
+	}
+	*preset = Podman
+	return nil
+}
+
+func (preset PodmanPreset) MarshalJSON() ([]byte, error) {
+	return json.Marshal(preset.String())
+}
+
+func (preset OkdPreset) MarshalJSON() ([]byte, error) {
+	return json.Marshal(preset.String())
 }
 
 type PodmanPreset struct{}

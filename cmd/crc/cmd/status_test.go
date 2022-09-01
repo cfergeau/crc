@@ -86,7 +86,7 @@ func TestJsonStatusWithError(t *testing.T) {
 	expected := `{
   "success": false,
   "error": "broken",
-  "preset": ""
+  "preset": null
 }
 `
 	assert.Equal(t, expected, out.String())
