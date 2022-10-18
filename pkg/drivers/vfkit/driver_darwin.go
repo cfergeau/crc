@@ -47,6 +47,8 @@ type Driver struct {
 
 	VsockPath       string
 	VsockDaemonPort uint
+
+	VsockQemuGAPort uint
 }
 
 func NewDriver(hostName, storePath string) *Driver {
@@ -250,6 +252,20 @@ func (d *Driver) Start() error {
 	err = vm.AddDevice(dev)
 	if err != nil {
 		return err
+	}
+
+	// when loading a VM created by a crc version predating this commit,
+	// d.VsockQemuGAPort will be missing from ~/.crc/machines/crc/config.json
+	// In such a case, assume the VM will not support time sync
+	if d.VsockQemuGAPort != 0 {
+		timesync, err := client.TimeSyncNew(d.VsockQemuGAPort)
+		if err != nil {
+			return err
+		}
+		err = vm.AddDevice(timesync)
+		if err != nil {
+			return err
+		}
 	}
 
 	args, err := vm.ToCmdLine()
