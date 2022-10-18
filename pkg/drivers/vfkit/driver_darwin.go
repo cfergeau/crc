@@ -26,6 +26,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/crc-org/crc/pkg/crc/constants"
 	crcos "github.com/crc-org/crc/pkg/os"
 	"github.com/crc-org/machine/libmachine/drivers"
 	"github.com/crc-org/machine/libmachine/state"
@@ -43,8 +44,9 @@ type Driver struct {
 	InitrdPath  string
 	VfkitPath   string
 	VirtioNet   bool
-	// TODO: Add vsock port(s)
-	VsockPath string
+
+	VsockPath       string
+	VsockDaemonPort uint
 }
 
 func NewDriver(hostName, storePath string) *Driver {
@@ -59,6 +61,9 @@ func NewDriver(hostName, storePath string) *Driver {
 			CPU:    DefaultCPUs,
 			Memory: DefaultMemory,
 		},
+		// needed when loading a VM which was created before
+		// VsockDaemonPort was introduced
+		VsockDaemonPort: constants.DaemonVsockPort,
 	}
 }
 
@@ -238,8 +243,7 @@ func (d *Driver) Start() error {
 	}
 
 	// virtio-vsock device
-	const vsockPort = 1024
-	dev, err = client.VirtioVsockNew(vsockPort, d.VsockPath, true)
+	dev, err = client.VirtioVsockNew(d.VsockDaemonPort, d.VsockPath, true)
 	if err != nil {
 		return err
 	}
