@@ -1,17 +1,28 @@
 package cmd
 
 import (
-	"errors"
+	gocontext "context"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"io"
+	"net"
+	"net/http"
+	"net/url"
 	"os"
+	"path/filepath"
+	"strings"
+	"time"
 
-	crcErrors "github.com/crc-org/crc/pkg/crc/errors"
+	"github.com/crc-org/crc/pkg/crc/constants"
 	"github.com/crc-org/crc/pkg/crc/machine"
-	"github.com/crc-org/crc/pkg/crc/machine/state"
 	"github.com/crc-org/crc/pkg/crc/machine/types"
-	"github.com/pkg/browser"
+	"github.com/openshift/oc/pkg/helpers/tokencmd"
 	"github.com/spf13/cobra"
+	"k8s.io/apimachinery/third_party/forked/golang/netutil"
+	restclient "k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/clientcmd/api"
 )
 
 var (
@@ -48,87 +59,135 @@ func showConsole(client machine.Client) (*types.ConsoleResult, error) {
 }
 
 func runConsole(writer io.Writer, client machine.Client, consolePrintURL, consolePrintCredentials bool, outputFormat string) error {
-	result, err := showConsole(client)
-	return render(&consoleResult{
-		Success:                 err == nil,
-		state:                   toState(result),
-		ClusterConfig:           toConsoleClusterConfig(result),
-		Error:                   crcErrors.ToSerializableError(err),
-		consolePrintURL:         consolePrintURL,
-		consolePrintCredentials: consolePrintCredentials,
-	}, writer, outputFormat)
-}
-
-type consoleResult struct {
-	Success                 bool `json:"success"`
-	state                   state.State
-	Error                   *crcErrors.SerializableError `json:"error,omitempty"`
-	ClusterConfig           *clusterConfig               `json:"clusterConfig,omitempty"`
-	consolePrintURL         bool
-	consolePrintCredentials bool
-}
-
-func (s *consoleResult) prettyPrintTo(writer io.Writer) error {
-	if s.Error != nil {
-		return s.Error
-	}
-	if s.consolePrintURL {
-		if _, err := fmt.Fprintln(writer, s.ClusterConfig.WebConsoleURL); err != nil {
-			return err
-		}
-	}
-
-	if s.consolePrintCredentials {
-		if _, err := fmt.Fprintf(writer, "To login as a regular user, run 'oc login -u %s -p %s %s'.\n",
-			s.ClusterConfig.DeveloperCredentials.Username, s.ClusterConfig.DeveloperCredentials.Password, s.ClusterConfig.URL); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(writer, "To login as an admin, run 'oc login -u %s -p %s %s'\n",
-			s.ClusterConfig.AdminCredentials.Username, s.ClusterConfig.AdminCredentials.Password, s.ClusterConfig.URL); err != nil {
-			return err
-		}
-	}
-	if s.consolePrintURL || s.consolePrintCredentials {
-		return nil
-	}
-
-	if s.state != state.Running {
-		return errors.New("The OpenShift cluster is not running, cannot open the OpenShift Web Console")
-	}
-
-	if _, err := fmt.Fprintln(writer, "Opening the OpenShift Web Console in the default browser..."); err != nil {
+	consoleResult, err := showConsole(client)
+	if err != nil {
 		return err
 	}
-	if err := browser.OpenURL(s.ClusterConfig.WebConsoleURL); err != nil {
-		return fmt.Errorf("Failed to open the OpenShift Web Console, you can access it by opening %s in your web browser", s.ClusterConfig.WebConsoleURL)
-	}
 
+	return writeKubeconfig("127.0.0.1", &consoleResult.ClusterConfig)
+}
+
+func addContext(cfg *api.Config, ip string, clusterConfig *types.ClusterConfig, ca []byte, context, username, password string) error {
+	host, err := hostname(clusterConfig.ClusterAPI)
+	if err != nil {
+		return err
+	}
+	roots := x509.NewCertPool()
+	ok := roots.AppendCertsFromPEM(ca)
+	if !ok {
+		return fmt.Errorf("failed to parse root certificate")
+	}
+	token, err := tokencmd.RequestToken(&restclient.Config{
+		Proxy: clusterConfig.ProxyConfig.ProxyFunc(),
+		Host:  clusterConfig.ClusterAPI,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs:    roots,
+				MinVersion: tls.VersionTLS12,
+			},
+			DialContext: func(ctx gocontext.Context, network, address string) (net.Conn, error) {
+				port := strings.SplitN(address, ":", 2)[1]
+				dialer := net.Dialer{
+					Timeout:   30 * time.Second,
+					KeepAlive: 30 * time.Second,
+				}
+				return dialer.Dial(network, fmt.Sprintf("%s:%s", ip, port))
+			},
+		},
+	}, nil, username, password)
+	if err != nil {
+		return err
+	}
+	cfg.AuthInfos[username] = &api.AuthInfo{
+		Token: token,
+	}
+	cfg.Contexts[context] = &api.Context{
+		Cluster:   host,
+		AuthInfo:  username,
+		Namespace: "default",
+	}
 	return nil
 }
 
-func toState(result *types.ConsoleResult) state.State {
-	if result == nil {
-		return state.Error
+const (
+	adminContext     = "crc-admin"
+	developerContext = "crc-developer"
+)
+
+func writeKubeconfig(ip string, clusterConfig *types.ClusterConfig) error {
+	kubeconfig := getGlobalKubeConfigPath()
+	dir := filepath.Dir(kubeconfig)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
 	}
-	return result.State
+	// Make sure .kube/config exist if not then this will create
+	_, _ = os.OpenFile(kubeconfig, os.O_RDONLY|os.O_CREATE, 0600)
+
+	ca, err := certificateAuthority(clusterConfig.KubeConfig)
+	if err != nil {
+		return err
+	}
+	host, err := hostname(clusterConfig.ClusterAPI)
+	if err != nil {
+		return err
+	}
+
+	cfg, err := clientcmd.LoadFromFile(kubeconfig)
+	if err != nil {
+		return err
+	}
+	cfg.Clusters[host] = &api.Cluster{
+		Server:                   clusterConfig.ClusterAPI,
+		CertificateAuthorityData: ca,
+	}
+
+	if err := addContext(cfg, ip, clusterConfig, ca, adminContext, "kubeadmin", clusterConfig.KubeAdminPass); err != nil {
+		return err
+	}
+	if err := addContext(cfg, ip, clusterConfig, ca, developerContext, "developer", "developer"); err != nil {
+		return err
+	}
+	return nil
+
+	/*
+		if cfg.CurrentContext == "" {
+			cfg.CurrentContext = adminContext
+		}
+
+		return clientcmd.WriteToFile(*cfg, kubeconfig)
+	*/
 }
 
-func toConsoleClusterConfig(result *types.ConsoleResult) *clusterConfig {
-	if result == nil {
-		return nil
+func certificateAuthority(kubeconfigFile string) ([]byte, error) {
+	builtin, err := clientcmd.LoadFromFile(kubeconfigFile)
+	if err != nil {
+		return nil, err
 	}
-	return &clusterConfig{
-		ClusterType:   result.ClusterConfig.ClusterType,
-		ClusterCACert: result.ClusterConfig.ClusterCACert,
-		WebConsoleURL: result.ClusterConfig.WebConsoleURL,
-		URL:           result.ClusterConfig.ClusterAPI,
-		AdminCredentials: credentials{
-			Username: "kubeadmin",
-			Password: result.ClusterConfig.KubeAdminPass,
-		},
-		DeveloperCredentials: credentials{
-			Username: "developer",
-			Password: "developer",
-		},
+	cluster, ok := builtin.Clusters["crc"]
+	if !ok {
+		return nil, fmt.Errorf("crc cluster not found in kubeconfig %s", kubeconfigFile)
 	}
+	return cluster.CertificateAuthorityData, nil
+}
+
+// https://github.com/openshift/oc/blob/f94afb52dc8a3185b3b9eacaf92ec34d80f8708d/pkg/helpers/kubeconfig/smart_merge.go#L21
+func hostname(clusterAPI string) (string, error) {
+	p, err := url.Parse(clusterAPI)
+	if err != nil {
+		return "", err
+	}
+	h := netutil.CanonicalAddr(p)
+	return strings.ReplaceAll(h, ".", "-"), nil
+}
+
+// getGlobalKubeConfigPath returns the path to the first entry in the KUBECONFIG environment variable
+// or if KUBECONFIG is not set then $HOME/.kube/config
+func getGlobalKubeConfigPath() string {
+	pathList := filepath.SplitList(os.Getenv("KUBECONFIG"))
+	if len(pathList) > 0 {
+		// Tools should write to the last entry in the KUBECONFIG file instead of the first one.
+		// oc cluster up also does the same.
+		return pathList[len(pathList)-1]
+	}
+	return filepath.Join(constants.GetHomeDir(), ".kube", "config")
 }
