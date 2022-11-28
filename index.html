@@ -443,10 +443,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#introducing-codeready-containers_gsg">1. Introducing Red&#160;Hat CRC</a>
+<li><a href="#introducing_gsg">1. Introducing CRC</a>
 <ul class="sectlevel2">
-<li><a href="#about-codeready-containers_gsg">1.1. About CRC</a></li>
-<li><a href="#differences-from-production-openshift-install_gsg">1.2. Differences from a production OpenShift installation</a></li>
+<li><a href="#about_gsg">1.1. About CRC</a></li>
+<li><a href="#differences-from-production-openshift-install_gsg">1.2. Differences from a production OpenShift Container Platform installation</a></li>
 </ul>
 </li>
 <li><a href="#installation_gsg">2. Installation</a>
@@ -458,16 +458,16 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </ul>
 </li>
 <li><a href="#required-software-packages_gsg">2.2. Required software packages for Linux</a></li>
-<li><a href="#installing-codeready-containers_gsg">2.3. Installing CRC</a></li>
+<li><a href="#installing_gsg">2.3. Installing CRC</a></li>
 <li><a href="#about-usage-data-collection_gsg">2.4. About usage data collection</a></li>
 <li><a href="#configuring-usage-data-collection_gsg">2.5. Configuring usage data collection</a></li>
-<li><a href="#upgrading-codeready-containers_gsg">2.6. Upgrading CRC</a></li>
+<li><a href="#upgrading_gsg">2.6. Upgrading CRC</a></li>
 </ul>
 </li>
-<li><a href="#using-codeready-containers_gsg">3. Using CRC</a>
+<li><a href="#using_gsg">3. Using CRC</a>
 <ul class="sectlevel2">
 <li><a href="#about-presets_gsg">3.1. About presets</a></li>
-<li><a href="#setting-up-codeready-containers_gsg">3.2. Setting up CRC</a></li>
+<li><a href="#setting-up_gsg">3.2. Setting up CRC</a></li>
 <li><a href="#starting-the-instance_gsg">3.3. Starting the instance</a></li>
 <li><a href="#accessing-the-openshift-cluster_gsg">3.4. Accessing the OpenShift cluster</a>
 <ul class="sectlevel3">
@@ -481,10 +481,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#deleting-the-instance_gsg">3.7. Deleting the instance</a></li>
 </ul>
 </li>
-<li><a href="#configuring-codeready-containers_gsg">4. Configuring CRC</a>
+<li><a href="#configuring_gsg">4. Configuring CRC</a>
 <ul class="sectlevel2">
-<li><a href="#about-codeready-containers-configuration_gsg">4.1. About CRC configuration</a></li>
-<li><a href="#viewing-codeready-containers-configuration_gsg">4.2. Viewing CRC configuration</a></li>
+<li><a href="#about-configuration_gsg">4.1. About CRC configuration</a></li>
+<li><a href="#viewing-configuration_gsg">4.2. Viewing CRC configuration</a></li>
 <li><a href="#changing-the-selected-preset_gsg">4.3. Changing the selected preset</a></li>
 <li><a href="#configuring-the-instance_gsg">4.4. Configuring the instance</a></li>
 </ul>
@@ -498,7 +498,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </ul>
 </li>
 <li><a href="#reserved-ip-subnets_gsg">5.2. Reserved IP subnets</a></li>
-<li><a href="#starting-codeready-containers-behind-proxy_gsg">5.3. Starting CRC behind a proxy</a></li>
+<li><a href="#starting-behind-proxy_gsg">5.3. Starting CRC behind a proxy</a></li>
 <li><a href="#setting-up-remote-server_gsg">5.4. Setting up CRC on a remote server</a></li>
 <li><a href="#connecting-to-remote-instance_gsg">5.5. Connecting to a remote CRC instance</a></li>
 </ul>
@@ -506,9 +506,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#administrative-tasks_gsg">6. Administrative tasks</a>
 <ul class="sectlevel2">
 <li><a href="#starting-monitoring_gsg">6.1. Starting monitoring</a></li>
+<li><a href="#enabling-override-operators_gsg">6.2. Enabling override Operators</a></li>
 </ul>
 </li>
-<li><a href="#troubleshooting-codeready-containers_gsg">7. Troubleshooting Red&#160;Hat CRC</a>
+<li><a href="#troubleshooting_gsg">7. Troubleshooting CRC</a>
 <ul class="sectlevel2">
 <li><a href="#getting-shell-access-to-the-openshift-cluster_gsg">7.1. Getting shell access to the OpenShift cluster</a></li>
 <li><a href="#troubleshooting-expired-certificates_gsg">7.2. Troubleshooting expired certificates</a></li>
@@ -521,36 +522,36 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="introducing-codeready-containers_gsg"><a class="anchor" href="#introducing-codeready-containers_gsg"></a><a class="link" href="#introducing-codeready-containers_gsg">1. Introducing Red&#160;Hat CRC</a></h2>
+<h2 id="introducing_gsg"><a class="anchor" href="#introducing_gsg"></a><a class="link" href="#introducing_gsg">1. Introducing CRC</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="about-codeready-containers_gsg"><a class="anchor" href="#about-codeready-containers_gsg"></a><a class="link" href="#about-codeready-containers_gsg">1.1. About CRC</a></h3>
+<h3 id="about_gsg"><a class="anchor" href="#about_gsg"></a><a class="link" href="#about_gsg">1.1. About CRC</a></h3>
 <div class="paragraph">
-<p>Red&#160;Hat CRC brings a minimal OpenShift Container Platform 4 cluster and Podman container runtime to your local computer.
+<p>CRC brings a minimal OpenShift Container Platform 4 cluster and Podman container runtime to your local computer.
 These runtimes provide minimal environments for development and testing purposes.
 CRC is mainly targeted at running on developers' desktops.
 For other OpenShift Container Platform use cases, such as headless or multi-developer setups, use the <a href="https://console.redhat.com/openshift/install">full OpenShift installer</a>.</p>
 </div>
 <div class="paragraph">
-<p>See the <a href="https://docs.openshift.com/container-platform/latest/welcome/index.html#developer-activities">OpenShift documentation</a> for a full introduction to OpenShift Container Platform.</p>
+<p>See the <a href="https://docs.openshift.com/container-platform/latest/welcome/index.html#developer-activities">OpenShift Container Platform documentation</a> for a full introduction to OpenShift Container Platform.</p>
 </div>
 <div class="paragraph">
 <p>CRC includes the <code class="command">crc</code> command-line interface (CLI) to interact with the CRC instance using the desired container runtime.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="differences-from-production-openshift-install_gsg"><a class="anchor" href="#differences-from-production-openshift-install_gsg"></a><a class="link" href="#differences-from-production-openshift-install_gsg">1.2. Differences from a production OpenShift installation</a></h3>
+<h3 id="differences-from-production-openshift-install_gsg"><a class="anchor" href="#differences-from-production-openshift-install_gsg"></a><a class="link" href="#differences-from-production-openshift-install_gsg">1.2. Differences from a production OpenShift Container Platform installation</a></h3>
 <div class="paragraph">
-<p>The OpenShift preset for Red&#160;Hat CRC provides a regular OpenShift Container Platform installation with the following notable differences:</p>
+<p>The OpenShift preset for CRC provides a regular OpenShift Container Platform installation with the following notable differences:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>The CRC OpenShift cluster is ephemeral and is not intended for production use.</strong></p>
+<p><strong>The OpenShift Container Platform cluster is ephemeral and is not intended for production use.</strong></p>
 </li>
 <li>
-<p><strong>CRC does not have a supported upgrade path to newer OpenShift versions.</strong>
-Upgrading the OpenShift version may cause issues that are difficult to reproduce.</p>
+<p><strong>CRC does not have a supported upgrade path to newer OpenShift Container Platform versions.</strong>
+Upgrading the OpenShift Container Platform version may cause issues that are difficult to reproduce.</p>
 </li>
 <li>
 <p>It uses a single node which behaves as both a control plane and worker node.</p>
@@ -560,13 +561,13 @@ Upgrading the OpenShift version may cause issues that are difficult to reproduce
 This disabled Operator causes the corresponding part of the web console to be non-functional.</p>
 </li>
 <li>
-<p>The OpenShift cluster runs in a virtual machine known as an <em>instance</em>.
+<p>The OpenShift Container Platform cluster runs in a virtual machine known as an <em>instance</em>.
 This may cause other differences, particularly with external networking.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>The OpenShift cluster provided by CRC also includes the following non-customizable cluster settings.
+<p>The OpenShift Container Platform cluster provided by CRC also includes the following non-customizable cluster settings.
 These settings should not be modified:</p>
 </div>
 <div class="ulist">
@@ -601,8 +602,9 @@ This can cause issues when, for example, a proxy is run in the same address spac
 <div class="sect3">
 <h4 id="minimum-system-requirements-hardware_gsg"><a class="anchor" href="#minimum-system-requirements-hardware_gsg"></a><a class="link" href="#minimum-system-requirements-hardware_gsg">2.1.1. Hardware requirements</a></h4>
 <div class="paragraph">
-<p>CRC is supported only on AMD64 and Intel 64 processor architectures.
-CRC does not support the ARM-based M1 architecture.
+<p>CRC is supported on AMD64 and Intel 64 processor architectures.
+The Podman container runtime preset is supported on the ARM-based M1 architecture.
+The OpenShift Container Platform preset is not supported on the M1 architecture.
 CRC does not support nested virtualization.</p>
 </div>
 <div class="paragraph">
@@ -633,7 +635,7 @@ CRC does not support nested virtualization.</p>
 <div class="paragraph">
 <p>The OpenShift Container Platform cluster requires these minimum resources to run in the CRC instance.
 Some workloads may require more resources.
-To assign more resources to the CRC instance, see <a href="https://code-ready.github.io/crc/#configuring-the-instance_gsg">Configuring the instance</a>.</p>
+To assign more resources to the CRC instance, see <a href="https://crc-org.github.io/crc/#configuring-the-instance_gsg">Configuring the instance</a>.</p>
 </div>
 </td>
 </tr>
@@ -690,7 +692,7 @@ CRC does not work on earlier versions of macOS.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>On Linux, CRC is supported only on Red&#160;Hat Enterprise&#160;Linux/CentOS 7.5 or later (including 8.x versions) and on the latest two stable Fedora releases.</p>
+<p>On Linux, CRC is supported only on the latest two Red&#160;Hat Enterprise&#160;Linux/CentOS 7, 8 and 9 minor releases and on the latest two stable Fedora releases.</p>
 </li>
 <li>
 <p>When using Red&#160;Hat Enterprise&#160;Linux, the machine running CRC must be <a href="https://access.redhat.com/solutions/253273">registered with the Red Hat Customer Portal</a>.</p>
@@ -699,7 +701,7 @@ CRC does not work on earlier versions of macOS.</p>
 <p>Ubuntu 18.04 LTS or later and Debian 10 or later are not supported and may require manual set up of the host machine.</p>
 </li>
 <li>
-<p>See <a href="https://code-ready.github.io/crc/#required-software-packages_gsg">Required software packages</a> to install the required packages for your Linux distribution.</p>
+<p>See <a href="https://crc-org.github.io/crc/#required-software-packages_gsg">Required software packages</a> to install the required packages for your Linux distribution.</p>
 </li>
 </ul>
 </div>
@@ -741,7 +743,7 @@ Consult the following table to find the command used to install these packages f
 </table>
 </div>
 <div class="sect2">
-<h3 id="installing-codeready-containers_gsg"><a class="anchor" href="#installing-codeready-containers_gsg"></a><a class="link" href="#installing-codeready-containers_gsg">2.3. Installing CRC</a></h3>
+<h3 id="installing_gsg"><a class="anchor" href="#installing_gsg"></a><a class="link" href="#installing_gsg">2.3. Installing CRC</a></h3>
 <div class="paragraph">
 <p>CRC is available as a portable executable for Red&#160;Hat Enterprise&#160;Linux.
 On Microsoft Windows and macOS, CRC is available using a guided installer.</p>
@@ -751,7 +753,7 @@ On Microsoft Windows and macOS, CRC is available using a guided installer.</p>
 <ul>
 <li>
 <p>Your host machine must meet the minimum system requirements.
-For more information, see <a href="https://code-ready.github.io/crc/#minimum-system-requirements_gsg">Minimum system requirements</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#minimum-system-requirements_gsg">Minimum system requirements</a>.</p>
 </li>
 </ul>
 </div>
@@ -833,7 +835,7 @@ Consent for usage data collection can be granted or revoked by you at any time.<
 <p>For more information about collected data, see the Red&#160;Hat <a href="https://developers.redhat.com/article/tool-data-collection">Telemetry data collection notice</a>.</p>
 </li>
 <li>
-<p>To grant or revoke consent for usage data collection, see <a href="https://code-ready.github.io/crc/#configuring-usage-data-collection_gsg">Configuring usage data collection</a>.</p>
+<p>To grant or revoke consent for usage data collection, see <a href="https://crc-org.github.io/crc/#configuring-usage-data-collection_gsg">Configuring usage data collection</a>.</p>
 </li>
 </ul>
 </div>
@@ -889,7 +891,7 @@ The change will take effect next time you run the <code class="command">crc star
 </div>
 </div>
 <div class="sect2">
-<h3 id="upgrading-codeready-containers_gsg"><a class="anchor" href="#upgrading-codeready-containers_gsg"></a><a class="link" href="#upgrading-codeready-containers_gsg">2.6. Upgrading CRC</a></h3>
+<h3 id="upgrading_gsg"><a class="anchor" href="#upgrading_gsg"></a><a class="link" href="#upgrading_gsg">2.6. Upgrading CRC</a></h3>
 <div class="paragraph">
 <p>Newer versions of the CRC executable require manual set up to prevent potential incompatibilities with earlier versions.</p>
 </div>
@@ -953,7 +955,7 @@ Verify that the new <code class="command">crc</code> executable is in use by che
 </div>
 </div>
 <div class="sect1">
-<h2 id="using-codeready-containers_gsg"><a class="anchor" href="#using-codeready-containers_gsg"></a><a class="link" href="#using-codeready-containers_gsg">3. Using CRC</a></h2>
+<h2 id="using_gsg"><a class="anchor" href="#using_gsg"></a><a class="link" href="#using_gsg">3. Using CRC</a></h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="about-presets_gsg"><a class="anchor" href="#about-presets_gsg"></a><a class="link" href="#about-presets_gsg">3.1. About presets</a></h3>
@@ -972,16 +974,16 @@ Only one preset can be active at a time.</p>
 <div class="title">Additional resources</div>
 <ul>
 <li>
-<p>For more information about the minimum system requirements for each preset, see <a href="https://code-ready.github.io/crc/#minimum-system-requirements_gsg">Minimum system requirements</a>.</p>
+<p>For more information about the minimum system requirements for each preset, see <a href="https://crc-org.github.io/crc/#minimum-system-requirements_gsg">Minimum system requirements</a>.</p>
 </li>
 <li>
-<p>For more information on changing the selected preset, see <a href="https://code-ready.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
+<p>For more information on changing the selected preset, see <a href="https://crc-org.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="setting-up-codeready-containers_gsg"><a class="anchor" href="#setting-up-codeready-containers_gsg"></a><a class="link" href="#setting-up-codeready-containers_gsg">3.2. Setting up CRC</a></h3>
+<h3 id="setting-up_gsg"><a class="anchor" href="#setting-up_gsg"></a><a class="link" href="#setting-up_gsg">3.2. Setting up CRC</a></h3>
 <div class="paragraph _abstract">
 <p>The <code class="command">crc setup</code> command performs operations to set up the environment of your host machine for the CRC instance.</p>
 </div>
@@ -1052,7 +1054,7 @@ To select the the Podman container runtime preset:</p>
 <div class="title">Additional resources</div>
 <ul>
 <li>
-<p>For more information about the available container runtime presets, see <a href="https://code-ready.github.io/crc/#about-presets_gsg">About presets</a>.</p>
+<p>For more information about the available container runtime presets, see <a href="https://crc-org.github.io/crc/#about-presets_gsg">About presets</a>.</p>
 </li>
 </ul>
 </div>
@@ -1070,7 +1072,7 @@ To select the the Podman container runtime preset:</p>
 </li>
 <li>
 <p>You set up the host machine using the <code class="command">crc setup</code> command.
-For more information, see <a href="https://code-ready.github.io/crc/#setting-up-codeready-containers_gsg">Setting up CRC</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#setting-up_gsg">Setting up CRC</a>.</p>
 </li>
 <li>
 <p>On Microsoft Windows, ensure that your user account can elevate to Administrator privileges.</p>
@@ -1129,10 +1131,10 @@ Copy or download the pull secret from the Pull Secret section of the <a href="ht
 <div class="title">Additional resources</div>
 <ul>
 <li>
-<p>To change the default resources allocated to the instance, see <a href="https://code-ready.github.io/crc/#configuring-the-instance_gsg">Configuring the instance</a>.</p>
+<p>To change the default resources allocated to the instance, see <a href="https://crc-org.github.io/crc/#configuring-the-instance_gsg">Configuring the instance</a>.</p>
 </li>
 <li>
-<p>If you see errors during <code class="command">crc start</code>, see the <a href="https://code-ready.github.io/crc/#troubleshooting-codeready-containers_gsg">Troubleshooting CRC</a> section for potential solutions.</p>
+<p>If you see errors during <code class="command">crc start</code>, see the <a href="https://crc-org.github.io/crc/#troubleshooting_gsg">Troubleshooting CRC</a> section for potential solutions.</p>
 </li>
 </ul>
 </div>
@@ -1140,12 +1142,12 @@ Copy or download the pull secret from the Pull Secret section of the <a href="ht
 <div class="sect2">
 <h3 id="accessing-the-openshift-cluster_gsg"><a class="anchor" href="#accessing-the-openshift-cluster_gsg"></a><a class="link" href="#accessing-the-openshift-cluster_gsg">3.4. Accessing the OpenShift cluster</a></h3>
 <div class="paragraph">
-<p>Access the OpenShift cluster running in the CRC instance by using the OpenShift web console or OpenShift CLI (<code class="command">oc</code>).</p>
+<p>Access the OpenShift Container Platform cluster running in the CRC instance by using the OpenShift Container Platform web console or OpenShift CLI (<code class="command">oc</code>).</p>
 </div>
 <div class="sect3">
 <h4 id="accessing-the-openshift-web-console_gsg"><a class="anchor" href="#accessing-the-openshift-web-console_gsg"></a><a class="link" href="#accessing-the-openshift-web-console_gsg">3.4.1. Accessing the OpenShift web console</a></h4>
 <div class="paragraph">
-<p>Access the OpenShift web console by using your web browser.</p>
+<p>Access the OpenShift Container Platform web console by using your web browser.</p>
 </div>
 <div class="paragraph">
 <p>Access the cluster by using either the <code>kubeadmin</code> or <code>developer</code> user.
@@ -1157,11 +1159,11 @@ Use the <code>kubeadmin</code> user only for administrative tasks such as creati
 <ul>
 <li>
 <p>CRC is configured to use the OpenShift preset.
-For more information, see <a href="https://code-ready.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
 </li>
 <li>
 <p>A running CRC instance.
-For more information, see <a href="https://code-ready.github.io/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
 </li>
 </ul>
 </div>
@@ -1169,7 +1171,7 @@ For more information, see <a href="https://code-ready.github.io/crc/#starting-th
 <div class="title">Procedure</div>
 <ol class="arabic">
 <li>
-<p>To access the OpenShift web console with your default web browser, run the following command:</p>
+<p>To access the OpenShift Container Platform web console with your default web browser, run the following command:</p>
 <div class="listingblock">
 <div class="content">
 <pre>$ crc console</pre>
@@ -1188,13 +1190,13 @@ You can also view the password for the <code>developer</code> and <code>kubeadmi
 </ol>
 </div>
 <div class="paragraph">
-<p>See <a href="https://code-ready.github.io/crc/#troubleshooting-codeready-containers_gsg">Troubleshooting CRC</a> if you cannot access the CRC OpenShift cluster.</p>
+<p>See <a href="https://crc-org.github.io/crc/#troubleshooting_gsg">Troubleshooting CRC</a> if you cannot access the OpenShift Container Platform cluster managed by CRC.</p>
 </div>
 <div class="ulist">
 <div class="title">Additional resources</div>
 <ul>
 <li>
-<p>The <a href="https://docs.openshift.com/container-platform/latest/applications/projects/working-with-projects.html">OpenShift documentation</a> covers the creation of projects and applications.</p>
+<p>The <a href="https://docs.openshift.com/container-platform/latest/applications/projects/working-with-projects.html">OpenShift Container Platform documentation</a> covers the creation of projects and applications.</p>
 </li>
 </ul>
 </div>
@@ -1202,18 +1204,18 @@ You can also view the password for the <code>developer</code> and <code>kubeadmi
 <div class="sect3">
 <h4 id="accessing-the-openshift-cluster-with-oc_gsg"><a class="anchor" href="#accessing-the-openshift-cluster-with-oc_gsg"></a><a class="link" href="#accessing-the-openshift-cluster-with-oc_gsg">3.4.2. Accessing the OpenShift cluster with the OpenShift CLI</a></h4>
 <div class="paragraph">
-<p>Access the OpenShift cluster by using the OpenShift CLI (<code class="command">oc</code>).</p>
+<p>Access the OpenShift Container Platform cluster managed by CRC by using the OpenShift CLI (<code class="command">oc</code>).</p>
 </div>
 <div class="ulist">
 <div class="title">Prerequisites</div>
 <ul>
 <li>
 <p>CRC is configured to use the OpenShift preset.
-For more information, see <a href="https://code-ready.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
 </li>
 <li>
 <p>A running CRC instance.
-For more information, see <a href="https://code-ready.github.io/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
 </li>
 </ul>
 </div>
@@ -1255,8 +1257,8 @@ You can also view it by running the <code class="command">crc console --credenti
 </div>
 </li>
 <li>
-<p>You can now use <code class="command">oc</code> to interact with your OpenShift cluster.
-For example, to verify that the OpenShift cluster Operators are available, log in as the <code>kubeadmin</code> user and run the following command:</p>
+<p>You can now use <code class="command">oc</code> to interact with your OpenShift Container Platform cluster.
+For example, to verify that the OpenShift Container Platform cluster Operators are available, log in as the <code>kubeadmin</code> user and run the following command:</p>
 <div class="listingblock">
 <div class="content">
 <pre class="nowrap">$ oc config use-context crc-admin
@@ -1283,13 +1285,13 @@ $ oc get co</pre>
 </ol>
 </div>
 <div class="paragraph">
-<p>See <a href="https://code-ready.github.io/crc/#troubleshooting-codeready-containers_gsg">Troubleshooting CRC</a> if you cannot access the CRC OpenShift cluster.</p>
+<p>See <a href="https://crc-org.github.io/crc/#troubleshooting_gsg">Troubleshooting CRC</a> if you cannot access the OpenShift Container Platform cluster managed by CRC.</p>
 </div>
 <div class="ulist">
 <div class="title">Additional resources</div>
 <ul>
 <li>
-<p>The <a href="https://docs.openshift.com/container-platform/latest/applications/projects/working-with-projects.html">OpenShift documentation</a> covers the creation of projects and applications.</p>
+<p>The <a href="https://docs.openshift.com/container-platform/latest/applications/projects/working-with-projects.html">OpenShift Container Platform documentation</a> covers the creation of projects and applications.</p>
 </li>
 </ul>
 </div>
@@ -1297,35 +1299,24 @@ $ oc get co</pre>
 <div class="sect3">
 <h4 id="accessing-the-internal-openshift-registry_gsg"><a class="anchor" href="#accessing-the-internal-openshift-registry_gsg"></a><a class="link" href="#accessing-the-internal-openshift-registry_gsg">3.4.3. Accessing the internal OpenShift registry</a></h4>
 <div class="paragraph">
-<p>The OpenShift cluster running in the CRC instance includes an internal container image registry by default.
+<p>The OpenShift Container Platform cluster running in the CRC instance includes an internal container image registry by default.
 This internal container image registry can be used as a publication target for locally developed container images.
-To access the internal OpenShift registry, follow these steps.</p>
+To access the internal OpenShift Container Platform registry, follow these steps.</p>
 </div>
 <div class="ulist">
 <div class="title">Prerequisites</div>
 <ul>
 <li>
 <p>CRC is configured to use the OpenShift preset.
-For more information, see <a href="https://code-ready.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
 </li>
 <li>
 <p>A running CRC instance.
-For more information, see <a href="https://code-ready.github.io/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
 </li>
 <li>
 <p>A working OpenShift CLI (<code class="command">oc</code>) command.
-For more information, see <a href="https://code-ready.github.io/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with the OpenShift CLI</a>.</p>
-</li>
-<li>
-<p>An installation of <code class="command">podman</code> or <code class="command">docker</code>.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>For Docker, add <code>default-route-openshift-image-registry.apps-crc.testing</code> as an insecure registry.
-For more information, see <a href="https://docs.docker.com/registry/insecure/">the Docker documentation</a>.</p>
-</li>
-</ul>
-</div>
+For more information, see <a href="https://crc-org.github.io/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with the OpenShift CLI</a>.</p>
 </li>
 </ul>
 </div>
@@ -1358,7 +1349,7 @@ For more information, see <a href="https://docs.docker.com/registry/insecure/">t
 <p>Log in to the registry as that user with its token:</p>
 <div class="listingblock">
 <div class="content">
-<pre>$ podman login -u kubeadmin -p $(oc whoami -t) default-route-openshift-image-registry.apps-crc.testing --tls-verify=false</pre>
+<pre>$ oc registry login --insecure=true</pre>
 </div>
 </div>
 </li>
@@ -1371,26 +1362,10 @@ For more information, see <a href="https://docs.docker.com/registry/insecure/">t
 </div>
 </li>
 <li>
-<p>Pull an example container image:</p>
+<p>Mirror an example container image:</p>
 <div class="listingblock">
 <div class="content">
-<pre>$ podman pull quay.io/libpod/alpine</pre>
-</div>
-</div>
-</li>
-<li>
-<p>Tag the image, including namespace details:</p>
-<div class="listingblock">
-<div class="content">
-<pre>$ podman tag alpine:latest default-route-openshift-image-registry.apps-crc.testing/demo/alpine:latest</pre>
-</div>
-</div>
-</li>
-<li>
-<p>Push the container image to the internal registry:</p>
-<div class="listingblock">
-<div class="content">
-<pre>$ podman push default-route-openshift-image-registry.apps-crc.testing/demo/alpine:latest --tls-verify=false</pre>
+<pre>$ oc image mirror registry.access.redhat.com/ubi8/ubi:latest=default-route-openshift-image-registry.apps-crc.testing/demo/ubi8:latest --insecure=true --filter-by-os=linux/amd64</pre>
 </div>
 </div>
 </li>
@@ -1406,7 +1381,7 @@ For more information, see <a href="https://docs.docker.com/registry/insecure/">t
 <p>Enable image lookup in the imagestream:</p>
 <div class="listingblock">
 <div class="content">
-<pre>$ oc set image-lookup alpine</pre>
+<pre>$ oc set image-lookup ubi8</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1417,7 +1392,7 @@ For more information, see <a href="https://docs.docker.com/registry/insecure/">t
 <p>Create a pod using the recently pushed image:</p>
 <div class="listingblock">
 <div class="content">
-<pre>$ oc run demo --image=alpine --command -- sleep 600s</pre>
+<pre>$ oc run demo --image=ubi8 --command -- sleep 600s</pre>
 </div>
 </div>
 </li>
@@ -1429,7 +1404,7 @@ For more information, see <a href="https://docs.docker.com/registry/insecure/">t
 <h3 id="deploying-sample-application-with-odo_gsg"><a class="anchor" href="#deploying-sample-application-with-odo_gsg"></a><a class="link" href="#deploying-sample-application-with-odo_gsg">3.5. Deploying a sample application with <code>odo</code></a></h3>
 <div class="paragraph">
 <p>You can use <code class="command">odo</code> to create OpenShift projects and applications from the command line.
-This procedure deploys a sample application to the OpenShift cluster running in the CRC instance.</p>
+This procedure deploys a sample application to the OpenShift Container Platform cluster running in the CRC instance.</p>
 </div>
 <div class="ulist">
 <div class="title">Prerequisites</div>
@@ -1440,11 +1415,11 @@ For more information, see <a href="https://docs.openshift.com/container-platform
 </li>
 <li>
 <p>CRC is configured to use the OpenShift preset.
-For more information, see <a href="https://code-ready.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
 </li>
 <li>
 <p>The CRC instance is running.
-For more information, see <a href="https://code-ready.github.io/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
 </li>
 </ul>
 </div>
@@ -1452,7 +1427,7 @@ For more information, see <a href="https://code-ready.github.io/crc/#starting-th
 <div class="title">Procedure</div>
 <ol class="arabic">
 <li>
-<p>Log in to the running CRC OpenShift cluster as the <code>developer</code> user:</p>
+<p>Log in to the running OpenShift Container Platform cluster managed by CRC as the <code>developer</code> user:</p>
 <div class="listingblock">
 <div class="content">
 <pre>$ odo login -u developer -p developer</pre>
@@ -1477,26 +1452,20 @@ $ cd sample-app</pre>
 </div>
 </li>
 <li>
-<p>Create a component from a sample application on GitHub:</p>
+<p>Clone an example Node.js application:</p>
 <div class="listingblock">
 <div class="content">
-<pre>$ odo create nodejs --s2i --git https://github.com/openshift/nodejs-ex</pre>
+<pre>$ git clone https://github.com/openshift/nodejs-ex
+$ cd nodejs-ex</pre>
 </div>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>Creating a component from a remote Git repository will rebuild the application each time you run the <code class="command">odo push</code> command.
-To create a component from a local Git repository, see <a href="https://docs.openshift.com/container-platform/latest/cli_reference/developer_cli_odo/creating_and_deploying_applications_with_odo/creating-a-single-component-application-with-odo.html">Creating a single-component application with <code>odo</code></a> in the <code class="command">odo</code> documentation.</p>
+</li>
+<li>
+<p>Add a <code>nodejs</code> component to the application:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ odo create nodejs</pre>
 </div>
-</td>
-</tr>
-</table>
 </div>
 </li>
 <li>
@@ -1597,10 +1566,10 @@ Save any desired information stored in the instance before running this command.
 </div>
 </div>
 <div class="sect1">
-<h2 id="configuring-codeready-containers_gsg"><a class="anchor" href="#configuring-codeready-containers_gsg"></a><a class="link" href="#configuring-codeready-containers_gsg">4. Configuring CRC</a></h2>
+<h2 id="configuring_gsg"><a class="anchor" href="#configuring_gsg"></a><a class="link" href="#configuring_gsg">4. Configuring CRC</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="about-codeready-containers-configuration_gsg"><a class="anchor" href="#about-codeready-containers-configuration_gsg"></a><a class="link" href="#about-codeready-containers-configuration_gsg">4.1. About CRC configuration</a></h3>
+<h3 id="about-configuration_gsg"><a class="anchor" href="#about-configuration_gsg"></a><a class="link" href="#about-configuration_gsg">4.1. About CRC configuration</a></h3>
 <div class="paragraph">
 <p>Use the <code class="command">crc config</code> command to configure both the <code class="command">crc</code> executable and the CRC instance.
 The <code class="command">crc config</code> command requires a subcommand to act on the configuration.
@@ -1615,7 +1584,7 @@ Set the value of a property starting with <code>skip-check</code> to <code>true<
 </div>
 </div>
 <div class="sect2">
-<h3 id="viewing-codeready-containers-configuration_gsg"><a class="anchor" href="#viewing-codeready-containers-configuration_gsg"></a><a class="link" href="#viewing-codeready-containers-configuration_gsg">4.2. Viewing CRC configuration</a></h3>
+<h3 id="viewing-configuration_gsg"><a class="anchor" href="#viewing-configuration_gsg"></a><a class="link" href="#viewing-configuration_gsg">4.2. Viewing CRC configuration</a></h3>
 <div class="paragraph">
 <p>The CRC executable provides commands to view configurable properties and the current CRC configuration.</p>
 </div>
@@ -1708,7 +1677,7 @@ To enable preset changes, you must delete the existing instance and start a new 
 <div class="title">Additional resources</div>
 <ul>
 <li>
-<p>For more information about the minimum system requirements for each preset, see <a href="https://code-ready.github.io/crc/#minimum-system-requirements_gsg">Minimum system requirements</a>.</p>
+<p>For more information about the minimum system requirements for each preset, see <a href="https://crc-org.github.io/crc/#minimum-system-requirements_gsg">Minimum system requirements</a>.</p>
 </li>
 </ul>
 </div>
@@ -1807,12 +1776,12 @@ The amount of memory to assign must be greater than or equal to the default.</p>
 <div class="sect3">
 <h4 id="dns-configuration-generalgsg"><a class="anchor" href="#dns-configuration-generalgsg"></a><a class="link" href="#dns-configuration-generalgsg">5.1.1. General DNS setup</a></h4>
 <div class="paragraph">
-<p>The OpenShift cluster managed by CRC uses 2 DNS domain names, <code>crc.testing</code> and <code>apps-crc.testing</code>.
-The <code>crc.testing</code> domain is for core OpenShift services.
+<p>The OpenShift Container Platform cluster managed by CRC uses 2 DNS domain names, <code>crc.testing</code> and <code>apps-crc.testing</code>.
+The <code>crc.testing</code> domain is for core OpenShift Container Platform services.
 The <code>apps-crc.testing</code> domain is for accessing OpenShift applications deployed on the cluster.</p>
 </div>
 <div class="paragraph">
-<p>For example, the OpenShift API server is exposed as <code>api.crc.testing</code> while the OpenShift console is accessed as <code>console-openshift-console.apps-crc.testing</code>.
+<p>For example, the OpenShift Container Platform API server is exposed as <code>api.crc.testing</code> while the OpenShift Container Platform console is accessed as <code>console-openshift-console.apps-crc.testing</code>.
 These DNS domains are served by a <code>dnsmasq</code> DNS container running inside the CRC instance.</p>
 </div>
 <div class="paragraph">
@@ -1908,7 +1877,7 @@ server=/apps-crc.testing/192.168.130.11</pre>
 <div class="sect2">
 <h3 id="reserved-ip-subnets_gsg"><a class="anchor" href="#reserved-ip-subnets_gsg"></a><a class="link" href="#reserved-ip-subnets_gsg">5.2. Reserved IP subnets</a></h3>
 <div class="paragraph">
-<p>The CRC OpenShift cluster reserves IP subnets for internal use which should not collide with your host network.
+<p>The OpenShift Container Platform cluster managed by CRC reserves IP subnets for internal use which should not collide with your host network.
 Ensure that the following IP subnets are available for use:</p>
 </div>
 <div class="ulist">
@@ -1933,7 +1902,7 @@ The additional reserved subnet for Linux is <code>192.168.130.0/24</code>.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="starting-codeready-containers-behind-proxy_gsg"><a class="anchor" href="#starting-codeready-containers-behind-proxy_gsg"></a><a class="link" href="#starting-codeready-containers-behind-proxy_gsg">5.3. Starting CRC behind a proxy</a></h3>
+<h3 id="starting-behind-proxy_gsg"><a class="anchor" href="#starting-behind-proxy_gsg"></a><a class="link" href="#starting-behind-proxy_gsg">5.3. Starting CRC behind a proxy</a></h3>
 <div class="paragraph">
 <p>You can start CRC behind a defined proxy using environment variables or configurable properties.</p>
 </div>
@@ -1955,9 +1924,9 @@ The additional reserved subnet for Linux is <code>192.168.130.0/24</code>.</p>
 <div class="title">Prerequisites</div>
 <ul>
 <li>
-<p>To use an existing OpenShift CLI (<code class="command">oc</code>) executable on your host machine, export the <code>.testing</code> domain as part of the <code>no_proxy</code> environment variable.
+<p>If you are not using <code class="command">crc oc-env</code>, when interacting with the cluster, export the <code>.testing</code> domain as part of the <code>no_proxy</code> environment variable.
 The embedded <code class="command">oc</code> executable does not require manual settings.
-For more information about using the embedded <code class="command">oc</code> executable, see <a href="https://code-ready.github.io/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with the OpenShift CLI</a>.</p>
+For more information about using the embedded <code class="command">oc</code> executable, see <a href="https://crc-org.github.io/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with the OpenShift CLI</a>.</p>
 </li>
 </ul>
 </div>
@@ -2002,7 +1971,7 @@ $ crc config set no-proxy <em>&lt;comma-separated-no-proxy-entries&gt;</em></pre
 <div class="sect2">
 <h3 id="setting-up-remote-server_gsg"><a class="anchor" href="#setting-up-remote-server_gsg"></a><a class="link" href="#setting-up-remote-server_gsg">5.4. Setting up CRC on a remote server</a></h3>
 <div class="paragraph">
-<p>Configure a remote server to run a CRC OpenShift cluster.</p>
+<p>Configure a remote server to run an OpenShift Container Platform cluster provided by CRC.</p>
 </div>
 <div class="paragraph">
 <p>This procedure assumes the use of a Red&#160;Hat Enterprise&#160;Linux, Fedora, or CentOS server.
@@ -2028,11 +1997,11 @@ Exposing an insecure server on the internet has many security implications.</p>
 <ul>
 <li>
 <p>CRC is installed and set up on the remote server.
-For more information, see <a href="https://code-ready.github.io/crc/#installing-codeready-containers_gsg">Installing CRC</a> and <a href="https://code-ready.github.io/crc/#setting-up-codeready-containers_gsg">Setting up CRC</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#installing_gsg">Installing CRC</a> and <a href="https://crc-org.github.io/crc/#setting-up_gsg">Setting up CRC</a>.</p>
 </li>
 <li>
 <p>CRC is configured to use the OpenShift preset on the remote server.
-For more information, see <a href="https://code-ready.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
 </li>
 <li>
 <p>Your user account has <code>sudo</code> permissions on the remote server.</p>
@@ -2136,7 +2105,7 @@ EOF</pre>
 <div class="sect2">
 <h3 id="connecting-to-remote-instance_gsg"><a class="anchor" href="#connecting-to-remote-instance_gsg"></a><a class="link" href="#connecting-to-remote-instance_gsg">5.5. Connecting to a remote CRC instance</a></h3>
 <div class="paragraph">
-<p>Use <code class="application">dnsmasq</code> to connect a client machine to a remote server running a CRC OpenShift cluster.</p>
+<p>Use <code class="application">dnsmasq</code> to connect a client machine to a remote server running an OpenShift Container Platform cluster managed by CRC.</p>
 </div>
 <div class="paragraph">
 <p>This procedure assumes the use of a Red&#160;Hat Enterprise&#160;Linux, Fedora, or CentOS client.
@@ -2161,7 +2130,7 @@ Run every command in this procedure on the client.</p>
 <ul>
 <li>
 <p>A remote server is set up for the client to connect to.
-For more information, see <a href="https://code-ready.github.io/crc/#setting-up-remote-server_gsg">Setting up CRC on a remote server</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#setting-up-remote-server_gsg">Setting up CRC on a remote server</a>.</p>
 </li>
 <li>
 <p>You know the external IP address of the server.</p>
@@ -2235,7 +2204,7 @@ These entries are created by running a local instance of CRC and will conflict w
 </div>
 </div>
 <div class="paragraph">
-<p>The remote OpenShift Web Console is available at https://console-openshift-console.apps-crc.testing.</p>
+<p>The remote OpenShift Container Platform web console is available at https://console-openshift-console.apps-crc.testing.</p>
 </div>
 </li>
 </ol>
@@ -2260,7 +2229,7 @@ Follow this procedure to enable monitoring for your cluster.</p>
 <p>You must assign additional memory to the CRC instance.
 At least 14 GiB of memory, a value of <code>14336</code>, is recommended for core functionality.
 Increased workloads will require more memory.
-For more information, see <a href="https://code-ready.github.io/crc/#configuring-the-instance_gsg">Configuring the instance</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#configuring-the-instance_gsg">Configuring the instance</a>.</p>
 </li>
 </ul>
 </div>
@@ -2301,10 +2270,66 @@ To remove monitoring, set the <code>enable-cluster-monitoring</code> configurabl
 </ol>
 </div>
 </div>
+<div class="sect2">
+<h3 id="enabling-override-operators_gsg"><a class="anchor" href="#enabling-override-operators_gsg"></a><a class="link" href="#enabling-override-operators_gsg">6.2. Enabling override Operators</a></h3>
+<div class="paragraph">
+<p>To make sure CRC can run on a typical laptop, some resource-heavy services get disabled by default.
+These services can be enabled by manually removing the desired Operator from the Operator override list.</p>
+</div>
+<div class="ulist">
+<div class="title">Prerequisites</div>
+<ul>
+<li>
+<p>A running CRC virtual machine and a working <code class="command">oc</code> command.
+For more information, see <a href="https://crc-org.github.io/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with <code>oc</code></a>.</p>
+</li>
+<li>
+<p>You must log in through <code class="command">oc</code> as the <code>kubeadmin</code> user.</p>
+</li>
+</ul>
+</div>
+<div class="olist arabic">
+<div class="title">Procedure</div>
+<ol class="arabic">
+<li>
+<p>List unmanaged Operators and note the numeric index for the desired Operator:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>On Linux or macOS:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc get clusterversion version -ojsonpath='{range .spec.overrides[*]}{.name}{"\n"}{end}' | nl -v 0</pre>
+</div>
+</div>
+</li>
+<li>
+<p>On Microsoft Windows using PowerShell:</p>
+<div class="listingblock">
+<div class="content">
+<pre>PS&gt; oc get clusterversion version -ojsonpath='{range .spec.overrides[*]}{.name}{"\n"}{end}' | % {$nl++;"`t$($nl-1) `t $_"};$nl=0</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Start the desired Operator using the identified numeric index:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc patch clusterversion/version --type='json' -p '[{"op":"remove", "path":"/spec/overrides/<em>&lt;unmanaged-operator-index&gt;</em>"}]'
+clusterversion.config.openshift.io/version patched</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="troubleshooting-codeready-containers_gsg"><a class="anchor" href="#troubleshooting-codeready-containers_gsg"></a><a class="link" href="#troubleshooting-codeready-containers_gsg">7. Troubleshooting Red&#160;Hat CRC</a></h2>
+<h2 id="troubleshooting_gsg"><a class="anchor" href="#troubleshooting_gsg"></a><a class="link" href="#troubleshooting_gsg">7. Troubleshooting CRC</a></h2>
 <div class="sectionbody">
 <div class="admonitionblock note">
 <table>
@@ -2314,10 +2339,9 @@ To remove monitoring, set the <code>enable-cluster-monitoring</code> configurabl
 </td>
 <td class="content">
 <div class="paragraph">
-<p>The goal of Red&#160;Hat CRC is to deliver an OpenShift environment for development and testing purposes.
+<p>The goal of CRC is to deliver an OpenShift Container Platform environment for development and testing purposes.
 Issues occurring during installation or usage of specific OpenShift applications are outside of the scope of CRC.
-Report such issues to the relevant project.
-For example, OpenShift tracks issues on <a href="https://github.com/openshift/origin/issues">GitHub</a>.</p>
+Report such issues to the relevant project.</p>
 </div>
 </td>
 </tr>
@@ -2336,7 +2360,7 @@ For example, OpenShift tracks issues on <a href="https://github.com/openshift/or
 </td>
 <td class="content">
 <div class="paragraph">
-<p>Direct access to the OpenShift cluster is not needed for regular use and is strongly discouraged.</p>
+<p>Direct access to the OpenShift Container Platform cluster is not needed for regular use and is strongly discouraged.</p>
 </div>
 </td>
 </tr>
@@ -2347,7 +2371,7 @@ For example, OpenShift tracks issues on <a href="https://github.com/openshift/or
 <ul>
 <li>
 <p>Enable OpenShift CLI (<code class="command">oc</code>) access to the cluster and log in as the <code>kubeadmin</code> user.
-For detailed steps, see <a href="https://code-ready.github.io/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with the OpenShift CLI</a>.</p>
+For detailed steps, see <a href="https://crc-org.github.io/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with the OpenShift CLI</a>.</p>
 </li>
 </ul>
 </div>
@@ -2375,7 +2399,7 @@ crc-shdl4-master-0   Ready    master,worker   7d7h   v1.14.6+7e13ab9a7</pre>
 <h3 id="troubleshooting-expired-certificates_gsg"><a class="anchor" href="#troubleshooting-expired-certificates_gsg"></a><a class="link" href="#troubleshooting-expired-certificates_gsg">7.2. Troubleshooting expired certificates</a></h3>
 <div class="paragraph">
 <p>The system bundle in each released <code class="command">crc</code> executable expires 30 days after the release.
-This expiration is due to certificates embedded in the OpenShift cluster.
+This expiration is due to certificates embedded in the OpenShift Container Platform cluster.
 The <code class="command">crc start</code> command triggers an automatic certificate renewal process when needed.
 Certificate renewal can add up to five minutes to the start time of the cluster.</p>
 </div>
@@ -2489,16 +2513,16 @@ This involves stopping the instance, deleting it, reverting changes made by the 
 <ul>
 <li>
 <p>You set up the host machine with the <code class="command">crc setup</code> command.
-For more information, see <a href="https://code-ready.github.io/crc/#setting-up-codeready-containers_gsg">Setting up CRC</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#setting-up_gsg">Setting up CRC</a>.</p>
 </li>
 <li>
 <p>You started CRC with the <code class="command">crc start</code> command.
-For more information, see <a href="https://code-ready.github.io/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
 </li>
 <li>
 <p>You are using the latest CRC release.
 Using a version earlier than CRC 1.2.0 may result in errors related to expired x509 certificates.
-For more information, see <a href="https://code-ready.github.io/crc/#troubleshooting-expired-certificates_gsg">Troubleshooting expired certificates</a>.</p>
+For more information, see <a href="https://crc-org.github.io/crc/#troubleshooting-expired-certificates_gsg">Troubleshooting expired certificates</a>.</p>
 </li>
 </ul>
 </div>
@@ -2600,10 +2624,10 @@ On macOS, the <code class="command">crc cleanup</code> command also removes the 
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p><a href="https://github.com/code-ready/crc/issues">Search open issues</a> for the issue that you are encountering.</p>
+<p><a href="https://github.com/crc-org/crc/issues">Search open issues</a> for the issue that you are encountering.</p>
 </li>
 <li>
-<p>If no existing issue addresses the encountered issue, <a href="https://github.com/code-ready/crc/issues/new">create an issue</a> and <a href="https://help.github.com/en/articles/file-attachments-on-issues-and-pull-requests">attach the <strong class="filename"><em>~/.crc/crc.log</em></strong> file</a> to the created issue.
+<p>If no existing issue addresses the encountered issue, <a href="https://github.com/crc-org/crc/issues/new">create an issue</a> and <a href="https://help.github.com/en/articles/file-attachments-on-issues-and-pull-requests">attach the <strong class="filename"><em>~/.crc/crc.log</em></strong> file</a> to the created issue.
 The <strong class="filename"><em>~/.crc/crc.log</em></strong> file has detailed debugging and troubleshooting information which can help diagnose the problem that you are experiencing.</p>
 </li>
 </ol>
