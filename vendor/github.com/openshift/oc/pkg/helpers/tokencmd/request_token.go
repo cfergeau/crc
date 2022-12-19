@@ -20,6 +20,8 @@ import (
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
 
+	"github.com/openshift/oc/pkg/version"
+
 	"github.com/openshift/library-go/pkg/oauth/oauthdiscovery"
 )
 
@@ -85,6 +87,8 @@ func NewRequestTokenOptions(clientCfg *restclient.Config, reader io.Reader, defa
 	// the SPNEGO ones must come before basic auth
 	var handlers []ChallengeHandler
 
+	serverVersionDetector := version.NewServerVersionRetriever(clientCfg)
+
 	if GSSAPIEnabled() {
 		klog.V(6).Info("GSSAPI Enabled")
 		handlers = append(handlers, NewNegotiateChallengeHandler(NewGSSAPINegotiator(defaultUsername)))
@@ -92,10 +96,10 @@ func NewRequestTokenOptions(clientCfg *restclient.Config, reader io.Reader, defa
 
 	if SSPIEnabled() {
 		klog.V(6).Info("SSPI Enabled")
-		handlers = append(handlers, NewNegotiateChallengeHandler(NewSSPINegotiator(defaultUsername, defaultPassword, clientCfg.Host, reader)))
+		handlers = append(handlers, NewNegotiateChallengeHandler(NewSSPINegotiator(defaultUsername, defaultPassword, clientCfg.Host, reader, serverVersionDetector)))
 	}
 
-	handlers = append(handlers, &BasicChallengeHandler{Host: clientCfg.Host, Reader: reader, Username: defaultUsername, Password: defaultPassword})
+	handlers = append(handlers, &BasicChallengeHandler{Host: clientCfg.Host, serverVersionRetriever: serverVersionDetector, Reader: reader, Username: defaultUsername, Password: defaultPassword})
 
 	var handler ChallengeHandler
 	if len(handlers) == 1 {
@@ -436,6 +440,7 @@ func transportWithSystemRoots(issuer string, clientConfig *restclient.Config) (h
 	resp.Body.Close()
 
 	_, err = verifyServerCertChain(issuerURL.Hostname(), resp.TLS.PeerCertificates)
+	klog.V(1).Infof("verifyServerCertChain return %T %v ", err, err)
 	switch err.(type) {
 	case nil:
 		// copy the config so we can freely mutate it
@@ -463,6 +468,12 @@ func transportWithSystemRoots(issuer string, clientConfig *restclient.Config) (h
 		klog.V(4).Infof("falling back to kubeconfig CA due to possible x509 error: %v", err)
 		return restclient.TransportFor(clientConfig)
 	default:
+		// TODO: this is a temporary workaround until issue is resolved in upstream Go: https://github.com/golang/go/issues/52010
+		if strings.Contains(err.Error(), "certificate is not trusted") {
+			klog.V(4).Infof("falling back to kubeconfig CA due to possible x509 error: %v", err)
+			return restclient.TransportFor(clientConfig)
+		}
+
 		switch err {
 		case io.EOF, io.ErrUnexpectedEOF, io.ErrNoProgress:
 			// also fallback on various io errors
