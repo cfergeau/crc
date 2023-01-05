@@ -35,10 +35,6 @@ func checkM1CPU() error {
 }
 
 func checkVfkitInstalled() error {
-	if version.IsInstaller() {
-		return nil
-	}
-
 	h := cache.NewVfkitCache()
 	if !h.IsCached() {
 		return fmt.Errorf("%s executable is not cached", h.GetExecutableName())
@@ -53,7 +49,7 @@ func checkVfkitInstalled() error {
 
 func fixVfkitInstallation() error {
 	if version.IsInstaller() {
-		return nil
+		return checkVfkitInstalled()
 	}
 
 	h := cache.NewVfkitCache()

@@ -122,10 +122,6 @@ func checkSuid(path string) error {
 
 // Check if helper executable is cached or not
 func checkAdminHelperExecutableCached() error {
-	if version.IsInstaller() {
-		return nil
-	}
-
 	helper := cache.NewAdminHelperCache()
 	if !helper.IsCached() {
 		return errors.New("crc-admin-helper executable is not cached")
@@ -139,7 +135,7 @@ func checkAdminHelperExecutableCached() error {
 
 func fixAdminHelperExecutableCached() error {
 	if version.IsInstaller() {
-		return nil
+		return checkAdminHelperExecutableCached()
 	}
 
 	helper := cache.NewAdminHelperCache()
