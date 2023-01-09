@@ -47,6 +47,15 @@ func genericPreflightChecks(preset crcpreset.Preset) []Check {
 			labels: None,
 		},
 		{
+			configKeySuffix:  "check-admin-helper-suid",
+			checkDescription: "Checking if crc-admin-helper executable is suid",
+			check:            checkAdminHelperSuid,
+			fixDescription:   "Making crc-admin-helper executable suid",
+			fix:              fixAdminHelperSuid,
+
+			labels: None,
+		},
+		{
 			configKeySuffix:  "check-supported-cpu-arch",
 			checkDescription: "Checking if running on a supported CPU architecture",
 			check:            checkSupportedCPUArch,
@@ -120,7 +129,6 @@ func checkSuid(path string) error {
 	return nil
 }
 
-// Check if helper executable is cached or not
 func checkAdminHelperExecutableCached() error {
 	helper := cache.NewAdminHelperCache()
 	if !helper.IsCached() {
@@ -130,7 +138,7 @@ func checkAdminHelperExecutableCached() error {
 		return errors.Wrap(err, "unexpected version of the crc-admin-helper executable")
 	}
 	logging.Debug("crc-admin-helper executable already cached")
-	return checkSuid(helper.GetExecutablePath())
+	return nil
 }
 
 func fixAdminHelperExecutableCached() error {
@@ -143,7 +151,15 @@ func fixAdminHelperExecutableCached() error {
 		return errors.Wrap(err, "Unable to download crc-admin-helper executable")
 	}
 	logging.Debug("crc-admin-helper executable cached")
-	return setSuid(helper.GetExecutablePath())
+	return nil
+}
+
+func checkAdminHelperSuid() error {
+	return checkSuid(constants.AdminHelperPath())
+}
+
+func fixAdminHelperSuid() error {
+	return setSuid(constants.AdminHelperPath())
 }
 
 func checkSupportedCPUArch() error {
