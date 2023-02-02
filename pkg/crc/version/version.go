@@ -14,6 +14,8 @@ import (
 	crcPreset "github.com/crc-org/crc/pkg/crc/preset"
 )
 
+//go:generate go run -tags genbuildparams ./genbuildparams.go $CRC_BUILD_PARAMS_PATH
+
 // The following variables are private fields and should be set when compiling with ldflags, for example --ldflags="-X github.com/crc-org/crc/pkg/version.crcVersion=vX.Y.Z
 var (
 	// The current version of minishift
@@ -135,4 +137,14 @@ func GetCRCLatestVersionFromMirror(transport http.RoundTripper) (*CrcReleaseInfo
 	}
 
 	return &releaseInfo, nil
+}
+
+func HelperPath(executableName string) string {
+	for _, helper := range helpers {
+		if helper.name == executableName {
+			return helper.path
+		}
+	}
+
+	return ""
 }

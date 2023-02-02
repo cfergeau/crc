@@ -132,6 +132,10 @@ func GetDefaultBundlePath(preset crcpreset.Preset) string {
 }
 
 func ResolveHelperPath(executableName string) string {
+	path := version.HelperPath(executableName)
+	if path != "" {
+		return path
+	}
 	if version.IsInstaller() {
 		return filepath.Join(version.InstallPath(), executableName)
 	}

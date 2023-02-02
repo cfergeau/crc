@@ -90,15 +90,19 @@ install: $(SOURCES)
 	go install -tags "$(BUILDTAGS)"  -ldflags="$(LDFLAGS)" $(GO_EXTRA_BUILDFLAGS) ./cmd/crc
 
 $(BUILD_DIR)/macos-amd64/crc: $(SOURCES)
+	go generate ./pkg/crc/version
 	GOARCH=amd64 GOOS=darwin go build -tags "$(BUILDTAGS)" -ldflags="$(LDFLAGS)" -o $(BUILD_DIR)/macos-amd64/crc $(GO_EXTRA_BUILDFLAGS) ./cmd/crc
 
 $(BUILD_DIR)/macos-arm64/crc: $(SOURCES)
+	go generate ./pkg/crc/version
 	GOARCH=arm64 GOOS=darwin go build -tags "$(BUILDTAGS)" -ldflags="$(LDFLAGS)" -o $@ $(GO_EXTRA_BUILDFLAGS) ./cmd/crc
 
 $(BUILD_DIR)/linux-amd64/crc: $(SOURCES)
+	go generate ./pkg/crc/version
 	GOOS=linux GOARCH=amd64 go build -tags "$(BUILDTAGS)" -ldflags="$(LDFLAGS)" -o $@ $(GO_EXTRA_BUILDFLAGS) ./cmd/crc
 
 $(BUILD_DIR)/windows-amd64/crc.exe: $(SOURCES)
+	go generate ./pkg/crc/version
 	GOARCH=amd64 GOOS=windows go build -tags "$(BUILDTAGS)" -ldflags="$(LDFLAGS)" -o $@ $(GO_EXTRA_BUILDFLAGS) ./cmd/crc
 
 $(HOST_BUILD_DIR)/crc-embedder: $(SOURCES)
