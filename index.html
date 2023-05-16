@@ -602,9 +602,8 @@ This can cause issues when, for example, a proxy is run in the same address spac
 <div class="sect3">
 <h4 id="minimum-system-requirements-hardware_gsg"><a class="anchor" href="#minimum-system-requirements-hardware_gsg"></a><a class="link" href="#minimum-system-requirements-hardware_gsg">2.1.1. Hardware requirements</a></h4>
 <div class="paragraph">
-<p>CRC is supported on AMD64 and Intel 64 processor architectures.
-The Podman container runtime preset is supported on the ARM-based M1 architecture.
-The OpenShift Container Platform preset is not supported on the M1 architecture.
+<p>CRC is supported on AMD64, Intel 64 processor and M1 architectures.
+The OKD preset is not supported on the M1 architecture.
 CRC does not support nested virtualization.</p>
 </div>
 <div class="paragraph">
@@ -625,6 +624,22 @@ CRC does not support nested virtualization.</p>
 </li>
 </ul>
 </div>
+</div>
+<div class="sect4">
+<h5 id="_for_microshift"><a class="anchor" href="#_for_microshift"></a><a class="link" href="#_for_microshift">For MicroShift</a></h5>
+<div class="ulist">
+<ul>
+<li>
+<p>2 physical CPU cores</p>
+</li>
+<li>
+<p>4 GB of free memory</p>
+</li>
+<li>
+<p>35 GB of storage space</p>
+</li>
+</ul>
+</div>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -633,7 +648,7 @@ CRC does not support nested virtualization.</p>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>The OpenShift Container Platform cluster requires these minimum resources to run in the CRC instance.
+<p>The OpenShift Container Platform and MicroShift presets require these minimum resources to run in the CRC instance.
 Some workloads may require more resources.
 To assign more resources to the CRC instance, see <a href="https://crc-org.github.io/crc/#configuring-the-instance_gsg">Configuring the instance</a>.</p>
 </div>
@@ -692,7 +707,7 @@ CRC does not work on earlier versions of macOS.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>On Linux, CRC is supported only on the latest two Red&#160;Hat Enterprise&#160;Linux/CentOS 7, 8 and 9 minor releases and on the latest two stable Fedora releases.</p>
+<p>On Linux, CRC is supported only on the latest two Red&#160;Hat Enterprise&#160;Linux/CentOS 8 and 9 minor releases and on the latest two stable Fedora releases.</p>
 </li>
 <li>
 <p>When using Red&#160;Hat Enterprise&#160;Linux, the machine running CRC must be <a href="https://access.redhat.com/solutions/253273">registered with the Red Hat Customer Portal</a>.</p>
@@ -957,7 +972,7 @@ Verify that the new <code class="command">crc</code> executable is in use by che
 <h3 id="about-presets_gsg"><a class="anchor" href="#about-presets_gsg"></a><a class="link" href="#about-presets_gsg">3.1. About presets</a></h3>
 <div class="paragraph _abstract">
 <p>CRC presets represent a managed container runtime and the lower bounds of system resources required by the instance to run it.
-CRC offers presets for OpenShift Container Platform, OKD and the Podman container runtime.</p>
+CRC offers presets for OpenShift Container Platform, OKD, MicroShift and the Podman container runtime.</p>
 </div>
 <div class="paragraph">
 <p>On Microsoft Windows and macOS, the CRC guided installer prompts you for your desired preset.
@@ -1892,8 +1907,7 @@ Ensure that the following IP subnets are available for use:</p>
 </div>
 <div class="paragraph">
 <p>Additionally, the host hypervisor may reserve another IP subnet depending on the host operating system.
-On Microsoft Windows, the hypervisor reserves a randomly generated IP subnet that cannot be determined ahead-of-time.
-No additional subnet is reserved on macOS.
+No additional subnet is reserved on macOS and Microsoft Windows.
 The additional reserved subnet for Linux is <code>192.168.130.0/24</code>.</p>
 </div>
 </div>
@@ -2394,7 +2408,7 @@ crc-shdl4-master-0   Ready    master,worker   7d7h   v1.14.6+7e13ab9a7</pre>
 <div class="sect2">
 <h3 id="troubleshooting-expired-certificates_gsg"><a class="anchor" href="#troubleshooting-expired-certificates_gsg"></a><a class="link" href="#troubleshooting-expired-certificates_gsg">7.2. Troubleshooting expired certificates</a></h3>
 <div class="paragraph">
-<p>The system bundle in each released <code class="command">crc</code> executable expires 30 days after the release.
+<p>The system bundle of OpenShift Container Platform in each released <code class="command">crc</code> executable expires 1 year after the release.
 This expiration is due to certificates embedded in the OpenShift Container Platform cluster.
 The <code class="command">crc start</code> command triggers an automatic certificate renewal process when needed.
 Certificate renewal can add up to five minutes to the start time of the cluster.</p>
