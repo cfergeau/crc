@@ -112,8 +112,7 @@ func (client *client) updateVMConfig(startConfig types.StartConfig, vm *virtualM
 
 func growRootFileSystem(sshRunner *crcssh.Runner, preset crcPreset.Preset) error {
 	if preset == crcPreset.Microshift {
-		logging.Debugf("growRootFileSystem does not support LVM which is used by %s images", preset)
-		return nil
+		return growLVForMicroshift(sshRunner)
 	}
 	// With 4.7, this is quite a manual process until https://github.com/openshift/installer/pull/4746 gets fixed
 	// See https://github.com/crc-org/crc/issues/2104 for details
@@ -161,6 +160,56 @@ func runGrowpart(sshRunner *crcssh.Runner, rootPart string) error {
 	}
 
 	logging.Debugf("No free space after %s, nothing to do", rootPart)
+	return nil
+}
+
+func growLVForMicroshift(sshRunner *crcssh.Runner) error {
+	rootPart, err := getrootPartition(sshRunner, "/dev/disk/by-id/lvm-pv-*")
+	if err != nil {
+		return err
+	}
+	if err := runGrowpart(sshRunner, rootPart); err != nil {
+		return err
+	}
+
+	if _, _, err := sshRunner.RunPrivileged("Resizing the physical volume(PV)", "/usr/sbin/pvresize", rootPart); err != nil {
+		return err
+	}
+
+	// Get the size of volume group
+	// $ sudo vgs --noheadings --nosuffix --units g -o vg_size
+	//   39.02
+	sizeVG, _, err := sshRunner.RunPrivileged("Get the volume group size", "/usr/sbin/vgs", "--noheadings", "--nosuffix", "--units", "g", "-o", "vg_size")
+	if err != nil {
+		return err
+	}
+	vgSize, err := strconv.ParseFloat(strings.TrimSpace(sizeVG), 64)
+	if err != nil {
+		return err
+	}
+
+	// Get the free space for volume group
+	// $ sudo vgs --noheadings --nosuffix --units g -o vg_free
+	//   7.51
+	freeVG, _, err := sshRunner.RunPrivileged("Get the free space for volume group", "/usr/sbin/vgs", "--noheadings", "--nosuffix", "--units", "g", "-o", "vg_free")
+	if err != nil {
+		return err
+	}
+	vgFree, err := strconv.ParseFloat(strings.TrimSpace(freeVG), 64)
+	if err != nil {
+		return err
+	}
+
+	// We want to expand the `/dev/rhel/root` vg in case the free size of volume group is greater than half of total size
+	// since that vg contain the `/sysroot` so we need to extend it to accommodate more container images. Free size is
+	// used by logical volume manager storage (LVMS) Container Storage Interface (CSI) provider for storing PVs.
+	sizeDiff := vgFree - vgSize/2
+	if sizeDiff > 1 {
+		logging.Info("Extending and resizing '/dev/rhel/root' logical volume")
+		if _, _, err := sshRunner.RunPrivileged("Extending and resizing the logical volume(LV)", "/usr/sbin/lvextend", "-r", "-L", fmt.Sprintf("+%fg", sizeDiff), "/dev/rhel/root"); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
