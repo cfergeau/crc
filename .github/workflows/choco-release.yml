@@ -21,17 +21,12 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go }}
-      - name: Build the chocolatey package
-        run: make choco
-      - name: Add api key for choco community feed
-        shell: pwsh
-        env:
-          CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
-        run: choco apikey --key "$env:CHOCO_API_KEY" --source https://push.chocolatey.org/
-      - name: Push the choco to community.chocolatey.org
-        run: choco push ./packaging/chocolatey/crc/*.nupkg --source https://push.chocolatey.org/
-      - name: Upload nupkg artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: crc-chocolatey-nupkg-${{ github.event.release.tag_name }}
-          path: "./packaging/chocolatey/crc/*.nupkg"
+      - name: env test
+        env: 
+          ENV_TEST: ${{ github.event.release.tag_name }}
+        run: echo ${ENV_TEST}
+      - name: env test2
+        run: echo ${GITHUB_REF_NAME}; echo $GITHUB_REF_NAME
+        shell: bash
+      - name: event test
+        run: echo "${{ github.event.release.tag_name }}"
