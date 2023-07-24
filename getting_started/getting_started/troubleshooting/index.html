@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Troubleshooting CRC :: CRC Documentation</title>
+    <link rel="canonical" href="https://crc.dev/getting_started/getting_started/troubleshooting/">
+    <meta name="description" content="Troubleshooting CRC">
+    <meta name="generator" content="Antora 3.1.4">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-item">
+                <button class="navbar-burger" data-target="topbar-nav">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <a href="https://crc.dev/">CRC Documentation</a>
+            </div>
+        </div>
+        <div id="topbar-nav" class="navbar-menu">
+            <div class="navbar-end">
+                <div class="navbar-item search hide-for-print">
+                    <div id="search-field" class="field">
+                        <input id="search-input" type="text" placeholder="Search the docs">
+                    </div>
+                </div>
+                <a class="navbar-item" href="https://crc.dev">Home</a>
+                <a class="navbar-item" href="https://github.com/crc-org/crc">Source Code</a>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="getting_started" data-version="">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../introducing/">Getting started with CRC</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../introducing/">Introducing CRC</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../installing/">Installing CRC</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../using/">Using CRC</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../configuring/">Configuring CRC</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../networking/">Networking</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../administrative-tasks/">Administrative tasks</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="./">Troubleshooting CRC</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Getting started with CRC</span>
+    <span class="version">default</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../introducing/">Getting started with CRC</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../introducing/">default</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../introducing/" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../introducing/">Getting started with CRC</a></li>
+    <li><a href="./">Troubleshooting CRC</a></li>
+  </ul>
+</nav>
+<div class="edit-this-page"><a href="file:///antora/docs/modules/getting_started/pages/troubleshooting.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Troubleshooting CRC</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The goal of CRC is to deliver an OpenShift Container Platform environment for development and testing purposes.
+Issues occurring during installation or usage of specific OpenShift applications are outside of the scope of CRC.
+Report such issues to the relevant project.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_getting_shell_access_to_the_openshift_cluster"><a class="anchor" href="#_getting_shell_access_to_the_openshift_cluster"></a>Getting shell access to the OpenShift cluster</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To access the cluster for troubleshooting or debugging purposes, follow this procedure.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Direct access to the OpenShift Container Platform cluster is not needed for regular use and is strongly discouraged.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<div class="title">Prerequisites</div>
+<ul>
+<li>
+<p>Enable OpenShift CLI (<code class="command">oc</code>) access to the cluster and log in as the <code>kubeadmin</code> user.
+For detailed steps, see <a href="https://crc-org.github.io/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with the OpenShift CLI</a>.</p>
+</li>
+</ul>
+</div>
+<div class="olist arabic">
+<div class="title">Procedure</div>
+<ol class="arabic">
+<li>
+<p>Run the <code class="command">oc get nodes</code> command to identify the desired node.
+The output will be similar to this:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ oc get nodes
+NAME                 STATUS   ROLES           AGE    VERSION
+crc-shdl4-master-0   Ready    master,worker   7d7h   v1.14.6+7e13ab9a7</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Run <code class="command">oc debug nodes/<em>&lt;node&gt;</em></code> where <code><em>&lt;node&gt;</em></code> is the name of the node printed in the previous step.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_troubleshooting_expired_certificates"><a class="anchor" href="#_troubleshooting_expired_certificates"></a>Troubleshooting expired certificates</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The system bundle of OpenShift Container Platform in each released <code class="command">crc</code> executable expires 1 year after the release.
+This expiration is due to certificates embedded in the OpenShift Container Platform cluster.
+The <code class="command">crc start</code> command triggers an automatic certificate renewal process when needed.
+Certificate renewal can add up to five minutes to the start time of the cluster.</p>
+</div>
+<div class="paragraph">
+<p>To avoid this additional startup time, or in case of failures in the certificate renewal process, use the following procedure:</p>
+</div>
+<div class="paragraph">
+<div class="title">Procedure</div>
+<p>To resolve expired certificate errors that cannot be automatically renewed:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><a href="https://console.redhat.com/openshift/create/local">Download the latest CRC release</a> and place the <code class="command">crc</code> executable in your <code>$PATH</code>.</p>
+</li>
+<li>
+<p>Remove the cluster with certificate errors using the <code class="command">crc delete</code> command:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc delete</pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code class="command">crc delete</code> command results in the loss of data stored in the CRC instance.
+Save any desired information stored in the instance before running this command.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Set up the new release:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc setup</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Start the new instance:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc start</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_troubleshooting_bundle_version_mismatch"><a class="anchor" href="#_troubleshooting_bundle_version_mismatch"></a>Troubleshooting bundle version mismatch</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Created CRC instances contain bundle information and instance data.
+Bundle information and instance data is not updated when setting up a new CRC release.
+This information is not updated due to customization in the earlier instance data.
+This will lead to errors when running the <code class="command">crc start</code> command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc start
+...
+FATA Bundle 'crc_hyperkit_4.2.8.crcbundle' was requested, but the existing VM is using
+'crc_hyperkit_4.2.2.crcbundle'</pre>
+</div>
+</div>
+<div class="olist arabic">
+<div class="title">Procedure</div>
+<ol class="arabic">
+<li>
+<p>Issue the <code class="command">crc delete</code> command before attempting to start the instance:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc delete</pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code class="command">crc delete</code> command results in the loss of data stored in the CRC instance.
+Save any desired information stored in the instance before running this command.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_troubleshooting_unknown_issues"><a class="anchor" href="#_troubleshooting_unknown_issues"></a>Troubleshooting unknown issues</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Resolve most issues by restarting CRC with a clean state.
+This involves stopping the instance, deleting it, reverting changes made by the <code class="command">crc setup</code> command, reapplying those changes, and restarting the instance.</p>
+</div>
+<div class="ulist">
+<div class="title">Prerequisites</div>
+<ul>
+<li>
+<p>You set up the host machine with the <code class="command">crc setup</code> command.
+For more information, see <a href="https://crc-org.github.io/crc/#setting-up_gsg">Setting up CRC</a>.</p>
+</li>
+<li>
+<p>You started CRC with the <code class="command">crc start</code> command.
+For more information, see <a href="https://crc-org.github.io/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
+</li>
+<li>
+<p>You are using the latest CRC release.
+Using a version earlier than CRC 1.2.0 might result in errors related to expired x509 certificates.
+For more information, see <a href="https://crc-org.github.io/crc/#troubleshooting-expired-certificates_gsg">Troubleshooting expired certificates</a>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<div class="title">Procedure</div>
+<p>To troubleshoot CRC, perform the following steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Stop the CRC instance:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc stop</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Delete the CRC instance:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc delete</pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code class="command">crc delete</code> command results in the loss of data stored in the CRC instance.
+Save any desired information stored in the instance before running this command.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Clean up remaining changes from the <code class="command">crc setup</code> command:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc cleanup</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code class="command">crc cleanup</code> command removes an existing CRC instance and reverts changes to DNS entries created by the <code class="command">crc setup</code> command.
+On macOS, the <code class="command">crc cleanup</code> command also removes the system tray.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Set up your host machine to reapply the changes:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc setup</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Start the CRC instance:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc start</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The cluster takes a minimum of four minutes to start the necessary containers and Operators before serving a request.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>If your issue is not resolved by this procedure, perform the following steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><a href="https://github.com/crc-org/crc/issues">Search open issues</a> for the issue that you are encountering.</p>
+</li>
+<li>
+<p>If no existing issue addresses the encountered issue, <a href="https://github.com/crc-org/crc/issues/new">create an issue</a> and <a href="https://help.github.com/en/articles/file-attachments-on-issues-and-pull-requests">attach the <strong class="filename"><em>~/.crc/crc.log</em></strong> file</a> to the created issue.
+The <strong class="filename"><em>~/.crc/crc.log</em></strong> file has detailed debugging and troubleshooting information which can help diagnose the problem that you are experiencing.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

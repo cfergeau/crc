@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Installing CRC :: CRC Documentation</title>
+    <link rel="canonical" href="https://crc.dev/getting_started/getting_started/installing/">
+    <meta name="description" content="Installing CRC">
+    <meta name="generator" content="Antora 3.1.4">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-item">
+                <button class="navbar-burger" data-target="topbar-nav">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <a href="https://crc.dev/">CRC Documentation</a>
+            </div>
+        </div>
+        <div id="topbar-nav" class="navbar-menu">
+            <div class="navbar-end">
+                <div class="navbar-item search hide-for-print">
+                    <div id="search-field" class="field">
+                        <input id="search-input" type="text" placeholder="Search the docs">
+                    </div>
+                </div>
+                <a class="navbar-item" href="https://crc.dev">Home</a>
+                <a class="navbar-item" href="https://github.com/crc-org/crc">Source Code</a>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="getting_started" data-version="">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../introducing/">Getting started with CRC</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../introducing/">Introducing CRC</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="./">Installing CRC</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../using/">Using CRC</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../configuring/">Configuring CRC</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../networking/">Networking</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../administrative-tasks/">Administrative tasks</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../troubleshooting/">Troubleshooting CRC</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Getting started with CRC</span>
+    <span class="version">default</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../introducing/">Getting started with CRC</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../introducing/">default</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../introducing/" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../introducing/">Getting started with CRC</a></li>
+    <li><a href="./">Installing CRC</a></li>
+  </ul>
+</nav>
+<div class="edit-this-page"><a href="file:///antora/docs/modules/getting_started/pages/installing.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Installing CRC</h1>
+<div class="sect1">
+<h2 id="_minimum_system_requirements"><a class="anchor" href="#_minimum_system_requirements"></a>Minimum system requirements</h2>
+<div class="sectionbody">
+<div class="paragraph _abstract">
+<p>CRC has the following minimum hardware and operating system requirements.</p>
+</div>
+<div class="sect2">
+<h3 id="_hardware_requirements"><a class="anchor" href="#_hardware_requirements"></a>Hardware requirements</h3>
+<div class="paragraph">
+<p>CRC is supported on these architectures:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. Preset and architecture compatibility</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 16.6666%;">
+<col style="width: 16.6666%;">
+<col style="width: 16.6668%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Preset</th>
+<th class="tableblock halign-left valign-top">AMD64</th>
+<th class="tableblock halign-left valign-top">Intel 64</th>
+<th class="tableblock halign-left valign-top">M1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OpenShift Container Platform</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OKD</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">no</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MicroShift</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Podman container runtime</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">yes</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>CRC does not support nested virtualization.</p>
+</div>
+<div class="paragraph">
+<p>Depending on the desired container runtime, CRC requires the following system resources:</p>
+</div>
+<div class="sect3">
+<h4 id="_for_openshift_container_platform"><a class="anchor" href="#_for_openshift_container_platform"></a>For OpenShift Container Platform</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>4 physical CPU cores</p>
+</li>
+<li>
+<p>9 GB of free memory</p>
+</li>
+<li>
+<p>35 GB of storage space</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_for_microshift"><a class="anchor" href="#_for_microshift"></a>For MicroShift</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>2 physical CPU cores</p>
+</li>
+<li>
+<p>4 GB of free memory</p>
+</li>
+<li>
+<p>35 GB of storage space</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The OpenShift Container Platform and MicroShift presets require these minimum resources to run in the CRC instance.
+Some workloads might require more resources.
+To assign more resources to the CRC instance, see <a href="https://crc-org.github.io/crc/#configuring-the-instance_gsg">Configuring the instance</a>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_for_the_podman_container_runtime"><a class="anchor" href="#_for_the_podman_container_runtime"></a>For the Podman container runtime</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>2 physical CPU cores</p>
+</li>
+<li>
+<p>2 GB of free memory</p>
+</li>
+<li>
+<p>35 GB of storage space</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_operating_system_requirements"><a class="anchor" href="#_operating_system_requirements"></a>Operating system requirements</h3>
+<div class="paragraph">
+<p>CRC requires the following minimum version of a supported operating system:</p>
+</div>
+<div class="sect3">
+<h4 id="_requirements_on_microsoft_windows"><a class="anchor" href="#_requirements_on_microsoft_windows"></a>Requirements on Microsoft Windows</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>On Microsoft Windows, CRC requires the Windows 10 Fall Creators Update (version 1709) or later.
+CRC does not work on earlier versions of Microsoft Windows.
+Microsoft Windows 10 Home Edition is not supported.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_requirements_on_macos"><a class="anchor" href="#_requirements_on_macos"></a>Requirements on macOS</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>On macOS, CRC requires macOS 11 Big Sur or later.
+CRC does not work on earlier versions of macOS.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_requirements_on_linux"><a class="anchor" href="#_requirements_on_linux"></a>Requirements on Linux</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>On Linux, CRC is supported only on the latest two Red&#160;Hat Enterprise&#160;Linux/CentOS 8 and 9 minor releases and on the latest two stable Fedora releases.</p>
+</li>
+<li>
+<p>When using Red&#160;Hat Enterprise&#160;Linux, the machine running CRC must be <a href="https://access.redhat.com/solutions/253273">registered with the Red Hat Customer Portal</a>.</p>
+</li>
+<li>
+<p>Ubuntu 18.04 LTS or later and Debian 10 or later are not supported and might require manual set up of the host machine.</p>
+</li>
+<li>
+<p>See <a href="https://crc-org.github.io/crc/#required-software-packages_gsg">Required software packages</a> to install the required packages for your Linux distribution.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_required_software_packages_for_linux"><a class="anchor" href="#_required_software_packages_for_linux"></a>Required software packages for Linux</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>CRC requires the <code>libvirt</code> and <code>NetworkManager</code> packages to run on Linux.
+Consult the following table to find the command used to install these packages for your Linux distribution:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. Package installation commands by distribution</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Linux Distribution</th>
+<th class="tableblock halign-left valign-top">Installation command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Fedora/Red&#160;Hat Enterprise&#160;Linux/CentOS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sudo dnf install NetworkManager</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Debian/Ubuntu</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>sudo apt install qemu-kvm libvirt-daemon libvirt-daemon-system network-manager</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_installing_crc"><a class="anchor" href="#_installing_crc"></a>Installing CRC</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>CRC is available as a portable executable for Red&#160;Hat Enterprise&#160;Linux.
+On Microsoft Windows and macOS, CRC is available using a guided installer.</p>
+</div>
+<div class="ulist">
+<div class="title">Prerequisites</div>
+<ul>
+<li>
+<p>Your host machine must meet the minimum system requirements.
+For more information, see <a href="https://crc-org.github.io/crc/#minimum-system-requirements_gsg">Minimum system requirements</a>.</p>
+</li>
+</ul>
+</div>
+<div class="olist arabic">
+<div class="title">Procedure</div>
+<ol class="arabic">
+<li>
+<p>Download the <a href="https://console.redhat.com/openshift/create/local">latest release of CRC</a> for your platform.</p>
+</li>
+<li>
+<p>On Microsoft Windows, extract the contents of the archive.</p>
+</li>
+<li>
+<p>On macOS or Microsoft Windows, run the guided installer and follow the instructions.</p>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>On Microsoft Windows, you must install CRC to your local <strong class="filename"><em>C:\</em></strong> drive.
+You cannot run CRC from a network drive.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>On Red&#160;Hat Enterprise&#160;Linux, assuming the archive is in the <strong class="filename"><em>~/Downloads</em></strong> directory, follow these steps:</p>
+</div>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Extract the contents of the archive:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ cd ~/Downloads
+$ tar xvf crc-linux-amd64.tar.xz</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create the <strong class="filename"><em>~/bin</em></strong> directory if it does not exist and copy the <code class="command">crc</code> executable to it:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ mkdir -p ~/bin
+$ cp ~/Downloads/crc-linux-*-amd64/crc ~/bin</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Add the <strong class="filename"><em>~/bin</em></strong> directory to your <code>$PATH</code>:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ export PATH=$PATH:$HOME/bin
+$ echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_about_usage_data_collection"><a class="anchor" href="#_about_usage_data_collection"></a>About usage data collection</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>CRC prompts you before use for optional, anonymous usage data collection to assist with development.
+No personally identifiable information is collected.
+Consent for usage data collection can be granted or revoked by you at any time.</p>
+</div>
+<div class="ulist _additional-resources">
+<div class="title">Additional resources</div>
+<ul>
+<li>
+<p>For more information about collected data, see the Red&#160;Hat <a href="https://developers.redhat.com/article/tool-data-collection">Telemetry data collection notice</a>.</p>
+</li>
+<li>
+<p>To grant or revoke consent for usage data collection, see <a href="https://crc-org.github.io/crc/#configuring-usage-data-collection_gsg">Configuring usage data collection</a>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_configuring_usage_data_collection"><a class="anchor" href="#_configuring_usage_data_collection"></a>Configuring usage data collection</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Consent for usage data collection can be granted or revoked by you at any time using the following configuration commands.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Changes to telemetry consent do not modify a running instance.
+The change will take effect next time you run the <code class="command">crc start</code> command.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<div class="title">Procedure</div>
+<ul>
+<li>
+<p>To manually enable telemetry, run the following command:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc config set consent-telemetry yes</pre>
+</div>
+</div>
+</li>
+<li>
+<p>To manually disable telemetry, run the following command:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc config set consent-telemetry no</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist _additional-resources">
+<div class="title">Additional resources</div>
+<ul>
+<li>
+<p>For more information about the collected data, see the Red&#160;Hat <a href="https://developers.redhat.com/article/tool-data-collection">Telemetry data collection notice</a>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_upgrading_crc"><a class="anchor" href="#_upgrading_crc"></a>Upgrading CRC</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Newer versions of the CRC executable require manual set up to prevent potential incompatibilities with earlier versions.</p>
+</div>
+<div class="olist arabic">
+<div class="title">Procedure</div>
+<ol class="arabic">
+<li>
+<p><a href="https://console.redhat.com/openshift/create/local">Download the latest release of CRC</a>.</p>
+</li>
+<li>
+<p>Delete the existing CRC instance:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc delete</pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code class="command">crc delete</code> command results in the loss of data stored in the CRC instance.
+Save any desired information stored in the instance before running this command.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Replace the earlier <code class="command">crc</code> executable with the executable of the latest release.
+Verify that the new <code class="command">crc</code> executable is in use by checking its version:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc version</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Set up the new CRC release:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc setup</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Start the new CRC instance:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc start</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

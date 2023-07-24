@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Using CRC :: CRC Documentation</title>
+    <link rel="canonical" href="https://crc.dev/getting_started/getting_started/using/">
+    <meta name="generator" content="Antora 3.1.4">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-item">
+                <button class="navbar-burger" data-target="topbar-nav">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <a href="https://crc.dev/">CRC Documentation</a>
+            </div>
+        </div>
+        <div id="topbar-nav" class="navbar-menu">
+            <div class="navbar-end">
+                <div class="navbar-item search hide-for-print">
+                    <div id="search-field" class="field">
+                        <input id="search-input" type="text" placeholder="Search the docs">
+                    </div>
+                </div>
+                <a class="navbar-item" href="https://crc.dev">Home</a>
+                <a class="navbar-item" href="https://github.com/crc-org/crc">Source Code</a>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="getting_started" data-version="">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../introducing/">Getting started with CRC</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../introducing/">Introducing CRC</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../installing/">Installing CRC</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="./">Using CRC</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../configuring/">Configuring CRC</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../networking/">Networking</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../administrative-tasks/">Administrative tasks</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../troubleshooting/">Troubleshooting CRC</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Getting started with CRC</span>
+    <span class="version">default</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../introducing/">Getting started with CRC</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../introducing/">default</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../introducing/" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../introducing/">Getting started with CRC</a></li>
+    <li><a href="./">Using CRC</a></li>
+  </ul>
+</nav>
+<div class="edit-this-page"><a href="file:///antora/docs/modules/getting_started/pages/using.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Using CRC</h1>
+<div class="sect1">
+<h2 id="_about_presets"><a class="anchor" href="#_about_presets"></a>About presets</h2>
+<div class="sectionbody">
+<div class="paragraph _abstract">
+<p>CRC presets represent a managed container runtime, and the lower bounds of system resources required by the instance to run it.
+CRC offers presets for:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>openshift</code></dt>
+<dd>
+<p>OpenShift Container Platform</p>
+</dd>
+<dt class="hdlist1"><code>okd</code></dt>
+<dd>
+<p>OKD</p>
+</dd>
+<dt class="hdlist1"><code>microshift</code></dt>
+<dd>
+<p>MicroShift</p>
+</dd>
+<dt class="hdlist1"><code>podman</code></dt>
+<dd>
+<p>Podman container runtime</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>On Microsoft Windows and macOS, the CRC guided installer prompts you for your desired preset.
+On Linux, the OpenShift Container Platform preset is selected by default.
+You can change this selection using the <code class="command">crc config</code> command before running the <code class="command">crc setup</code> command.
+You can change your selected preset from the system tray on Microsoft Windows and macOS or from the command line on all supported operating systems.
+Only one preset can be active at a time.</p>
+</div>
+<div class="ulist _additional-resources">
+<div class="title">Additional resources</div>
+<ul>
+<li>
+<p>For more information about the minimum system requirements for each preset, see <a href="https://crc-org.github.io/crc/#minimum-system-requirements_gsg">Minimum system requirements</a>.</p>
+</li>
+<li>
+<p>For more information on changing the selected preset, see <a href="https://crc-org.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_setting_up_crc"><a class="anchor" href="#_setting_up_crc"></a>Setting up CRC</h2>
+<div class="sectionbody">
+<div class="paragraph _abstract">
+<p>The <code class="command">crc setup</code> command performs operations to set up the environment of your host machine for the CRC instance.</p>
+</div>
+<div class="paragraph">
+<p>The <code class="command">crc setup</code> command creates the <strong class="filename"><em>~/.crc</em></strong> directory if it does not already exist.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If you are setting up a new version, capture any changes made to the instance before setting up a new CRC release.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<div class="title">Prerequisites</div>
+<ul>
+<li>
+<p>On Linux or macOS, ensure that your user account has permission to use the <code class="command">sudo</code> command.
+On Microsoft Windows, ensure that your user account can elevate to Administrator privileges.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Do not run the <code class="command">crc</code> executable as the <code>root</code> user or an administrator.
+Always run the <code class="command">crc</code> executable with your user account.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="olist arabic">
+<div class="title">Procedure</div>
+<ol class="arabic">
+<li>
+<p>(Optional) On Linux, the OpenShift Container Platform preset is selected by default.
+To select the Podman container runtime preset:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc config set preset podman</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Set up your host machine for CRC:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc setup</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="ulist _additional-resources">
+<div class="title">Additional resources</div>
+<ul>
+<li>
+<p>For more information about the available container runtime presets, see <a href="https://crc-org.github.io/crc/#about-presets_gsg">About presets</a>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_starting_the_instance"><a class="anchor" href="#_starting_the_instance"></a>Starting the instance</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code class="command">crc start</code> command starts the CRC instance and configured container runtime.</p>
+</div>
+<div class="ulist">
+<div class="title">Prerequisites</div>
+<ul>
+<li>
+<p>To avoid networking-related issues, ensure that you are not connected to a VPN and that your network connection is reliable.</p>
+</li>
+<li>
+<p>You set up the host machine using the <code class="command">crc setup</code> command.
+For more information, see <a href="https://crc-org.github.io/crc/#setting-up_gsg">Setting up CRC</a>.</p>
+</li>
+<li>
+<p>On Microsoft Windows, ensure that your user account can elevate to Administrator privileges.</p>
+</li>
+<li>
+<p>For the OpenShift preset, ensure that you have a valid OpenShift user pull secret.
+Copy or download the pull secret from the Pull Secret section of the <a href="https://console.redhat.com/openshift/create/local">CRC page on the Red&#160;Hat Hybrid Cloud Console</a>.</p>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Accessing the user pull secret requires a Red Hat account.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ul>
+</div>
+<div class="olist arabic">
+<div class="title">Procedure</div>
+<ol class="arabic">
+<li>
+<p>Start the CRC instance:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc start</pre>
+</div>
+</div>
+</li>
+<li>
+<p>For the OpenShift preset, supply your user pull secret when prompted.</p>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The cluster takes a minimum of four minutes to start the necessary containers and Operators before serving a request.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+<div class="ulist">
+<div class="title">Additional resources</div>
+<ul>
+<li>
+<p>To change the default resources allocated to the instance, see <a href="https://crc-org.github.io/crc/#configuring-the-instance_gsg">Configuring the instance</a>.</p>
+</li>
+<li>
+<p>If you see errors during <code class="command">crc start</code>, see the <a href="https://crc-org.github.io/crc/#troubleshooting_gsg">Troubleshooting CRC</a> section for potential solutions.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_accessing_the_openshift_cluster"><a class="anchor" href="#_accessing_the_openshift_cluster"></a>Accessing the OpenShift cluster</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Access the OpenShift Container Platform cluster running in the CRC instance by using the OpenShift Container Platform web console or OpenShift CLI (<code class="command">oc</code>).</p>
+</div>
+<div class="sect2">
+<h3 id="_accessing_the_openshift_web_console"><a class="anchor" href="#_accessing_the_openshift_web_console"></a>Accessing the OpenShift web console</h3>
+<div class="paragraph">
+<p>Access the OpenShift Container Platform web console by using your web browser.</p>
+</div>
+<div class="paragraph">
+<p>Access the cluster by using either the <code>kubeadmin</code> or <code>developer</code> user.
+Use the <code>developer</code> user for creating projects or OpenShift applications and for application deployment.
+Use the <code>kubeadmin</code> user only for administrative tasks such as creating new users or setting roles.</p>
+</div>
+<div class="ulist">
+<div class="title">Prerequisites</div>
+<ul>
+<li>
+<p>CRC is configured to use the OpenShift preset.
+For more information, see <a href="https://crc-org.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
+</li>
+<li>
+<p>A running CRC instance.
+For more information, see <a href="https://crc-org.github.io/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
+</li>
+</ul>
+</div>
+<div class="olist arabic">
+<div class="title">Procedure</div>
+<ol class="arabic">
+<li>
+<p>To access the OpenShift Container Platform web console with your default web browser, run the following command:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc console</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Log in as the <code>developer</code> user with the password printed in the output of the <code class="command">crc start</code> command.
+You can also view the password for the <code>developer</code> and <code>kubeadmin</code> users by running the following command:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc console --credentials</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>See <a href="https://crc-org.github.io/crc/#troubleshooting_gsg">Troubleshooting CRC</a> if you cannot access the OpenShift Container Platform cluster managed by CRC.</p>
+</div>
+<div class="ulist">
+<div class="title">Additional resources</div>
+<ul>
+<li>
+<p>The <a href="https://docs.openshift.com/container-platform/latest/applications/projects/working-with-projects.html">OpenShift Container Platform documentation</a> covers the creation of projects and applications.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_accessing_the_openshift_cluster_with_the_openshift_cli"><a class="anchor" href="#_accessing_the_openshift_cluster_with_the_openshift_cli"></a>Accessing the OpenShift cluster with the OpenShift CLI</h3>
+<div class="paragraph">
+<p>Access the OpenShift Container Platform cluster managed by CRC by using the OpenShift CLI (<code class="command">oc</code>).</p>
+</div>
+<div class="ulist">
+<div class="title">Prerequisites</div>
+<ul>
+<li>
+<p>CRC is configured to use the OpenShift preset.
+For more information, see <a href="https://crc-org.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
+</li>
+<li>
+<p>A running CRC instance.
+For more information, see <a href="https://crc-org.github.io/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
+</li>
+</ul>
+</div>
+<div class="olist arabic">
+<div class="title">Procedure</div>
+<ol class="arabic">
+<li>
+<p>Run the <code class="command">crc oc-env</code> command to print the command needed to add the cached <code class="command">oc</code> executable to your <code>$PATH</code>:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc oc-env</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Run the printed command.</p>
+</li>
+<li>
+<p>Log in as the <code>developer</code> user:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc login -u developer https://api.crc.testing:6443</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code class="command">crc start</code> command prints the password for the <code>developer</code> user.
+You can also view it by running the <code class="command">crc console --credentials</code> command.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>You can now use <code class="command">oc</code> to interact with your OpenShift Container Platform cluster.
+For example, to verify that the OpenShift Container Platform cluster Operators are available, log in as the <code>kubeadmin</code> user and run the following command:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ oc config use-context crc-admin
+$ oc whoami
+kubeadmin
+$ oc get co</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>CRC disables the Cluster Monitoring Operator by default.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>See <a href="https://crc-org.github.io/crc/#troubleshooting_gsg">Troubleshooting CRC</a> if you cannot access the OpenShift Container Platform cluster managed by CRC.</p>
+</div>
+<div class="ulist">
+<div class="title">Additional resources</div>
+<ul>
+<li>
+<p>The <a href="https://docs.openshift.com/container-platform/latest/applications/projects/working-with-projects.html">OpenShift Container Platform documentation</a> covers the creation of projects and applications.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_accessing_the_internal_openshift_registry"><a class="anchor" href="#_accessing_the_internal_openshift_registry"></a>Accessing the internal OpenShift registry</h3>
+<div class="paragraph">
+<p>The OpenShift Container Platform cluster running in the CRC instance includes an internal container image registry by default.
+This internal container image registry can be used as a publication target for locally developed container images.
+To access the internal OpenShift Container Platform registry, follow these steps.</p>
+</div>
+<div class="ulist">
+<div class="title">Prerequisites</div>
+<ul>
+<li>
+<p>CRC is configured to use the OpenShift preset.
+For more information, see <a href="https://crc-org.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
+</li>
+<li>
+<p>A running CRC instance.
+For more information, see <a href="https://crc-org.github.io/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
+</li>
+<li>
+<p>A working OpenShift CLI (<code class="command">oc</code>) command.
+For more information, see <a href="https://crc-org.github.io/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with the OpenShift CLI</a>.</p>
+</li>
+</ul>
+</div>
+<div class="olist arabic">
+<div class="title">Procedure</div>
+<ol class="arabic">
+<li>
+<p>Check which user is logged in to the cluster:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc whoami</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>For demonstration purposes, the current user is assumed to be <code>kubeadmin</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Log in to the registry as that user with its token:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc registry login --insecure=true</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create a new project:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc new-project demo</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Mirror an example container image:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc image mirror registry.access.redhat.com/ubi8/ubi:latest=default-route-openshift-image-registry.apps-crc.testing/demo/ubi8:latest --insecure=true --filter-by-os=linux/amd64</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Get imagestreams and verify that the pushed image is listed:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc get is</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Enable image lookup in the imagestream:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc set image-lookup ubi8</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This setting allows the imagestream to be the source of images without having to provide the full URL to the internal registry.</p>
+</div>
+</li>
+<li>
+<p>Create a pod using the recently pushed image:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc run demo --image=ubi8 --command -- sleep 600s</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_deploying_a_sample_application_with_odo"><a class="anchor" href="#_deploying_a_sample_application_with_odo"></a>Deploying a sample application with <code>odo</code></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can use <code class="command">odo</code> to create OpenShift projects and applications from the command line.
+This procedure deploys a sample application to the OpenShift Container Platform cluster running in the CRC instance.</p>
+</div>
+<div class="ulist">
+<div class="title">Prerequisites</div>
+<ul>
+<li>
+<p>You have installed <code class="command">odo</code>.
+For more information, see <a href="https://docs.openshift.com/container-platform/latest/cli_reference/developer_cli_odo/installing-odo.html">Installing <code>odo</code></a> in the <code class="command">odo</code> documentation.</p>
+</li>
+<li>
+<p>CRC is configured to use the OpenShift preset.
+For more information, see <a href="https://crc-org.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
+</li>
+<li>
+<p>The CRC instance is running.
+For more information, see <a href="https://crc-org.github.io/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
+</li>
+</ul>
+</div>
+<div class="olist arabic">
+<div class="title">Procedure</div>
+<ol class="arabic">
+<li>
+<p>Log in to the running OpenShift Container Platform cluster managed by CRC as the <code>developer</code> user:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ odo login -u developer -p developer</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create a project for your application:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ odo project create sample-app</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create a directory for your components:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ mkdir sample-app
+$ cd sample-app</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Clone an example Node.js application:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ git clone https://github.com/openshift/nodejs-ex
+$ cd nodejs-ex</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Add a <code>nodejs</code> component to the application:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ odo create nodejs</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create a URL and add an entry to the local configuration file:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ odo url create --port 8080</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Push the changes:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ odo push</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Your component is now deployed to the cluster with an accessible URL.</p>
+</div>
+</li>
+<li>
+<p>List the URLs and check the desired URL for the component:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ odo url list</pre>
+</div>
+</div>
+</li>
+<li>
+<p>View the deployed application using the generated URL.</p>
+</li>
+</ol>
+</div>
+<div class="ulist">
+<div class="title">Additional resources</div>
+<ul>
+<li>
+<p>For more information about using <code class="command">odo</code>, see the <a href="https://docs.openshift.com/container-platform/latest/cli_reference/developer_cli_odo/understanding-odo.html"><code>odo</code> documentation</a>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_stopping_the_instance"><a class="anchor" href="#_stopping_the_instance"></a>Stopping the instance</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code class="command">crc stop</code> command stops the running CRC instance and container runtime.
+The stopping process takes a few minutes while the cluster shuts down.</p>
+</div>
+<div class="ulist">
+<div class="title">Procedure</div>
+<ul>
+<li>
+<p>Stop the CRC instance and container runtime:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc stop</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_deleting_the_instance"><a class="anchor" href="#_deleting_the_instance"></a>Deleting the instance</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code class="command">crc delete</code> command deletes an existing CRC instance.</p>
+</div>
+<div class="ulist">
+<div class="title">Procedure</div>
+<ul>
+<li>
+<p>Delete the CRC instance:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc delete</pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code class="command">crc delete</code> command results in the loss of data stored in the CRC instance.
+Save any desired information stored in the instance before running this command.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

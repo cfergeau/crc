@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Networking :: CRC Documentation</title>
+    <link rel="canonical" href="https://crc.dev/getting_started/getting_started/networking/">
+    <meta name="description" content="Networking">
+    <meta name="generator" content="Antora 3.1.4">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-item">
+                <button class="navbar-burger" data-target="topbar-nav">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <a href="https://crc.dev/">CRC Documentation</a>
+            </div>
+        </div>
+        <div id="topbar-nav" class="navbar-menu">
+            <div class="navbar-end">
+                <div class="navbar-item search hide-for-print">
+                    <div id="search-field" class="field">
+                        <input id="search-input" type="text" placeholder="Search the docs">
+                    </div>
+                </div>
+                <a class="navbar-item" href="https://crc.dev">Home</a>
+                <a class="navbar-item" href="https://github.com/crc-org/crc">Source Code</a>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="getting_started" data-version="">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../introducing/">Getting started with CRC</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../introducing/">Introducing CRC</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../installing/">Installing CRC</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../using/">Using CRC</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../configuring/">Configuring CRC</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="./">Networking</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../administrative-tasks/">Administrative tasks</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../troubleshooting/">Troubleshooting CRC</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Getting started with CRC</span>
+    <span class="version">default</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../introducing/">Getting started with CRC</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../introducing/">default</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../introducing/" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../introducing/">Getting started with CRC</a></li>
+    <li><a href="./">Networking</a></li>
+  </ul>
+</nav>
+<div class="edit-this-page"><a href="file:///antora/docs/modules/getting_started/pages/networking.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Networking</h1>
+<div class="sect1">
+<h2 id="_dns_configuration_details"><a class="anchor" href="#_dns_configuration_details"></a>DNS configuration details</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_general_dns_setup"><a class="anchor" href="#_general_dns_setup"></a>General DNS setup</h3>
+<div class="paragraph">
+<p>The OpenShift Container Platform cluster managed by CRC uses 2 DNS domain names, <code>crc.testing</code> and <code>apps-crc.testing</code>.
+The <code>crc.testing</code> domain is for core OpenShift Container Platform services.
+The <code>apps-crc.testing</code> domain is for accessing OpenShift applications deployed on the cluster.</p>
+</div>
+<div class="paragraph">
+<p>For example, the OpenShift Container Platform API server is exposed as <code>api.crc.testing</code> while the OpenShift Container Platform console is accessed as <code>console-openshift-console.apps-crc.testing</code>.
+These DNS domains are served by a <code>dnsmasq</code> DNS container running inside the CRC instance.</p>
+</div>
+<div class="paragraph">
+<p>The <code class="command">crc setup</code> command detects and adjusts your system DNS configuration so that it can resolve these domains.
+Additional checks are done to verify DNS is properly configured when running <code class="command">crc start</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_dns_on_linux"><a class="anchor" href="#_dns_on_linux"></a>DNS on Linux</h3>
+<div class="paragraph">
+<p>On Linux, depending on your distribution, CRC expects the following DNS configuration:</p>
+</div>
+<div class="sect3">
+<h4 id="_networkmanager_systemd_resolved"><a class="anchor" href="#_networkmanager_systemd_resolved"></a>NetworkManager + systemd-resolved</h4>
+<div class="paragraph">
+<p>This configuration is used by default on Fedora 33 or newer, and on Ubuntu Desktop editions.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>CRC expects NetworkManager to manage networking.</p>
+</li>
+<li>
+<p>CRC configures <code>systemd-resolved</code> to forward requests for the <code>testing</code> domain to the <code>192.168.130.11</code> DNS server.
+<code>192.168.130.11</code> is the IP of the CRC instance.</p>
+</li>
+<li>
+<p><code>systemd-resolved</code> configuration is done with a NetworkManager dispatcher script in <strong class="filename"><em>/etc/NetworkManager/dispatcher.d/99-crc.sh</em></strong>:</p>
+<div class="listingblock">
+<div class="content">
+<pre>#!/bin/sh
+
+export LC_ALL=C
+
+systemd-resolve --interface crc --set-dns 192.168.130.11 --set-domain ~testing
+
+exit 0</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><code>systemd-resolved</code> is also available as an unsupported Technology Preview on Red&#160;Hat Enterprise&#160;Linux and CentOS 8.3.
+After <a href="https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/configuring_and_managing_networking/using-different-dns-servers-for-different-domains_configuring-and-managing-networking">configuring the host</a> to use <code>systemd-resolved</code>, stop any running clusters and rerun <code class="command">crc setup</code>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_networkmanager_dnsmasq"><a class="anchor" href="#_networkmanager_dnsmasq"></a>NetworkManager + dnsmasq</h4>
+<div class="paragraph">
+<p>This configuration is used by default on Fedora 32 or older, on Red&#160;Hat Enterprise&#160;Linux, and on CentOS.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>CRC expects NetworkManager to manage networking.</p>
+</li>
+<li>
+<p>NetworkManager uses <code>dnsmasq</code> with the <strong class="filename"><em>/etc/NetworkManager/conf.d/crc-nm-dnsmasq.conf</em></strong> configuration file.</p>
+</li>
+<li>
+<p>The configuration file for this <code>dnsmasq</code> instance is <strong class="filename"><em>/etc/NetworkManager/dnsmasq.d/crc.conf</em></strong>:</p>
+<div class="listingblock">
+<div class="content">
+<pre>server=/crc.testing/192.168.130.11
+server=/apps-crc.testing/192.168.130.11</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The NetworkManager <code>dnsmasq</code> instance forwards requests for the <code>crc.testing</code> and <code>apps-crc.testing</code> domains to the <code>192.168.130.11</code> DNS server.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_reserved_ip_subnets"><a class="anchor" href="#_reserved_ip_subnets"></a>Reserved IP subnets</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The OpenShift Container Platform cluster managed by CRC reserves IP subnets for internal use, which should not collide with your host network.
+Ensure that the following IP subnets are available for use:</p>
+</div>
+<div class="ulist">
+<div class="title">Reserved IP subnets</div>
+<ul>
+<li>
+<p><code>10.217.0.0/22</code></p>
+</li>
+<li>
+<p><code>10.217.4.0/23</code></p>
+</li>
+<li>
+<p><code>192.168.126.0/24</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Additionally, the host hypervisor might reserve another IP subnet depending on the host operating system.
+No additional subnet is reserved on macOS and Microsoft Windows.
+The additional reserved subnet for Linux is <code>192.168.130.0/24</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_starting_crc_behind_a_proxy"><a class="anchor" href="#_starting_crc_behind_a_proxy"></a>Starting CRC behind a proxy</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can start CRC behind a defined proxy using environment variables or configurable properties.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>SOCKS proxies are not supported by OpenShift Container Platform.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<div class="title">Prerequisites</div>
+<ul>
+<li>
+<p>If you are not using <code class="command">crc oc-env</code>, when interacting with the cluster, export the <code>.testing</code> domain as part of the <code>no_proxy</code> environment variable.
+The embedded <code class="command">oc</code> executable does not require manual settings.
+For more information about using the embedded <code class="command">oc</code> executable, see <a href="https://crc-org.github.io/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with the OpenShift CLI</a>.</p>
+</li>
+</ul>
+</div>
+<div class="olist arabic">
+<div class="title">Procedure</div>
+<ol class="arabic">
+<li>
+<p>Define a proxy using the <code>http_proxy</code> and <code>https_proxy</code> environment variables or using the <code class="command">crc config set</code> command as follows:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc config set http-proxy http://proxy.example.com:<em>&lt;port&gt;</em>
+$ crc config set https-proxy http://proxy.example.com:<em>&lt;port&gt;</em>
+$ crc config set no-proxy <em>&lt;comma-separated-no-proxy-entries&gt;</em></pre>
+</div>
+</div>
+</li>
+<li>
+<p>If the proxy uses a custom CA certificate file, set it as follows:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc config set proxy-ca-file <em>&lt;path-to-custom-ca-file&gt;</em></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Proxy-related values set in the configuration for CRC have priority over values set with environment variables.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_setting_up_crc_on_a_remote_server"><a class="anchor" href="#_setting_up_crc_on_a_remote_server"></a>Setting up CRC on a remote server</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Configure a remote server to run an OpenShift Container Platform cluster provided by CRC.</p>
+</div>
+<div class="paragraph">
+<p>This procedure assumes the use of a Red&#160;Hat Enterprise&#160;Linux, Fedora, or CentOS server.
+Run every command in this procedure on the remote server.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>Perform this procedure only on a local network.</strong>
+Exposing an insecure server on the internet has many security implications.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<div class="title">Prerequisites</div>
+<ul>
+<li>
+<p>CRC is installed and set up on the remote server.
+For more information, see <a href="https://crc-org.github.io/crc/#installing_gsg">Installing CRC</a> and <a href="https://crc-org.github.io/crc/#setting-up_gsg">Setting up CRC</a>.</p>
+</li>
+<li>
+<p>CRC is configured to use the OpenShift preset on the remote server.
+For more information, see <a href="https://crc-org.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
+</li>
+<li>
+<p>Your user account has <code>sudo</code> permissions on the remote server.</p>
+</li>
+</ul>
+</div>
+<div class="olist arabic">
+<div class="title">Procedure</div>
+<ol class="arabic">
+<li>
+<p>Start the cluster:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc start</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Ensure that the cluster remains running during this procedure.</p>
+</div>
+</li>
+<li>
+<p>Install the <code class="package">haproxy</code> package and other utilities:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ sudo dnf install haproxy /usr/sbin/semanage</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Modify the firewall to allow communication with the cluster:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ sudo systemctl enable --now firewalld
+$ sudo firewall-cmd --add-service=http --permanent
+$ sudo firewall-cmd --add-service=https --permanent
+$ sudo firewall-cmd --add-service=kube-apiserver --permanent
+$ sudo firewall-cmd --reload</pre>
+</div>
+</div>
+</li>
+<li>
+<p>For SELinux, allow HAProxy to listen on TCP port 6443 to serve <code>kube-apiserver</code> on this port:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ sudo semanage port -a -t http_port_t -p tcp 6443</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create a backup of the default <code class="application">haproxy</code> configuration:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ sudo cp /etc/haproxy/haproxy.cfg{,.bak}</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Configure <code class="application">haproxy</code> for use with the cluster:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ export CRC_IP=$(crc ip)
+$ sudo tee /etc/haproxy/haproxy.cfg &amp;&gt;/dev/null &lt;&lt;EOF
+global
+    log /dev/log local0
+
+defaults
+    balance roundrobin
+    log global
+    maxconn 100
+    mode tcp
+    timeout connect 5s
+    timeout client 500s
+    timeout server 500s
+
+listen apps
+    bind 0.0.0.0:80
+    server crcvm $CRC_IP:80 check
+
+listen apps_ssl
+    bind 0.0.0.0:443
+    server crcvm $CRC_IP:443 check
+
+listen api
+    bind 0.0.0.0:6443
+    server crcvm $CRC_IP:6443 check
+EOF</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Start the <code class="application">haproxy</code> service:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ sudo systemctl start haproxy</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_connecting_to_a_remote_crc_instance"><a class="anchor" href="#_connecting_to_a_remote_crc_instance"></a>Connecting to a remote CRC instance</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Use <code class="application">dnsmasq</code> to connect a client machine to a remote server running an OpenShift Container Platform cluster managed by CRC.</p>
+</div>
+<div class="paragraph">
+<p>This procedure assumes the use of a Red&#160;Hat Enterprise&#160;Linux, Fedora, or CentOS client.
+Run every command in this procedure on the client.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p><strong>Connect to a server that is only exposed on your local network.</strong></p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<div class="title">Prerequisites</div>
+<ul>
+<li>
+<p>A remote server is set up for the client to connect to.
+For more information, see <a href="https://crc-org.github.io/crc/#setting-up-remote-server_gsg">Setting up CRC on a remote server</a>.</p>
+</li>
+<li>
+<p>You know the external IP address of the server.</p>
+</li>
+<li>
+<p>You have the <a href="https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/">latest OpenShift CLI (<code class="command">oc</code>)</a> in your <code>$PATH</code> on the client.</p>
+</li>
+</ul>
+</div>
+<div class="olist arabic">
+<div class="title">Procedure</div>
+<ol class="arabic">
+<li>
+<p>Install the <code class="package">dnsmasq</code> package:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ sudo dnf install dnsmasq</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Enable the use of <code class="application">dnsmasq</code> for DNS resolution in NetworkManager:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ sudo tee /etc/NetworkManager/conf.d/use-dnsmasq.conf &amp;&gt;/dev/null &lt;&lt;EOF
+[main]
+dns=dnsmasq
+EOF</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Add DNS entries for CRC to the <code class="application">dnsmasq</code> configuration:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ sudo tee /etc/NetworkManager/dnsmasq.d/external-crc.conf &amp;&gt;/dev/null &lt;&lt;EOF
+address=/apps-crc.testing/<em>SERVER_IP_ADDRESS</em>
+address=/api.crc.testing/<em>SERVER_IP_ADDRESS</em>
+EOF</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Comment out any existing entries in <strong class="filename"><em>/etc/NetworkManager/dnsmasq.d/crc.conf</em></strong>.
+These entries are created by running a local instance of CRC and will conflict with the entries for the remote cluster.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Reload the NetworkManager service:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ sudo systemctl reload NetworkManager</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Log in to the remote cluster as the <code>developer</code> user with <code class="command">oc</code>:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc login -u developer -p developer https://api.crc.testing:6443</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The remote OpenShift Container Platform web console is available at https://console-openshift-console.apps-crc.testing.</p>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

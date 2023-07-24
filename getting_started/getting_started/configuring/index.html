@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Configuring CRC :: CRC Documentation</title>
+    <link rel="canonical" href="https://crc.dev/getting_started/getting_started/configuring/">
+    <meta name="description" content="Configuring CRC">
+    <meta name="generator" content="Antora 3.1.4">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-item">
+                <button class="navbar-burger" data-target="topbar-nav">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <a href="https://crc.dev/">CRC Documentation</a>
+            </div>
+        </div>
+        <div id="topbar-nav" class="navbar-menu">
+            <div class="navbar-end">
+                <div class="navbar-item search hide-for-print">
+                    <div id="search-field" class="field">
+                        <input id="search-input" type="text" placeholder="Search the docs">
+                    </div>
+                </div>
+                <a class="navbar-item" href="https://crc.dev">Home</a>
+                <a class="navbar-item" href="https://github.com/crc-org/crc">Source Code</a>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="getting_started" data-version="">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../introducing/">Getting started with CRC</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../introducing/">Introducing CRC</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../installing/">Installing CRC</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../using/">Using CRC</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="./">Configuring CRC</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../networking/">Networking</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../administrative-tasks/">Administrative tasks</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../troubleshooting/">Troubleshooting CRC</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Getting started with CRC</span>
+    <span class="version">default</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../introducing/">Getting started with CRC</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../introducing/">default</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../introducing/" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../introducing/">Getting started with CRC</a></li>
+    <li><a href="./">Configuring CRC</a></li>
+  </ul>
+</nav>
+<div class="edit-this-page"><a href="file:///antora/docs/modules/getting_started/pages/configuring.adoc">Edit this Page</a></div>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Configuring CRC</h1>
+<div class="sect1">
+<h2 id="_about_crc_configuration"><a class="anchor" href="#_about_crc_configuration"></a>About CRC configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Use the <code class="command">crc config</code> command to configure both the <code class="command">crc</code> executable and the CRC instance.
+The <code class="command">crc config</code> command requires a subcommand to act on the configuration.
+The available subcommands are <code>get</code>, <code>set,</code> <code>unset</code>, and <code>view</code>.
+The <code>get</code>, <code>set</code>, and <code>unset</code> subcommands operate on named configurable properties.
+Run the <code class="command">crc config --help</code> command to list the available properties.</p>
+</div>
+<div class="paragraph">
+<p>You can also use the <code class="command">crc config</code> command to configure the behavior of the startup checks for the <code class="command">crc start</code> and <code class="command">crc setup</code> commands.
+By default, startup checks report an error and stop execution when their conditions are not met.
+Set the value of a property starting with <code>skip-check</code> to <code>true</code> to skip the check.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_viewing_crc_configuration"><a class="anchor" href="#_viewing_crc_configuration"></a>Viewing CRC configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The CRC executable provides commands to view configurable properties and the current CRC configuration.</p>
+</div>
+<div class="ulist">
+<div class="title">Procedure</div>
+<ul>
+<li>
+<p>To view the available configurable properties:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc config --help</pre>
+</div>
+</div>
+</li>
+<li>
+<p>To view the values for a configurable property:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc config get <em>&lt;property&gt;</em></pre>
+</div>
+</div>
+</li>
+<li>
+<p>To view the complete current configuration:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc config view</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code class="command">crc config view</code> command does not return any information if the configuration consists of default values.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_changing_the_selected_preset"><a class="anchor" href="#_changing_the_selected_preset"></a>Changing the selected preset</h2>
+<div class="sectionbody">
+<div class="paragraph _abstract">
+<p>You can change the container runtime used for the CRC instance by selecting the desired preset.</p>
+</div>
+<div class="paragraph">
+<p>On Microsoft Windows and macOS, you can change the selected preset using the system tray or command line interface.
+On Linux, use the command line interface.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>You cannot change the preset of an existing CRC instance.
+Preset changes are only applied when a CRC instance is created.
+To enable preset changes, you must delete the existing instance and start a new one.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<div class="title">Procedure</div>
+<ul>
+<li>
+<p>Change the selected preset from the command line:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc config set preset <em>&lt;name&gt;</em></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Valid preset names are:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. Preset names</caption>
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Preset</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openshift</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OpenShift Container Platform</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>okd</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">OKD</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>microshift</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MicroShift</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>podman</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Podman container runtime</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</div>
+<div class="ulist _additional-resources">
+<div class="title">Additional resources</div>
+<ul>
+<li>
+<p>For more information about the minimum system requirements for each preset, see <a href="https://crc-org.github.io/crc/#minimum-system-requirements_gsg">Minimum system requirements</a>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_configuring_the_instance"><a class="anchor" href="#_configuring_the_instance"></a>Configuring the instance</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Use the <code>cpus</code> and <code>memory</code> properties to configure the default number of vCPUs and amount of memory available to the CRC instance, respectively.</p>
+</div>
+<div class="paragraph">
+<p>Alternatively, the number of vCPUs and amount of memory can be assigned using the <code>--cpus</code> and <code>--memory</code> flags to the <code>crc start</code> command, respectively.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>You cannot change the configuration of a running CRC instance.
+To enable configuration changes, you must stop the running instance and start it again.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<div class="title">Procedure</div>
+<ul>
+<li>
+<p>To configure the number of vCPUs available to the instance:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc config set cpus <em>&lt;number&gt;</em></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The default value for the <code>cpus</code> property is <code>4</code>.
+The number of vCPUs to assign must be greater than or equal to the default.</p>
+</div>
+</li>
+<li>
+<p>To start the instance with the desired number of vCPUs:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc start --cpus <em>&lt;number&gt;</em></pre>
+</div>
+</div>
+</li>
+<li>
+<p>To configure the memory available to the instance:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc config set memory <em>&lt;number-in-mib&gt;</em></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Values for available memory are set in mebibytes (MiB).
+One gibibyte (GiB) of memory is equal to 1024 MiB.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The default value for the <code>memory</code> property is <code>9216</code>.
+The amount of memory to assign must be greater than or equal to the default.</p>
+</div>
+</li>
+<li>
+<p>To start the instance with the desired amount of memory:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc start --memory <em>&lt;number-in-mib&gt;</em></pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
