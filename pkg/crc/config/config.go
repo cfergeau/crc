@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"path/filepath"
 	"reflect"
 
 	"github.com/crc-org/crc/pkg/crc/preset"
@@ -75,6 +76,8 @@ func (c *Config) validate(key string, value interface{}) error {
 	return nil
 }
 
+type Path string
+
 // Set sets the value for a given config key
 func (c *Config) Set(key string, value interface{}) (string, error) {
 	setting, ok := c.settingsByName[key]
@@ -101,6 +104,14 @@ func (c *Config) Set(key string, value interface{}) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf(invalidProp, value, key, err)
 		}
+	case Path:
+		path := cast.ToString(value)
+		path, err := filepath.Abs(path)
+		if err != nil {
+			return "", fmt.Errorf(invalidProp, value, key, err)
+		}
+		castValue = path
+
 	case preset.Preset:
 		castValue = cast.ToString(value)
 	default:
@@ -198,7 +209,7 @@ func (c *Config) Get(key string) SettingValue {
 				Invalid: true,
 			}
 		}
-	case string:
+	case Path, string:
 		value = cast.ToString(value)
 	case bool:
 		value, err = cast.ToBoolE(value)
