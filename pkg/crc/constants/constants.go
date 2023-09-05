@@ -116,7 +116,7 @@ var (
 	DaemonSocketPath   = filepath.Join(CrcBaseDir, "crc.sock")
 )
 
-func InstanceDirName(preset crcpreset.Preset) string {
+func instanceDirName(preset crcpreset.Preset) string {
 	return InstanceName(preset)
 }
 
@@ -125,7 +125,7 @@ func InstanceName(preset crcpreset.Preset) string {
 }
 
 func ResolveInstancePath(preset crcpreset.Preset, pathElems ...string) string {
-	return filepath.Join(MachineInstanceDir, InstanceDirName(preset), filepath.Join(pathElems...))
+	return filepath.Join(MachineInstanceDir, instanceDirName(preset), filepath.Join(pathElems...))
 }
 
 func GetDefaultBundlePath(preset crcpreset.Preset) string {
