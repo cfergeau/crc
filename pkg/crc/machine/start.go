@@ -611,7 +611,7 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 		return nil, errors.Wrap(err, "Failed to update cluster pull secret")
 	}
 
-	if err := cluster.EnsureSSHKeyPresentInTheCluster(ctx, ocConfig, constants.GetPublicKeyPath(startConfig.Preset)); err != nil {
+	if err := cluster.EnsureSSHKeyPresentInTheCluster(ctx, ocConfig, constants.ResolveInstancePath(startConfig.Preset, constants.InstancePublicSSHKey)); err != nil {
 		return nil, errors.Wrap(err, "Failed to update ssh public key to machine config")
 	}
 
@@ -819,7 +819,7 @@ func disableEmergencyLogin(sshRunner *crcssh.Runner, preset crcPreset.Preset) er
 
 func updateSSHKeyPair(sshRunner *crcssh.Runner, preset crcPreset.Preset) error {
 	// Read generated public key
-	publicKey, err := os.ReadFile(constants.GetPublicKeyPath(preset))
+	publicKey, err := os.ReadFile(constants.ResolveInstancePath(preset, constants.InstancePublicSSHKey))
 	if err != nil {
 		return err
 	}

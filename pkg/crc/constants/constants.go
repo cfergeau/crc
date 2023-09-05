@@ -201,10 +201,6 @@ func GetPasswdFilePath(preset crcpreset.Preset) string {
 	return ResolveInstancePath(preset, InstancePasswd)
 }
 
-func GetPublicKeyPath(preset crcpreset.Preset) string {
-	return ResolveInstancePath(preset, InstancePublicSSHKey)
-}
-
 func GetPrivateKeyPath(preset crcpreset.Preset) string {
 	return ResolveInstancePath(preset, InstancePrivateSSHKey)
 }
