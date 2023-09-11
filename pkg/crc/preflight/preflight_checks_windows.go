@@ -8,7 +8,6 @@ import (
 	"github.com/crc-org/crc/v2/pkg/crc/logging"
 
 	"github.com/crc-org/crc/v2/pkg/crc/adminhelper"
-	crcpreset "github.com/crc-org/crc/v2/pkg/crc/preset"
 	winnet "github.com/crc-org/crc/v2/pkg/os/windows/network"
 	"github.com/crc-org/crc/v2/pkg/os/windows/powershell"
 
@@ -199,25 +198,25 @@ func removeDNSServerAddress() error {
 	return nil
 }
 
-func removeCrcVM(preset crcpreset.Preset) func() error {
-	return func() (err error) {
-		if _, _, err := powershell.Execute("Get-VM -Name crc"); err != nil {
+func removeCrcVM() (err error) {
+	for _, instanceName := range getAllInstanceNamesToDelete() {
+		if _, _, err := powershell.Execute(fmt.Sprintf(`Get-VM -Name "%s"`, instanceName)); err != nil {
 			// This means that there is no crc VM exist
-			return nil
+			continue
 		}
-		stopVMCommand := fmt.Sprintf(`Stop-VM -Name "%s" -TurnOff -Force`, constants.InstanceName(preset))
+		stopVMCommand := fmt.Sprintf(`Stop-VM -Name "%s" -TurnOff -Force`, (instanceName))
 		if _, _, err := powershell.Execute(stopVMCommand); err != nil {
 			// ignore the error as this is useless (prefer not to use nolint here)
 			return err
 		}
-		removeVMCommand := fmt.Sprintf(`Remove-VM -Name "%s" -Force`, constants.InstanceName(preset))
+		removeVMCommand := fmt.Sprintf(`Remove-VM -Name "%s" -Force`, instanceName)
 		if _, _, err := powershell.Execute(removeVMCommand); err != nil {
 			// ignore the error as this is useless (prefer not to use nolint here)
 			return err
 		}
-		logging.Debug("'crc' VM is removed")
-		return nil
+		logging.Debugf("'%s' VM is removed", instanceName)
 	}
+	return nil
 }
 
 func checkIfAdminHelperServiceRunning() error {

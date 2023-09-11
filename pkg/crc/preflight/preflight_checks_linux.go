@@ -16,7 +16,6 @@ import (
 	"github.com/crc-org/crc/v2/pkg/crc/constants"
 	"github.com/crc-org/crc/v2/pkg/crc/logging"
 	"github.com/crc-org/crc/v2/pkg/crc/machine/libvirt"
-	crcpreset "github.com/crc-org/crc/v2/pkg/crc/preset"
 	"github.com/crc-org/crc/v2/pkg/crc/systemd"
 	"github.com/crc-org/crc/v2/pkg/crc/systemd/states"
 	crcos "github.com/crc-org/crc/v2/pkg/os"
@@ -577,52 +576,52 @@ func removeLibvirtCrcNetwork() error {
 	return nil
 }
 
-func removeCrcVM(preset crcpreset.Preset) func() error {
-	return func() error {
-		stdout, _, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "domstate", constants.InstanceName(preset))
+func removeCrcVM() error {
+	for _, instanceName := range getAllInstanceNamesToDelete() {
+		stdout, _, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "domstate", instanceName)
 		if err != nil {
 			//  User may have run `crc delete` before `crc cleanup`
-			//  in that case there is no crc vm so return early.
-			return nil
+			//  in that case there is no vm for the preset move to next preset.
+			continue
 		}
 		if strings.TrimSpace(stdout) == "running" {
-			_, stderr, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "destroy", constants.InstanceName(preset))
+			_, stderr, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "destroy", instanceName)
 			if err != nil {
 				logging.Debugf("%v : %s", err, stderr)
-				return fmt.Errorf("Failed to destroy 'crc' VM")
+				return fmt.Errorf("Failed to destroy '%s' VM", instanceName)
 			}
 		}
-		_, stderr, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "undefine", constants.InstanceName(preset))
+		_, stderr, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "undefine", instanceName)
 		if err != nil {
 			logging.Debugf("%v : %s", err, stderr)
-			return fmt.Errorf("Failed to undefine 'crc' VM")
+			return fmt.Errorf("Failed to undefine '%s' VM", instanceName)
 		}
-		logging.Debug("'crc' VM is removed")
-		return nil
+		logging.Debugf("'%s' VM is removed", instanceName)
 	}
+	return nil
 }
 
-func removeLibvirtStoragePool(preset crcpreset.Preset) func() error {
-	return func() error {
-		_, stderr, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "pool-info", constants.InstanceName(preset))
+func removeLibvirtStoragePool() error {
+	for _, instanceName := range getAllInstanceNamesToDelete() {
+		_, stderr, err := crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "pool-info", instanceName)
 		if err != nil {
 			logging.Debugf("%v : %s", err, stderr)
-			// Pool does not exist
-			return nil
+			// Pool does not exist for current preset, move to next preset
+			continue
 		}
-		_, stderr, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "pool-destroy", constants.InstanceName(preset))
+		_, stderr, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "pool-destroy", instanceName)
 		if err != nil {
 			logging.Debugf("%v : %s", err, stderr)
 			// ignore error, we want to try to delete the pool regardless of success or not
 		}
-		_, stderr, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "pool-undefine", constants.InstanceName(preset))
+		_, stderr, err = crcos.RunWithDefaultLocale("virsh", "--connect", "qemu:///system", "pool-undefine", instanceName)
 		if err != nil {
 			logging.Debugf("%v : %s", err, stderr)
-			return fmt.Errorf("Failed to undefine 'crc' libvirt storage pool")
+			return fmt.Errorf("Failed to undefine '%s' libvirt storage pool", instanceName)
 		}
-		logging.Debug("'crc' libvirt storage has been removed")
-		return nil
+		logging.Debugf("'%s' libvirt storage has been removed", instanceName)
 	}
+	return nil
 }
 
 func trimSpacesFromXML(str string) string {
