@@ -5,7 +5,6 @@ import (
 
 	"github.com/crc-org/crc/v2/pkg/crc/constants"
 	"github.com/crc-org/crc/v2/pkg/crc/network"
-	"github.com/crc-org/crc/v2/pkg/crc/preset"
 	crcpreset "github.com/crc-org/crc/v2/pkg/crc/preset"
 	"github.com/crc-org/crc/v2/pkg/os/launchd"
 )
@@ -99,7 +98,7 @@ var daemonLaunchdChecks = []Check{
 // Passing 'SystemNetworkingMode' to getPreflightChecks currently achieves this
 // as there are no user networking specific checks
 func getAllPreflightChecks() []Check {
-	return getPreflightChecks(true, network.SystemNetworkingMode, constants.GetDefaultBundlePath(preset.OpenShift), preset.OpenShift)
+	return getPreflightChecks(true, network.SystemNetworkingMode, constants.GetDefaultBundlePath(crcpreset.OpenShift), crcpreset.OpenShift)
 }
 
 func getChecks(_ network.Mode, bundlePath string, preset crcpreset.Preset) []Check {
