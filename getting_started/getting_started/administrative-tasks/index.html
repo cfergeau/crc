@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Administrative tasks :: CRC Documentation</title>
-    <link rel="canonical" href="https://crc.dev/getting_started/getting_started/administrative-tasks/">
+    <link rel="canonical" href="https://crc.dev/crc/getting_started/getting_started/administrative-tasks/">
     <meta name="description" content="Administrative tasks">
     <meta name="generator" content="Antora 3.1.4">
     <link rel="stylesheet" href="../../../_/css/site.css">
@@ -19,7 +19,7 @@
                     <span></span>
                     <span></span>
                 </button>
-                <a href="https://crc.dev/">CRC Documentation</a>
+                <a href="https://crc.dev/crc/">CRC Documentation</a>
             </div>
         </div>
         <div id="topbar-nav" class="navbar-menu">
@@ -29,11 +29,12 @@
                         <input id="search-input" type="text" placeholder="Search the docs">
                     </div>
                 </div>
-                <a class="navbar-item" href="https://crc.dev">Home</a>
+                <a class="navbar-item" href="https://crc.dev/crc">Home</a>
                 <a class="navbar-item" href="https://github.com/crc-org/crc">Source Code</a>
             </div>
         </div>
     </nav>
+    <script data-goatcounter="https://crc.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </header>
 <div class="body">
 <div class="nav-container" data-component="getting_started" data-version="">
@@ -123,7 +124,7 @@ Follow this procedure to enable monitoring for your cluster.</p>
 <p>You must assign additional memory to the CRC instance.
 At least 14 GiB of memory, a value of <code>14336</code>, is recommended for core functionality.
 Increased workloads will require more memory.
-For more information, see <a href="https://crc-org.github.io/crc/#configuring-the-instance_gsg">Configuring the instance</a>.</p>
+For more information, see <a href="https://crc.dev/crc/#configuring-the-instance_gsg">Configuring the instance</a>.</p>
 </li>
 </ul>
 </div>
@@ -177,7 +178,7 @@ These services can be enabled by manually removing the desired Operator from the
 <ul>
 <li>
 <p>A running CRC virtual machine and a working <code class="command">oc</code> command.
-For more information, see <a href="https://crc-org.github.io/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with <code>oc</code></a>.</p>
+For more information, see <a href="https://crc.dev/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with <code>oc</code></a>.</p>
 </li>
 <li>
 <p>You must log in through <code class="command">oc</code> as the <code>kubeadmin</code> user.</p>
@@ -233,5 +234,8 @@ clusterversion.config.openshift.io/version patched</pre>
 </footer>
 <script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
 <script async src="../../../_/js/vendor/highlight.js"></script>
+<script src="../../../_/js/vendor/lunr.js"></script>
+<script src="../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../.." data-snippet-length="100" data-stylesheet="../../../_/css/search.css"></script>
+<script async src="../../../search-index.js"></script>
   </body>
 </html>

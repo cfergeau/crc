@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Troubleshooting CRC :: CRC Documentation</title>
-    <link rel="canonical" href="https://crc.dev/getting_started/getting_started/troubleshooting/">
+    <link rel="canonical" href="https://crc.dev/crc/getting_started/getting_started/troubleshooting/">
     <meta name="description" content="Troubleshooting CRC">
     <meta name="generator" content="Antora 3.1.4">
     <link rel="stylesheet" href="../../../_/css/site.css">
@@ -19,7 +19,7 @@
                     <span></span>
                     <span></span>
                 </button>
-                <a href="https://crc.dev/">CRC Documentation</a>
+                <a href="https://crc.dev/crc/">CRC Documentation</a>
             </div>
         </div>
         <div id="topbar-nav" class="navbar-menu">
@@ -29,11 +29,12 @@
                         <input id="search-input" type="text" placeholder="Search the docs">
                     </div>
                 </div>
-                <a class="navbar-item" href="https://crc.dev">Home</a>
+                <a class="navbar-item" href="https://crc.dev/crc">Home</a>
                 <a class="navbar-item" href="https://github.com/crc-org/crc">Source Code</a>
             </div>
         </div>
     </nav>
+    <script data-goatcounter="https://crc.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </header>
 <div class="body">
 <div class="nav-container" data-component="getting_started" data-version="">
@@ -153,7 +154,7 @@ Report such issues to the relevant project.</p>
 <ul>
 <li>
 <p>Enable OpenShift CLI (<code class="command">oc</code>) access to the cluster and log in as the <code>kubeadmin</code> user.
-For detailed steps, see <a href="https://crc-org.github.io/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with the OpenShift CLI</a>.</p>
+For detailed steps, see <a href="https://crc.dev/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with the OpenShift CLI</a>.</p>
 </li>
 </ul>
 </div>
@@ -301,16 +302,16 @@ This involves stopping the instance, deleting it, reverting changes made by the 
 <ul>
 <li>
 <p>You set up the host machine with the <code class="command">crc setup</code> command.
-For more information, see <a href="https://crc-org.github.io/crc/#setting-up_gsg">Setting up CRC</a>.</p>
+For more information, see <a href="https://crc.dev/crc/#setting-up_gsg">Setting up CRC</a>.</p>
 </li>
 <li>
 <p>You started CRC with the <code class="command">crc start</code> command.
-For more information, see <a href="https://crc-org.github.io/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
+For more information, see <a href="https://crc.dev/crc/#starting-the-instance_gsg">Starting the instance</a>.</p>
 </li>
 <li>
 <p>You are using the latest CRC release.
 Using a version earlier than CRC 1.2.0 might result in errors related to expired x509 certificates.
-For more information, see <a href="https://crc-org.github.io/crc/#troubleshooting-expired-certificates_gsg">Troubleshooting expired certificates</a>.</p>
+For more information, see <a href="https://crc.dev/crc/#troubleshooting-expired-certificates_gsg">Troubleshooting expired certificates</a>.</p>
 </li>
 </ul>
 </div>
@@ -432,5 +433,8 @@ The <strong class="filename"><em>~/.crc/crc.log</em></strong> file has detailed 
 </footer>
 <script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
 <script async src="../../../_/js/vendor/highlight.js"></script>
+<script src="../../../_/js/vendor/lunr.js"></script>
+<script src="../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../.." data-snippet-length="100" data-stylesheet="../../../_/css/search.css"></script>
+<script async src="../../../search-index.js"></script>
   </body>
 </html>

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Networking :: CRC Documentation</title>
-    <link rel="canonical" href="https://crc.dev/getting_started/getting_started/networking/">
+    <link rel="canonical" href="https://crc.dev/crc/getting_started/getting_started/networking/">
     <meta name="description" content="Networking">
     <meta name="generator" content="Antora 3.1.4">
     <link rel="stylesheet" href="../../../_/css/site.css">
@@ -19,7 +19,7 @@
                     <span></span>
                     <span></span>
                 </button>
-                <a href="https://crc.dev/">CRC Documentation</a>
+                <a href="https://crc.dev/crc/">CRC Documentation</a>
             </div>
         </div>
         <div id="topbar-nav" class="navbar-menu">
@@ -29,11 +29,12 @@
                         <input id="search-input" type="text" placeholder="Search the docs">
                     </div>
                 </div>
-                <a class="navbar-item" href="https://crc.dev">Home</a>
+                <a class="navbar-item" href="https://crc.dev/crc">Home</a>
                 <a class="navbar-item" href="https://github.com/crc-org/crc">Source Code</a>
             </div>
         </div>
     </nav>
+    <script data-goatcounter="https://crc.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </header>
 <div class="body">
 <div class="nav-container" data-component="getting_started" data-version="">
@@ -267,7 +268,7 @@ The additional reserved subnet for Linux is <code>192.168.130.0/24</code>.</p>
 <li>
 <p>If you are not using <code class="command">crc oc-env</code>, when interacting with the cluster, export the <code>.testing</code> domain as part of the <code>no_proxy</code> environment variable.
 The embedded <code class="command">oc</code> executable does not require manual settings.
-For more information about using the embedded <code class="command">oc</code> executable, see <a href="https://crc-org.github.io/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with the OpenShift CLI</a>.</p>
+For more information about using the embedded <code class="command">oc</code> executable, see <a href="https://crc.dev/crc/#accessing-the-openshift-cluster-with-oc_gsg">Accessing the OpenShift cluster with the OpenShift CLI</a>.</p>
 </li>
 </ul>
 </div>
@@ -340,11 +341,11 @@ Exposing an insecure server on the internet has many security implications.</p>
 <ul>
 <li>
 <p>CRC is installed and set up on the remote server.
-For more information, see <a href="https://crc-org.github.io/crc/#installing_gsg">Installing CRC</a> and <a href="https://crc-org.github.io/crc/#setting-up_gsg">Setting up CRC</a>.</p>
+For more information, see <a href="https://crc.dev/crc/#installing_gsg">Installing CRC</a> and <a href="https://crc.dev/crc/#setting-up_gsg">Setting up CRC</a>.</p>
 </li>
 <li>
 <p>CRC is configured to use the OpenShift preset on the remote server.
-For more information, see <a href="https://crc-org.github.io/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
+For more information, see <a href="https://crc.dev/crc/#changing-the-selected-preset_gsg">Changing the selected preset</a>.</p>
 </li>
 <li>
 <p>Your user account has <code>sudo</code> permissions on the remote server.</p>
@@ -475,7 +476,7 @@ Run every command in this procedure on the client.</p>
 <ul>
 <li>
 <p>A remote server is set up for the client to connect to.
-For more information, see <a href="https://crc-org.github.io/crc/#setting-up-remote-server_gsg">Setting up CRC on a remote server</a>.</p>
+For more information, see <a href="https://crc.dev/crc/#setting-up-remote-server_gsg">Setting up CRC on a remote server</a>.</p>
 </li>
 <li>
 <p>You know the external IP address of the server.</p>
@@ -566,5 +567,8 @@ These entries are created by running a local instance of CRC and will conflict w
 </footer>
 <script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
 <script async src="../../../_/js/vendor/highlight.js"></script>
+<script src="../../../_/js/vendor/lunr.js"></script>
+<script src="../../../_/js/search-ui.js" id="search-ui-script" data-site-root-path="../../.." data-snippet-length="100" data-stylesheet="../../../_/css/search.css"></script>
+<script async src="../../../search-index.js"></script>
   </body>
 </html>
