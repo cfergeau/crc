@@ -68,7 +68,7 @@ github.com/cavaliergopher/grab/v3/pkg/bps
 ## explicit; go 1.17
 github.com/cheggaaa/pb/v3
 github.com/cheggaaa/pb/v3/termutil
-# github.com/cloudflare/circl v1.3.6
+# github.com/cloudflare/circl v1.3.7
 ## explicit; go 1.19
 github.com/cloudflare/circl/dh/x25519
 github.com/cloudflare/circl/dh/x448
@@ -783,7 +783,7 @@ go.mozilla.org/pkcs7
 # go.uber.org/multierr v1.11.0
 ## explicit; go 1.19
 go.uber.org/multierr
-# golang.org/x/crypto v0.16.0
+# golang.org/x/crypto v0.17.0
 ## explicit; go 1.18
 golang.org/x/crypto/argon2
 golang.org/x/crypto/bcrypt
