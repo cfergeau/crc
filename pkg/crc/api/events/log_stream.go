@@ -56,7 +56,7 @@ func (s *streamHook) Fire(entry *logrus.Entry) error {
 		return err
 	}
 
-	s.server.Publish(LOGS, &sse.Event{Event: []byte(LOGS), Data: line})
+	s.server.Publish(Logs, &sse.Event{Event: []byte(Logs), Data: line})
 	return nil
 }
 
