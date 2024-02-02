@@ -1,4 +1,4 @@
-= CRC - Runs Containers
+= CRC
 :icons:
 :toc: macro
 :toc-title:
