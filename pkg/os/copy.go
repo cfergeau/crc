@@ -63,13 +63,13 @@ func CopySparse(dst io.WriteSeeker, src io.Reader) (int64, error) {
 	return bytesWritten, err
 }
 
-type sparseWriter struct {
+type SparseWriter struct {
 	writer          io.WriteSeeker
 	lastChunkSparse bool
 }
 
-func newSparseWriter(writer io.WriteSeeker) *sparseWriter {
-	return &sparseWriter{writer: writer}
+func newSparseWriter(writer io.WriteSeeker) *SparseWriter {
+	return &SparseWriter{writer: writer}
 }
 
 const copyChunkSize = 4096
@@ -83,7 +83,7 @@ func isEmptyChunk(p []byte) bool {
 	return bytes.HasPrefix(emptyChunk, p)
 }
 
-func (w *sparseWriter) Write(p []byte) (n int, err error) {
+func (w *SparseWriter) Write(p []byte) (n int, err error) {
 	if isEmptyChunk(p) {
 		offset, err := w.writer.Seek(int64(len(p)), io.SeekCurrent)
 		if err != nil {
@@ -98,7 +98,7 @@ func (w *sparseWriter) Write(p []byte) (n int, err error) {
 	return w.writer.Write(p)
 }
 
-func (w *sparseWriter) Close() error {
+func (w *SparseWriter) Close() error {
 	if w.lastChunkSparse {
 		if _, err := w.writer.Seek(-1, io.SeekCurrent); err != nil {
 			return err
