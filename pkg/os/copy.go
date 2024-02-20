@@ -51,9 +51,9 @@ func CopyFileSparse(src, dst string) error {
 	return copyFile(src, dst, true)
 }
 
-func CopySparse(dst io.WriteSeeker, src io.Reader) (int64, error) {
+func CopySparse(dst WriteSeekCloser, src io.Reader) (int64, error) {
 	copyBuf := make([]byte, copyChunkSize)
-	sparseWriter := newSparseWriter(dst)
+	sparseWriter := NewSparseWriter(dst)
 
 	bytesWritten, err := io.CopyBuffer(sparseWriter, src, copyBuf)
 	if err != nil {
