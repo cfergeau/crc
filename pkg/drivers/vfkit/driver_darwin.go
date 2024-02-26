@@ -26,16 +26,17 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/containers/common/pkg/strongunits"
 	"github.com/crc-org/crc/v2/pkg/crc/constants"
 	crcos "github.com/crc-org/crc/v2/pkg/os"
 	"github.com/crc-org/crc/v2/pkg/os/darwin"
 	"github.com/crc-org/machine/libmachine/drivers"
 	"github.com/crc-org/machine/libmachine/state"
 	"github.com/crc-org/vfkit/pkg/config"
+	vfutil "github.com/crc-org/vfkit/pkg/util"
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/process"
 	log "github.com/sirupsen/logrus"
-	"golang.org/x/sys/unix"
 )
 
 type Driver struct {
@@ -113,7 +114,7 @@ func (d *Driver) resize(newSize int64) error {
 	if newSize < fi.Size() {
 		return fmt.Errorf("current disk image capacity is bigger than the requested size (%d > %d)", fi.Size(), newSize)
 	}
-	return os.Truncate(diskPath, newSize)
+	return vfutil.ResizeDiskImage(diskPath, strongunits.B(newSize))
 
 }
 
@@ -125,7 +126,7 @@ func (d *Driver) Create() error {
 
 	switch d.ImageFormat {
 	case "raw":
-		if err := unix.Clonefile(d.ImageSourcePath, d.getDiskPath(), 0); err != nil {
+		if err := vfutil.NewDiskImageWithBackingFile(d.getDiskPath(), d.ImageSourcePath); err != nil {
 			// fall back to a regular sparse copy, the error may be caused by the filesystem not supporting unix.CloneFile
 			if err := crcos.CopyFileSparse(d.ImageSourcePath, d.getDiskPath()); err != nil {
 				return err
