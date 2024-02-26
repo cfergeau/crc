@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Introducing CRC :: CRC Documentation</title>
     <link rel="canonical" href="https://crc.dev/crc/getting_started/getting_started/introducing/">
-    <meta name="description" content="Introducting  CRC">
+    <meta name="description" content="Introducing  CRC">
     <meta name="generator" content="Antora 3.1.4">
     <link rel="stylesheet" href="../../../_/css/site.css">
   </head>
@@ -81,7 +81,7 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <a class="title" href="./">Getting started with CRC</a>
+      <div class="title"><a href="./">Getting started with CRC</a></div>
     </li>
   </ul>
 </div>
@@ -110,8 +110,8 @@
 <h2 id="_about_crc"><a class="anchor" href="#_about_crc"></a>About CRC</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>CRC brings a minimal OpenShift Container Platform 4 cluster and Podman container runtime to your local computer.
-These runtimes provide minimal environments for development and testing purposes.
+<p>CRC brings a minimal OpenShift Container Platform 4 cluster to your local computer.
+This runtime provides minimal environments for development and testing purposes.
 CRC is mainly targeted at running on developers' desktops.
 For other OpenShift Container Platform use cases, such as headless or multi-developer setups, use the <a href="https://console.redhat.com/openshift/create">full OpenShift installer</a>.</p>
 </div>
@@ -144,6 +144,22 @@ Upgrading the OpenShift Container Platform version might cause issues that are d
 <li>
 <p>It disables the Cluster Monitoring Operator by default.
 This disabled Operator causes the corresponding part of the web console to be non-functional.</p>
+</li>
+<li>
+<p>It disables the following operators:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Cloud Credential Operator.</p>
+</li>
+<li>
+<p>Cluster Autoscaler Operator.</p>
+</li>
+<li>
+<p>Cloud Controller Manager Operator.</p>
+</li>
+</ul>
+</div>
 </li>
 <li>
 <p>The OpenShift Container Platform cluster runs in a virtual machine known as an <em>instance</em>.
