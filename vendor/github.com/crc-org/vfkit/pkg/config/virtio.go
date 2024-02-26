@@ -47,37 +47,42 @@ type VirtioGPU struct {
 type VirtioVsock struct {
 	// Port is the virtio-vsock port used for this device, see `man vsock` for more
 	// details.
-	Port uint
+	Port uint `json:"port"`
 	// SocketURL is the path to a unix socket on the host to use for the virtio-vsock communication with the guest.
-	SocketURL string
+	SocketURL string `json:"socketURL"`
 	// If true, vsock connections will have to be done from guest to host. If false, vsock connections will only be possible
 	// from host to guest
-	Listen bool
+	Listen bool `json:"listen,omitempty"`
 }
 
 // VirtioBlk configures a disk device.
 type VirtioBlk struct {
 	StorageConfig
-	DeviceIdentifier string
+	DeviceIdentifier string `json:"deviceIdentifier,omitempty"`
 }
 
 type DirectorySharingConfig struct {
-	MountTag string
+	MountTag string `json:"mountTag"`
 }
 
 // VirtioFs configures directory sharing between the guest and the host.
 type VirtioFs struct {
 	DirectorySharingConfig
-	SharedDir string
+	SharedDir string `json:"sharedDir"`
 }
 
 // RosettaShare configures rosetta support in the guest to run Intel binaries on Apple CPUs
 type RosettaShare struct {
 	DirectorySharingConfig
-	InstallRosetta bool
+	InstallRosetta bool `json:"installRosetta"`
 }
 
-// virtioRng configures a random number generator (RNG) device.
+// NVMExpressController configures a NVMe controller in the guest
+type NVMExpressController struct {
+	StorageConfig
+}
+
+// VirtioRng configures a random number generator (RNG) device.
 type VirtioRng struct {
 }
 
@@ -86,19 +91,19 @@ type VirtioRng struct {
 
 // VirtioNet configures the virtual machine networking.
 type VirtioNet struct {
-	Nat        bool
-	MacAddress net.HardwareAddr
+	Nat        bool             `json:"nat"`
+	MacAddress net.HardwareAddr `json:"-"` // custom marshaller in json.go
 	// file parameter is holding a connected datagram socket.
 	// see https://github.com/Code-Hex/vz/blob/7f648b6fb9205d6f11792263d79876e3042c33ec/network.go#L113-L155
-	Socket *os.File
+	Socket *os.File `json:"socket,omitempty"`
 
-	UnixSocketPath string
+	UnixSocketPath string `json:"unixSocketPath,omitempty"`
 }
 
 // VirtioSerial configures the virtual machine serial ports.
 type VirtioSerial struct {
-	LogFile   string
-	UsesStdio bool
+	LogFile   string `json:"logFile,omitempty"`
+	UsesStdio bool   `json:"usesStdio,omitempty"`
 }
 
 // TODO: Add VirtioBalloon
@@ -143,6 +148,8 @@ func deviceFromCmdLine(deviceOpts string) (VirtioDevice, error) {
 	switch opts[0] {
 	case "rosetta":
 		dev = &RosettaShare{}
+	case "nvme":
+		dev = nvmExpressControllerNewEmpty()
 	case "virtio-blk":
 		dev = virtioBlkNewEmpty()
 	case "virtio-fs":
@@ -349,7 +356,7 @@ func VirtioNetNew(macAddress string) (*VirtioNet, error) {
 	}, nil
 }
 
-// Set the socket to use for the network communication
+// SetSocket Set the socket to use for the network communication
 //
 // This maps the virtual machine network interface to a connected datagram
 // socket. This means all network traffic on this interface will go through
@@ -450,6 +457,23 @@ func (dev *VirtioRng) FromOptions(options []option) error {
 		return fmt.Errorf("unknown options for virtio-rng devices: %s", options)
 	}
 	return nil
+}
+
+func nvmExpressControllerNewEmpty() *NVMExpressController {
+	return &NVMExpressController{
+		StorageConfig: StorageConfig{
+			DevName: "nvme",
+		},
+	}
+}
+
+// NVMExpressControllerNew creates a new NVMExpress controller to use in the
+// virtual machine. It will use the file at imagePath as the disk image. This
+// image must be in raw format.
+func NVMExpressControllerNew(imagePath string) (*NVMExpressController, error) {
+	r := nvmExpressControllerNewEmpty()
+	r.ImagePath = imagePath
+	return r, nil
 }
 
 func virtioBlkNewEmpty() *VirtioBlk {
@@ -589,7 +613,7 @@ func (dev *VirtioFs) FromOptions(options []option) error {
 	return nil
 }
 
-// RosettaShare creates a new rosetta share for running x86_64 binaries on M1 machines.
+// RosettaShareNew RosettaShare creates a new rosetta share for running x86_64 binaries on M1 machines.
 // It will share a directory containing the linux rosetta binaries with the
 // virtual machine. This directory can be mounted in the VM using `mount -t
 // virtiofs mountTag /some/dir`
@@ -652,9 +676,9 @@ func USBMassStorageNew(imagePath string) (VMComponent, error) {
 
 // StorageConfig configures a disk device.
 type StorageConfig struct {
-	DevName   string
-	ImagePath string
-	ReadOnly  bool
+	DevName   string `json:"devName"`
+	ImagePath string `json:"imagePath"`
+	ReadOnly  bool   `json:"readOnly,omitempty"`
 }
 
 func (config *StorageConfig) ToCmdLine() ([]string, error) {
