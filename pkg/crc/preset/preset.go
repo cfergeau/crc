@@ -16,7 +16,6 @@ const (
 )
 
 var presetMap = map[Preset]string{
-	Podman:     string(Podman),
 	OpenShift:  string(OpenShift),
 	OKD:        string(OKD),
 	Microshift: string(Microshift),
