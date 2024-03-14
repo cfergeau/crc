@@ -58,6 +58,9 @@ func (preset Preset) ForDisplay() string {
 }
 
 func ParsePresetE(input string) (Preset, error) {
+	if string(Podman) == input {
+		return Podman, fmt.Errorf(PodmanDeprecatedWarning)
+	}
 	for pSet, pString := range presetMap {
 		if pString == input {
 			return pSet, nil
@@ -68,7 +71,7 @@ func ParsePresetE(input string) (Preset, error) {
 }
 func ParsePreset(input string) Preset {
 	preset, err := ParsePresetE(input)
-	if err != nil {
+	if err != nil && preset != Podman {
 		logging.Errorf("unexpected preset mode %s, using default", input)
 		return OpenShift
 	}
