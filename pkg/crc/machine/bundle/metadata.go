@@ -167,16 +167,12 @@ func (bundle *CrcBundleInfo) GetBundleBuildTime() (time.Time, error) {
 	return time.Parse(time.RFC3339, strings.TrimSpace(bundle.BuildInfo.BuildTime))
 }
 
-func (bundle *CrcBundleInfo) GetOpenshiftVersion() string {
+func (bundle *CrcBundleInfo) GetVersion() string {
 	return bundle.ClusterInfo.OpenShiftVersion.String()
 }
 
 func (bundle *CrcBundleInfo) GetPodmanVersion() string {
 	return bundle.Nodes[0].PodmanVersion
-}
-
-func (bundle *CrcBundleInfo) GetVersion() string {
-	return bundle.GetOpenshiftVersion()
 }
 
 func (bundle *CrcBundleInfo) GetBundleNameWithoutExtension() string {
