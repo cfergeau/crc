@@ -185,6 +185,10 @@ github.com/containers/ocicrypt/keywrap/pkcs7
 github.com/containers/ocicrypt/spec
 github.com/containers/ocicrypt/utils
 github.com/containers/ocicrypt/utils/keyprovider
+# github.com/containers/podman/v5 v5.0.2 => github.com/cfergeau/podman/v5 v5.0.0-20240423150536-f8898e383855
+## explicit; go 1.20
+github.com/containers/podman/v5/pkg/fileserver
+github.com/containers/podman/v5/pkg/fileserver/plan9
 # github.com/containers/storage v1.55.0
 ## explicit; go 1.21
 github.com/containers/storage/pkg/archive
@@ -204,7 +208,7 @@ github.com/containers/storage/pkg/reexec
 github.com/containers/storage/pkg/regexp
 github.com/containers/storage/pkg/system
 github.com/containers/storage/pkg/unshare
-# github.com/coreos/go-systemd/v22 v22.5.0
+# github.com/coreos/go-systemd/v22 v22.5.1-0.20231103132048-7d375ecc2b09
 ## explicit; go 1.12
 github.com/coreos/go-systemd/v22/activation
 github.com/coreos/go-systemd/v22/daemon
@@ -346,7 +350,7 @@ github.com/go-openapi/validate
 # github.com/go-task/slim-sprig/v3 v3.0.0
 ## explicit; go 1.20
 github.com/go-task/slim-sprig/v3
-# github.com/godbus/dbus/v5 v5.1.0
+# github.com/godbus/dbus/v5 v5.1.1-0.20230522191255-76236955d466
 ## explicit; go 1.12
 github.com/godbus/dbus/v5
 # github.com/gofrs/uuid v4.3.1+incompatible
@@ -434,7 +438,7 @@ github.com/hashicorp/hcl/json/token
 ## explicit; go 1.12
 github.com/hectane/go-acl
 github.com/hectane/go-acl/api
-# github.com/hugelgupf/p9 v0.3.0
+# github.com/hugelgupf/p9 v0.3.1-0.20230822151754-54f5c5530921
 ## explicit; go 1.20
 github.com/hugelgupf/p9/fsimpl/localfs
 github.com/hugelgupf/p9/fsimpl/templatefs
@@ -1364,3 +1368,4 @@ sigs.k8s.io/structured-merge-diff/v4/value
 ## explicit; go 1.12
 sigs.k8s.io/yaml
 sigs.k8s.io/yaml/goyaml.v2
+# github.com/containers/podman/v5 => github.com/cfergeau/podman/v5 v5.0.0-20240423150536-f8898e383855
