@@ -1,15 +1,31 @@
 package libvirt
 
 import (
-	"fmt"
-
+	macadam "github.com/cfergeau/macadam/pkg/machinedriver"
 	"github.com/crc-org/crc/v2/pkg/crc/constants"
 	"github.com/crc-org/crc/v2/pkg/crc/machine/config"
-	"github.com/crc-org/crc/v2/pkg/crc/network"
-	"github.com/crc-org/machine/drivers/libvirt"
-	"github.com/crc-org/machine/libmachine/drivers"
 )
 
+func CreateHost(machineConfig config.MachineConfig) *macadam.Driver {
+	macadamDriver := macadam.NewDriver(machineConfig.Name, constants.MachineBaseDir)
+
+	config.InitVMDriverFromMachineConfig(machineConfig, macadamDriver.VMDriver)
+
+	/*
+		if machineConfig.NetworkMode == network.UserNetworkingMode {
+			macadamDriver.Network = "" // don't need to attach a network interface
+			macadamDriver.VSock = true
+		} else {
+			macadamDriver.Network = DefaultNetwork
+		}
+	*/
+
+	//macadamDriver.SharedDirs = configureShareDirs(machineConfig)
+
+	return macadamDriver
+}
+
+/*
 func CreateHost(machineConfig config.MachineConfig) *libvirt.Driver {
 	libvirtDriver := libvirt.NewDriver(machineConfig.Name, constants.MachineBaseDir)
 
@@ -41,3 +57,4 @@ func configureShareDirs(machineConfig config.MachineConfig) []drivers.SharedDir 
 	}
 	return sharedDirs
 }
+*/

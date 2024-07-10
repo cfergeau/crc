@@ -3,13 +3,12 @@ package machine
 import (
 	"encoding/json"
 	"errors"
-	"path/filepath"
 
+	macadam "github.com/cfergeau/macadam/pkg/machinedriver"
 	"github.com/crc-org/crc/v2/pkg/crc/machine/config"
 	"github.com/crc-org/crc/v2/pkg/crc/machine/libvirt"
 	"github.com/crc-org/crc/v2/pkg/libmachine"
 	"github.com/crc-org/crc/v2/pkg/libmachine/host"
-	machineLibvirt "github.com/crc-org/machine/drivers/libvirt"
 	"github.com/crc-org/machine/libmachine/drivers"
 )
 
@@ -18,20 +17,20 @@ func newHost(api libmachine.API, machineConfig config.MachineConfig) (*host.Host
 	if err != nil {
 		return nil, errors.New("Failed to marshal driver options")
 	}
-	return api.NewHost("libvirt", filepath.Dir(libvirt.MachineDriverPath()), json)
+	return api.NewHost("macadam", "", json)
 }
 
 /* FIXME: host.Host is only known here, and libvirt.Driver is only accessible
  * in libvirt/driver_linux.go
  */
-func loadDriverConfig(host *host.Host) (*machineLibvirt.Driver, error) {
-	var libvirtDriver machineLibvirt.Driver
+func loadDriverConfig(host *host.Host) (*macadam.Driver, error) {
+	var libvirtDriver macadam.Driver
 	err := json.Unmarshal(host.RawDriver, &libvirtDriver)
 
 	return &libvirtDriver, err
 }
 
-func updateDriverConfig(host *host.Host, driver *machineLibvirt.Driver) error {
+func updateDriverConfig(host *host.Host, driver *macadam.Driver) error {
 	driverData, err := json.Marshal(driver)
 	if err != nil {
 		return err
@@ -49,6 +48,6 @@ func (r *RPCServerDriver) SetConfigRaw(data []byte, _ *struct{}) error {
 }
 */
 
-func updateDriverStruct(_ *host.Host, _ *machineLibvirt.Driver) error {
+func updateDriverStruct(_ *host.Host, _ *macadam.Driver) error {
 	return drivers.ErrNotImplemented
 }

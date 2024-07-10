@@ -73,7 +73,8 @@ RELEASE_VERSION_VARIABLES := -X $(MODULEPATH)/pkg/crc/segment.WriteKey=cvpHsNcmG
 # https://golang.org/cmd/link/
 LDFLAGS := $(VERSION_VARIABLES) ${GO_EXTRA_LDFLAGS}
 # Same build flags are used in the podman remote to cross build it https://github.com/containers/podman/blob/main/Makefile
-BUILDTAGS := containers_image_openpgp
+BUILDTAGS := containers_image_openpgp exclude_graphdriver_btrfs btrfs_noversion
+
 
 # Add default target
 .PHONY: default
