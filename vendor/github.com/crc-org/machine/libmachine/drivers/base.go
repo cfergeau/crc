@@ -22,6 +22,7 @@ type VMDriver struct {
 	CPU             uint
 	DiskCapacity    uint64 // bytes
 	SharedDirs      []SharedDir
+	SSHConfig       *SSHConfig
 }
 
 type SharedDir struct {
@@ -32,6 +33,20 @@ type SharedDir struct {
 	Type     string
 	Username string
 	Password string `json:"-"`
+}
+
+// SSHConfig contains remote access information for SSH
+type SSHConfig struct {
+	// IdentityPath is the fq path to the ssh priv key
+	IdentityPath string
+	// SSH port for user networking
+	Port int
+	// RemoteUsername of the vm user
+	RemoteUsername string
+}
+
+func (d *BaseDriver) SSH() SSHConfig {
+	return SSHConfig{}
 }
 
 // DriverName returns the name of the driver

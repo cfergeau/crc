@@ -1,12 +1,15 @@
 package libmachine
 
 import (
+	"encoding/json"
+
+	macadam "github.com/cfergeau/macadam/pkg/machinedriver"
 	"github.com/crc-org/crc/v2/pkg/libmachine/host"
 )
 
 func (api *Client) NewHost(driverName string, driverPath string, rawDriver []byte) (*host.Host, error) {
-	driver, err := api.clientDriverFactory.NewRPCClientDriver(driverName, driverPath, rawDriver)
-	if err != nil {
+	driver := macadam.NewDriver("", "")
+	if err := json.Unmarshal(rawDriver, &driver); err != nil {
 		return nil, err
 	}
 
@@ -26,10 +29,10 @@ func (api *Client) Load(name string) (*host.Host, error) {
 		return nil, err
 	}
 
-	d, err := api.clientDriverFactory.NewRPCClientDriver(h.DriverName, h.DriverPath, h.RawDriver)
-	if err != nil {
+	driver := macadam.NewDriver("", "")
+	if err := json.Unmarshal(h.RawDriver, &driver); err != nil {
 		return nil, err
 	}
-	h.Driver = d
+	h.Driver = driver
 	return h, nil
 }
