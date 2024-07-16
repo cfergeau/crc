@@ -33,6 +33,9 @@ func (api *Client) Load(name string) (*host.Host, error) {
 	if err := json.Unmarshal(h.RawDriver, &driver); err != nil {
 		return nil, err
 	}
+	if err := driver.Reload(); err != nil {
+		return nil, err
+	}
 	h.Driver = driver
 	return h, nil
 }
