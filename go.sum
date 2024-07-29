@@ -58,8 +58,6 @@ github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UF
 github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cfergeau/gvisor-tap-vsock v0.7.3-0.20241209155656-dc16c2d91990 h1:NrYHaizZuMJX+7C/y5YS0PRDt1JFKRfsvEp0DBNQEuo=
 github.com/cfergeau/gvisor-tap-vsock v0.7.3-0.20241209155656-dc16c2d91990/go.mod h1:gjdY4JBWnynrXsxT8+OM7peEOd4FCZpoOWjSadHva0g=
-github.com/cfergeau/macadam v0.0.0-20241127162307-91fcf8fc2045 h1:/3zqDnE3Vx3600oU7u3PUIOmOD2dsPkZsJfTKDyJC40=
-github.com/cfergeau/macadam v0.0.0-20241127162307-91fcf8fc2045/go.mod h1:04qMQKVWagEF4shT4NAD0aKhj1HY59Je3tfiOqTaVPU=
 github.com/cfergeau/machine v0.0.0-20241127155529-1b8b9b8d1078 h1:KpgRncgq6ZiWDnLe6R58dJjd6QSuU7RDqRrpl11Dxcg=
 github.com/cfergeau/machine v0.0.0-20241127155529-1b8b9b8d1078/go.mod h1:trWeQimjfE3dJ8qWOxI4ePtYm13aecK42bf01s6h/Nc=
 github.com/cheggaaa/pb/v3 v3.1.5 h1:QuuUzeM2WsAqG2gMqtzaWithDJv0i+i6UlnwSCI4QLk=

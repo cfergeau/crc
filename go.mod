@@ -282,3 +282,5 @@ replace github.com/containers/podman/v5 => /home/teuf/freesoftware/github.com/co
 replace github.com/crc-org/machine => github.com/cfergeau/machine v0.0.0-20241127155529-1b8b9b8d1078
 
 replace github.com/containers/gvisor-tap-vsock => github.com/cfergeau/gvisor-tap-vsock v0.7.3-0.20241209155656-dc16c2d91990
+
+replace github.com/cfergeau/macadam => /home/teuf/dev/macadam

@@ -133,7 +133,7 @@ github.com/bytedance/sonic/utf8
 ## explicit; go 1.14
 github.com/cavaliergopher/grab/v3
 github.com/cavaliergopher/grab/v3/pkg/bps
-# github.com/cfergeau/macadam v0.0.0-20241127162307-91fcf8fc2045
+# github.com/cfergeau/macadam v0.0.0-20241127162307-91fcf8fc2045 => /home/teuf/dev/macadam
 ## explicit; go 1.22.6
 github.com/cfergeau/macadam/pkg/machinedriver
 # github.com/cheggaaa/pb/v3 v3.1.5
@@ -1866,3 +1866,4 @@ tags.cncf.io/container-device-interface/pkg/parser
 # github.com/containers/podman/v5 => /home/teuf/freesoftware/github.com/containers/podman
 # github.com/crc-org/machine => github.com/cfergeau/machine v0.0.0-20241127155529-1b8b9b8d1078
 # github.com/containers/gvisor-tap-vsock => github.com/cfergeau/gvisor-tap-vsock v0.7.3-0.20241209155656-dc16c2d91990
+# github.com/cfergeau/macadam => /home/teuf/dev/macadam
