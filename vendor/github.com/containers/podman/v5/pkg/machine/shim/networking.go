@@ -50,9 +50,9 @@ func startHostForwarder(mc *vmconfigs.MachineConfig, provider vmconfigs.VMProvid
 	if err != nil {
 		return err
 	}
+	logrus.Warnf("gvproxy: %v", binary)
 
 	cmd := gvproxy.NewGvproxyCommand()
-	logrus.Warnf("gvproxy: %+v", cmd)
 
 	// GvProxy PID file path is now derived
 	runDir := dirs.RuntimeDir
@@ -77,6 +77,7 @@ func startHostForwarder(mc *vmconfigs.MachineConfig, provider vmconfigs.VMProvid
 		logrus.Debug(cmd)
 	}
 
+	logrus.Warnf("gvproxy: %+v", cmd)
 	// This allows a provider to perform additional setup as well as
 	// add in any provider specific options for gvproxy
 	if err := provider.StartNetworking(mc, &cmd); err != nil {

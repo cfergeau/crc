@@ -62,8 +62,6 @@ github.com/cfergeau/macadam v0.0.0-20241127162307-91fcf8fc2045 h1:/3zqDnE3Vx3600
 github.com/cfergeau/macadam v0.0.0-20241127162307-91fcf8fc2045/go.mod h1:04qMQKVWagEF4shT4NAD0aKhj1HY59Je3tfiOqTaVPU=
 github.com/cfergeau/machine v0.0.0-20241127155529-1b8b9b8d1078 h1:KpgRncgq6ZiWDnLe6R58dJjd6QSuU7RDqRrpl11Dxcg=
 github.com/cfergeau/machine v0.0.0-20241127155529-1b8b9b8d1078/go.mod h1:trWeQimjfE3dJ8qWOxI4ePtYm13aecK42bf01s6h/Nc=
-github.com/cfergeau/podman/v5 v5.0.0-20241213090455-63ea6fa04b45 h1:ydSafv0c92fgIJsrEu8ay6ko0EqhX9kz3YpCcfrg/zY=
-github.com/cfergeau/podman/v5 v5.0.0-20241213090455-63ea6fa04b45/go.mod h1:DTVzcjHg3KA5RwO36cd+nmJvfBPZKcfLugk7wL47ql0=
 github.com/cheggaaa/pb/v3 v3.1.5 h1:QuuUzeM2WsAqG2gMqtzaWithDJv0i+i6UlnwSCI4QLk=
 github.com/cheggaaa/pb/v3 v3.1.5/go.mod h1:CrxkeghYTXi1lQBEI7jSn+3svI3cuc19haAj6jM60XI=
 github.com/chenzhuoyu/base64x v0.0.0-20211019084208-fb5309c8db06/go.mod h1:DH46F32mSOjUmXrMHnKwZdA8wcEefY7UVqBKYGjpdQY=
