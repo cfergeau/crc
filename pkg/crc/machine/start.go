@@ -373,12 +373,6 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 
 	logging.Infof("Starting CRC VM for %s %s...", startConfig.Preset, vm.bundle.GetVersion())
 
-	if client.useVSock() {
-		if err := exposePorts(startConfig.Preset, startConfig.IngressHTTPPort, startConfig.IngressHTTPSPort); err != nil {
-			return nil, err
-		}
-	}
-
 	if err := client.updateVMConfig(startConfig, vm); err != nil {
 		return nil, errors.Wrap(err, "Could not update CRC VM configuration")
 	}
