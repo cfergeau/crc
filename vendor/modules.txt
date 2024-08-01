@@ -136,8 +136,8 @@ github.com/bytedance/sonic/utf8
 ## explicit; go 1.14
 github.com/cavaliergopher/grab/v3
 github.com/cavaliergopher/grab/v3/pkg/bps
-# github.com/cfergeau/macadam v0.0.0-20240712085649-6d3ce352388b
-## explicit; go 1.21
+# github.com/cfergeau/macadam v0.0.0-20240801092845-2c20c25b0aff
+## explicit; go 1.21.0
 github.com/cfergeau/macadam/pkg/machinedriver
 # github.com/cheggaaa/pb/v3 v3.1.5
 ## explicit; go 1.17
@@ -183,6 +183,7 @@ github.com/cloudflare/circl/sign/ed448
 github.com/containerd/cgroups/v3/cgroup1/stats
 # github.com/containerd/containerd v1.7.18
 ## explicit; go 1.21
+github.com/containerd/containerd/errdefs
 github.com/containerd/containerd/pkg/userns
 github.com/containerd/containerd/platforms
 # github.com/containerd/errdefs v0.1.0
@@ -198,8 +199,8 @@ github.com/containerd/stargz-snapshotter/estargz/errorutil
 # github.com/containerd/typeurl/v2 v2.1.1
 ## explicit; go 1.13
 github.com/containerd/typeurl/v2
-# github.com/containers/buildah v1.36.0
-## explicit; go 1.21
+# github.com/containers/buildah v1.37.0
+## explicit; go 1.21.0
 github.com/containers/buildah/define
 github.com/containers/buildah/internal/mkcw/types
 github.com/containers/buildah/internal/parse
@@ -207,8 +208,8 @@ github.com/containers/buildah/internal/sbom
 github.com/containers/buildah/internal/tmpdir
 github.com/containers/buildah/pkg/parse
 github.com/containers/buildah/pkg/sshagent
-# github.com/containers/common v0.59.1
-## explicit; go 1.21
+# github.com/containers/common v0.60.0
+## explicit; go 1.21.0
 github.com/containers/common/internal
 github.com/containers/common/internal/attributedstring
 github.com/containers/common/libimage
@@ -345,8 +346,8 @@ github.com/containers/ocicrypt/keywrap/pkcs7
 github.com/containers/ocicrypt/spec
 github.com/containers/ocicrypt/utils
 github.com/containers/ocicrypt/utils/keyprovider
-# github.com/containers/podman/v5 v5.1.1
-## explicit; go 1.21
+# github.com/containers/podman/v5 v5.2.0-rc2.0.20240731215226-8b246b68ac0c
+## explicit; go 1.21.0
 github.com/containers/podman/v5/libpod/define
 github.com/containers/podman/v5/pkg/errorhandling
 github.com/containers/podman/v5/pkg/machine
@@ -454,7 +455,7 @@ github.com/coreos/go-systemd/v22/dbus
 github.com/crc-org/admin-helper/pkg/client
 github.com/crc-org/admin-helper/pkg/hosts
 github.com/crc-org/admin-helper/pkg/types
-# github.com/crc-org/machine v0.0.0-20240715101719-0c1bc9eb95f8
+# github.com/crc-org/machine v0.0.0-20240715101719-0c1bc9eb95f8 => github.com/cfergeau/machine v0.0.0-20240731114918-7c24500be902
 ## explicit; go 1.17
 github.com/crc-org/machine/libmachine/drivers
 github.com/crc-org/machine/libmachine/drivers/plugin/localbinary
@@ -583,7 +584,7 @@ github.com/felixge/httpsnoop
 # github.com/fsnotify/fsnotify v1.7.0
 ## explicit; go 1.17
 github.com/fsnotify/fsnotify
-# github.com/fsouza/go-dockerclient v1.11.0
+# github.com/fsouza/go-dockerclient v1.11.1
 ## explicit; go 1.21
 github.com/fsouza/go-dockerclient
 # github.com/gabriel-vasile/mimetype v1.4.3
@@ -972,8 +973,8 @@ github.com/opencontainers/go-digest
 ## explicit; go 1.18
 github.com/opencontainers/image-spec/specs-go
 github.com/opencontainers/image-spec/specs-go/v1
-# github.com/opencontainers/runc v1.1.12
-## explicit; go 1.17
+# github.com/opencontainers/runc v1.1.13
+## explicit; go 1.18
 github.com/opencontainers/runc/libcontainer/apparmor
 github.com/opencontainers/runc/libcontainer/cgroups
 github.com/opencontainers/runc/libcontainer/cgroups/devices
@@ -1013,7 +1014,7 @@ github.com/openshift/client-go/config/clientset/versioned
 github.com/openshift/client-go/config/clientset/versioned/scheme
 github.com/openshift/client-go/config/clientset/versioned/typed/config/v1
 github.com/openshift/client-go/config/clientset/versioned/typed/config/v1alpha1
-# github.com/openshift/imagebuilder v1.2.11
+# github.com/openshift/imagebuilder v1.2.14
 ## explicit; go 1.19
 github.com/openshift/imagebuilder
 github.com/openshift/imagebuilder/dockerfile/command
@@ -1839,3 +1840,4 @@ sigs.k8s.io/yaml/goyaml.v2
 # tags.cncf.io/container-device-interface v0.8.0
 ## explicit; go 1.20
 tags.cncf.io/container-device-interface/pkg/parser
+# github.com/crc-org/machine => github.com/cfergeau/machine v0.0.0-20240731114918-7c24500be902

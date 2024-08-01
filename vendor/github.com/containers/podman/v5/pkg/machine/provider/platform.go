@@ -32,10 +32,14 @@ func Get() (vmconfigs.VMProvider, error) {
 	logrus.Debugf("Using Podman machine with `%s` virtualization provider", resolvedVMType.String())
 	switch resolvedVMType {
 	case define.QemuVirt:
-		return new(qemu.QEMUStubber), nil
+		return qemu.NewStubber()
 	default:
 		return nil, fmt.Errorf("unsupported virtualization provider: `%s`", resolvedVMType.String())
 	}
+}
+
+func GetAll(_ bool) ([]vmconfigs.VMProvider, error) {
+	return []vmconfigs.VMProvider{new(qemu.QEMUStubber)}, nil
 }
 
 // SupportedProviders returns the providers that are supported on the host operating system

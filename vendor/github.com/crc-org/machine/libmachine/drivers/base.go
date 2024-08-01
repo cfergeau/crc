@@ -34,6 +34,20 @@ type SharedDir struct {
 	Password string `json:"-"`
 }
 
+// SSHConfig contains remote access information for SSH
+type SSHConfig struct {
+	// IdentityPath is the fq path to the ssh priv key
+	IdentityPath string
+	// SSH port for user networking
+	Port int
+	// RemoteUsername of the vm user
+	RemoteUsername string
+}
+
+func (d *BaseDriver) SSH() SSHConfig {
+	return SSHConfig{}
+}
+
 // DriverName returns the name of the driver
 func (d *BaseDriver) DriverName() string {
 	return "unknown"

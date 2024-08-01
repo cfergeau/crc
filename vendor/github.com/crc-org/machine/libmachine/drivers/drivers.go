@@ -52,6 +52,9 @@ type Driver interface {
 
 	// Get Version information
 	DriverVersion() string
+
+	// Get SSH connection details
+	SSH() SSHConfig
 }
 
 var ErrHostIsNotRunning = errors.New("Host is not running")

@@ -10,7 +10,7 @@ require (
 	github.com/YourFin/binappend v0.0.0-20181105185800-0add4bf0b9ad
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/cavaliergopher/grab/v3 v3.0.1
-	github.com/cfergeau/macadam v0.0.0-20240712085649-6d3ce352388b
+	github.com/cfergeau/macadam v0.0.0-20240801092845-2c20c25b0aff
 	github.com/cheggaaa/pb/v3 v3.1.5
 	github.com/containers/gvisor-tap-vsock v0.7.4
 	github.com/containers/image/v5 v5.32.0
@@ -92,12 +92,12 @@ require (
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/containerd/stargz-snapshotter/estargz v0.15.1 // indirect
 	github.com/containerd/typeurl/v2 v2.1.1 // indirect
-	github.com/containers/buildah v1.36.0 // indirect
-	github.com/containers/common v0.59.1 // indirect
+	github.com/containers/buildah v1.37.0 // indirect
+	github.com/containers/common v0.60.0 // indirect
 	github.com/containers/libhvee v0.7.1 // indirect
 	github.com/containers/libtrust v0.0.0-20230121012942-c1716e8a8d01 // indirect
 	github.com/containers/ocicrypt v1.2.0 // indirect
-	github.com/containers/podman/v5 v5.1.1 // indirect
+	github.com/containers/podman/v5 v5.2.0-rc2.0.20240731215226-8b246b68ac0c // indirect
 	github.com/containers/psgo v1.9.0 // indirect
 	github.com/containers/storage v1.55.0 // indirect
 	github.com/containers/winquit v1.1.0 // indirect
@@ -119,7 +119,7 @@ require (
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/fsouza/go-dockerclient v1.11.0 // indirect
+	github.com/fsouza/go-dockerclient v1.11.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.9.1 // indirect
@@ -200,11 +200,11 @@ require (
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/opencontainers/runc v1.1.12 // indirect
+	github.com/opencontainers/runc v1.1.13 // indirect
 	github.com/opencontainers/runtime-spec v1.2.0 // indirect
 	github.com/opencontainers/runtime-tools v0.9.1-0.20230914150019-408c51e934dc // indirect
 	github.com/opencontainers/selinux v1.11.0 // indirect
-	github.com/openshift/imagebuilder v1.2.11 // indirect
+	github.com/openshift/imagebuilder v1.2.14 // indirect
 	github.com/ostreedev/ostree-go v0.0.0-20210805093236-719684c64e4f // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
@@ -268,3 +268,5 @@ require (
 	sigs.k8s.io/yaml v1.4.0 // indirect
 	tags.cncf.io/container-device-interface v0.8.0 // indirect
 )
+
+replace github.com/crc-org/machine => github.com/cfergeau/machine v0.0.0-20240731114918-7c24500be902

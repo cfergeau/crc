@@ -135,7 +135,6 @@ func (d *Driver) initOpts() *define.InitOptions {
 	initOpts.Image = d.getDiskPath()
 	initOpts.Volumes = []string{}
 	initOpts.USBs = []string{}
-	initOpts.VolumeDriver = ""
 	initOpts.IgnitionPath = ""
 	initOpts.Rootful = false
 	userModeNetworking := false
@@ -162,7 +161,6 @@ func (d *Driver) Reload() error {
 	return nil
 }
 
-// Create a host using the driver's config
 func (d *Driver) Create() error {
 	if err := d.PreCreateCheck(); err != nil {
 		return err
@@ -429,6 +427,9 @@ func podmanStatusToCrcState(status define.Status) state.State {
 
 // GetState returns the state that the host is in (running, stopped, etc)
 func (d *Driver) GetState() (state.State, error) {
+	if d.vmConfig == nil {
+		return state.Stopped, nil
+	}
 	status, err := d.vmProvider.State(d.vmConfig, false)
 	if err != nil {
 		return state.Error, err
@@ -485,4 +486,12 @@ func (d *Driver) UpdateConfigRaw(rawConfig []byte) error {
 func (d *Driver) Stop() error {
 	// podman machine stop
 	return fmt.Errorf("Stop() unimplemented")
+}
+
+func (d *Driver) SSH() drivers.SSHConfig {
+	return drivers.SSHConfig{
+		IdentityPath:   d.vmConfig.SSH.IdentityPath,
+		Port:           d.vmConfig.SSH.Port,
+		RemoteUsername: d.vmConfig.SSH.RemoteUsername,
+	}
 }
