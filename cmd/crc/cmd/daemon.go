@@ -121,11 +121,6 @@ var daemonCmd = &cobra.Command{
 }
 
 func run(configuration *types.Configuration) error {
-	vsockListener, err := vsockListener()
-	if err != nil {
-		return err
-	}
-
 	vn, err := virtualnetwork.New(configuration)
 	if err != nil {
 		return err
@@ -143,7 +138,7 @@ func run(configuration *types.Configuration) error {
 			return
 		}
 		mux := http.NewServeMux()
-		mux.Handle("/network/", interceptResponseBodyMiddleware(http.StripPrefix("/network", vn.Mux()), logResponseBodyConditionally))
+		//mux.Handle("/network/", interceptResponseBodyMiddleware(http.StripPrefix("/network", vn.Mux()), logResponseBodyConditionally))
 		machineClient := newMachine()
 		mux.Handle("/api/", interceptResponseBodyMiddleware(http.StripPrefix("/api", api.NewMux(config, machineClient, logging.Memory, segmentClient)), logResponseBodyConditionally))
 		mux.Handle("/events", interceptResponseBodyMiddleware(http.StripPrefix("/events", events.NewEventServer(machineClient)), logResponseBodyConditionally))
@@ -172,34 +167,39 @@ func run(configuration *types.Configuration) error {
 		}
 	}()
 
-	networkListener, err := vn.Listen("tcp", fmt.Sprintf("%s:80", hostVirtualIP))
-	if err != nil {
-		return err
-	}
-	go func() {
-		mux := networkAPIMux(vn)
-		s := &http.Server{
-			Handler:      handlers.LoggingHandler(os.Stderr, mux),
-			ReadTimeout:  10 * time.Second,
-			WriteTimeout: 10 * time.Second,
-		}
-		if err := s.Serve(networkListener); err != nil {
-			errCh <- errors.Wrap(err, "host virtual IP http.Serve failed")
-		}
-	}()
+	// networkListener, err := vn.Listen("tcp", fmt.Sprintf("%s:80", hostVirtualIP))
+	// if err != nil {
+	// 	return err
+	// }
+	// go func() {
+	// 	mux := networkAPIMux(vn)
+	// 	s := &http.Server{
+	// 		Handler:      handlers.LoggingHandler(os.Stderr, mux),
+	// 		ReadTimeout:  10 * time.Second,
+	// 		WriteTimeout: 10 * time.Second,
+	// 	}
+	// 	if err := s.Serve(networkListener); err != nil {
+	// 		errCh <- errors.Wrap(err, "host virtual IP http.Serve failed")
+	// 	}
+	// }()
 
-	go func() {
-		mux := http.NewServeMux()
-		mux.Handle(types.ConnectPath, vn.Mux())
-		s := &http.Server{
-			Handler:      mux,
-			ReadTimeout:  10 * time.Second,
-			WriteTimeout: 10 * time.Second,
-		}
-		if err := s.Serve(vsockListener); err != nil {
-			errCh <- errors.Wrap(err, "virtualnetwork http.Serve failed")
-		}
-	}()
+	// vsockListener, err := vsockListener()
+	// if err != nil {
+	// 	return err
+	// }
+	//
+	// go func() {
+	// 	mux := http.NewServeMux()
+	// 	mux.Handle(types.ConnectPath, vn.Mux())
+	// 	s := &http.Server{
+	// 		Handler:      mux,
+	// 		ReadTimeout:  10 * time.Second,
+	// 		WriteTimeout: 10 * time.Second,
+	// 	}
+	// 	if err := s.Serve(vsockListener); err != nil {
+	// 		errCh <- errors.Wrap(err, "virtualnetwork http.Serve failed")
+	// 	}
+	// }()
 
 	startupDone()
 
