@@ -95,6 +95,9 @@ func (vm *virtualMachine) IP() (string, error) {
 }
 
 func (vm *virtualMachine) SSHPort() int {
+	if vm.Driver.SSH().Port != 0 {
+		return vm.Driver.SSH().Port
+	}
 	if vm.vsock {
 		return constants.VsockSSHPort
 	}
