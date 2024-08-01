@@ -1,6 +1,7 @@
 package machine
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/url"
@@ -13,32 +14,52 @@ import (
 	crcErrors "github.com/crc-org/crc/v2/pkg/crc/errors"
 	"github.com/crc-org/crc/v2/pkg/crc/logging"
 	crcPreset "github.com/crc-org/crc/v2/pkg/crc/preset"
+	crcssh "github.com/crc-org/crc/v2/pkg/crc/ssh"
 	"github.com/pkg/errors"
 )
 
-func exposePorts(preset crcPreset.Preset, ingressHTTPPort, ingressHTTPSPort uint) error {
+func exposePorts(sshRunner *crcssh.Runner, preset crcPreset.Preset, ingressHTTPPort, ingressHTTPSPort uint) error {
 	portsToExpose := vsockPorts(preset, ingressHTTPPort, ingressHTTPSPort)
-	daemonClient := daemonclient.New()
-	alreadyOpenedPorts, err := listOpenPorts(daemonClient)
+	logging.Infof("ports to expose: %v", portsToExpose)
+	alreadyOpenedPorts, err := list(sshRunner)
 	if err != nil {
+		logging.Infof("listOpenPorts: %v", err)
 		return err
 	}
+	logging.Infof("already opened ports: %v", portsToExpose)
 	var missingPorts []types.ExposeRequest
 	for _, port := range portsToExpose {
 		if !isOpened(alreadyOpenedPorts, port) {
 			missingPorts = append(missingPorts, port)
 		}
 	}
+	logging.Infof("missing ports: %v", missingPorts)
 	for i := range missingPorts {
 		port := &missingPorts[i]
-		if err := daemonClient.NetworkClient.Expose(port); err != nil {
+		req, err := json.Marshal(port)
+		if err != nil {
 			return errors.Wrapf(err, "failed to expose port %s -> %s", port.Local, port.Remote)
 		}
+		stdout, stderr, err := sshRunner.Run("curl", "-X", "POST", "-d", fmt.Sprintf("'%s'", string(req)), "http://192.168.127.1/services/forwarder/expose")
+		logging.Infof("exposePorts stdout: %s\nstderr: %s\nerr: %v", stdout, stderr, err)
+		if err != nil {
+			return errors.Wrapf(err, "failed to expose port %s -> %s", port.Local, port.Remote)
+		}
+
+		/*
+			if err := daemonClient.NetworkClient.Expose(port); err != nil {
+				return errors.Wrapf(err, "failed to expose port %s -> %s", port.Local, port.Remote)
+			}
+		*/
 	}
 	return nil
 }
 
 func isOpened(exposed []types.ExposeRequest, port types.ExposeRequest) bool {
+	logging.Infof("testing if %+v is already open", port)
+	if port.Local == "127.0.0.1:2222" {
+		return true
+	}
 	for _, alreadyOpenedPort := range exposed {
 		if port == alreadyOpenedPort {
 			return true
@@ -74,6 +95,20 @@ func listOpenPorts(daemonClient *daemonclient.Client) ([]types.ExposeRequest, er
 	return alreadyOpenedPorts, nil
 }
 
+func list(sshRunner *crcssh.Runner) ([]types.ExposeRequest, error) {
+	stdout, stderr, err := sshRunner.Run("curl", "http://192.168.127.1/services/forwarder/all")
+	logging.Infof("listPorts stdout: %s\nstderr: %s\nerr: %v", stdout, stderr, err)
+	if err != nil {
+		return nil, err
+	}
+	var ports []types.ExposeRequest
+	err = json.Unmarshal([]byte(stdout), &ports)
+	if err != nil {
+		return nil, err
+	}
+	return ports, nil
+}
+
 const (
 	virtualMachineIP = "192.168.127.2"
 	hostVirtualIP    = "192.168.127.254"
@@ -94,7 +129,7 @@ func vsockPorts(preset crcPreset.Preset, ingressHTTPPort, ingressHTTPSPort uint)
 	exposeRequest := []types.ExposeRequest{
 		{
 			Protocol: "tcp",
-			Local:    net.JoinHostPort(constants.LocalIP, strconv.Itoa(constants.VsockSSHPort)),
+			Local:    net.JoinHostPort(constants.LocalIP, strconv.Itoa(2223)),
 			Remote:   net.JoinHostPort(virtualMachineIP, internalSSHPort),
 		},
 		{

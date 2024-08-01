@@ -407,6 +407,15 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 	}
 	logging.Info("CRC VM is running")
 
+	/* FIXME: This works because the ssh port is exposed early on gvproxy cmdline. This will need to be reworked */
+	logging.Info("exposing ports")
+	if client.useVSock() {
+		logging.Info("exposing ports #2")
+		if err := exposePorts(sshRunner, startConfig.Preset, startConfig.IngressHTTPPort, startConfig.IngressHTTPSPort); err != nil {
+			return nil, err
+		}
+	}
+
 	if startConfig.EmergencyLogin {
 		if err := enableEmergencyLogin(sshRunner); err != nil {
 			return nil, errors.Wrap(err, "Error enabling emergency login")
