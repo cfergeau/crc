@@ -446,7 +446,7 @@ github.com/coreos/go-systemd/v22/dbus
 github.com/crc-org/admin-helper/pkg/client
 github.com/crc-org/admin-helper/pkg/hosts
 github.com/crc-org/admin-helper/pkg/types
-# github.com/crc-org/machine v0.0.0-20240926103419-a943b47fd48b => github.com/cfergeau/machine v0.0.0-20241127155529-1b8b9b8d1078
+# github.com/crc-org/machine v0.0.0-20240926103419-a943b47fd48b => /home/teuf/dev/machine
 ## explicit; go 1.17
 github.com/crc-org/machine/libmachine/drivers
 github.com/crc-org/machine/libmachine/drivers/plugin/localbinary
@@ -1864,6 +1864,6 @@ sigs.k8s.io/yaml/goyaml.v2
 ## explicit; go 1.20
 tags.cncf.io/container-device-interface/pkg/parser
 # github.com/containers/podman/v5 => /home/teuf/freesoftware/github.com/containers/podman
-# github.com/crc-org/machine => github.com/cfergeau/machine v0.0.0-20241127155529-1b8b9b8d1078
+# github.com/crc-org/machine => /home/teuf/dev/machine
 # github.com/containers/gvisor-tap-vsock => github.com/cfergeau/gvisor-tap-vsock v0.7.3-0.20241209155656-dc16c2d91990
 # github.com/cfergeau/macadam => /home/teuf/dev/macadam
