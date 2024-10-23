@@ -95,7 +95,7 @@ github.com/cloudflare/circl/sign/ed448
 # github.com/containers/common v0.60.4
 ## explicit; go 1.21.0
 github.com/containers/common/pkg/strongunits
-# github.com/containers/gvisor-tap-vsock v0.7.6-0.20241023100848-78d4944ff742
+# github.com/containers/gvisor-tap-vsock v0.7.6-0.20241023100848-78d4944ff742 => github.com/cfergeau/gvisor-tap-vsock v0.7.3-0.20241023135407-09864f1fbff4
 ## explicit; go 1.22.0
 github.com/containers/gvisor-tap-vsock/pkg/client
 github.com/containers/gvisor-tap-vsock/pkg/fs
@@ -1043,7 +1043,7 @@ gopkg.in/yaml.v2
 # gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3
-# gvisor.dev/gvisor v0.0.0-20240826182512-9f3309e5b121
+# gvisor.dev/gvisor v0.0.0-20240916094835-a174eb65023f
 ## explicit; go 1.22.0
 gvisor.dev/gvisor/pkg/atomicbitops
 gvisor.dev/gvisor/pkg/bits
@@ -1360,3 +1360,4 @@ sigs.k8s.io/structured-merge-diff/v4/value
 ## explicit; go 1.12
 sigs.k8s.io/yaml
 sigs.k8s.io/yaml/goyaml.v2
+# github.com/containers/gvisor-tap-vsock => github.com/cfergeau/gvisor-tap-vsock v0.7.3-0.20241023135407-09864f1fbff4
