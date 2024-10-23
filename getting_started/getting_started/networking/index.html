@@ -308,6 +308,63 @@ $ crc config set no-proxy <em>&lt;comma-separated-no-proxy-entries&gt;</em></pre
 </div>
 </div>
 <div class="sect1">
+<h2 id="_accessing_services_running_on_your_host_from_crc"><a class="anchor" href="#_accessing_services_running_on_your_host_from_crc"></a>Accessing services running on your host from CRC</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When you run services on your host, you can configure CRC to access these services.</p>
+</div>
+<div class="ulist">
+<div class="title">Prerequisites</div>
+<ul>
+<li>
+<p>You have a service which is running on your host and want to consume it with CRC.</p>
+</li>
+<li>
+<p>You are using the user mode network. On macOS and Microsoft Windows this is the default behavior.</p>
+</li>
+</ul>
+</div>
+<div class="olist arabic">
+<div class="title">Procedure</div>
+<ol class="arabic">
+<li>
+<p>Enable accessing services from host to CRC:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc config set host-network-access true</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Verify that the CRC configuration uses user network mode and enables host network access:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc config view
+[...]
+- network-mode                          : user
+- host-network-access                   : true
+[...]</pre>
+</div>
+</div>
+</li>
+<li>
+<p>If CRC instance is already running then restart it (stop &#8658; start), otherwise just start it.</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ crc stop &amp;&amp; crc start</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<div class="title">Verification</div>
+<p>Assuming your service is running on the host on port <code>8080</code>, to access
+it from the CRC instance, use <code>host.crc.testing:8080</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_setting_up_crc_on_a_remote_server"><a class="anchor" href="#_setting_up_crc_on_a_remote_server"></a>Setting up CRC on a remote server</h2>
 <div class="sectionbody">
 <div class="paragraph">
