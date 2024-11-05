@@ -43,7 +43,7 @@ func NewClient(name string, debug bool, config crcConfig.Storage) Client {
 	return newClientWithVirtualMachine(name, debug, config, nil)
 }
 
-// newClientWithVirtualMachine creates a Client instance with a overridden VirtualMachine implementation.
+// newClientWithVirtualMachine creates a Client instance with an overridden VirtualMachine implementation.
 // It would not create a new VirtualMachine object. This method is primarily created for usage in tests so
 // that we can pass a fake VirtualMachine implementation.
 func newClientWithVirtualMachine(name string, debug bool, config crcConfig.Storage, vm VirtualMachine) Client {

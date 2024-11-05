@@ -5,6 +5,7 @@ import (
 
 	"github.com/crc-org/crc/v2/pkg/crc/machine/bundle"
 	"github.com/crc-org/crc/v2/pkg/crc/machine/state"
+	crcPreset "github.com/crc-org/crc/v2/pkg/crc/preset"
 	"github.com/crc-org/crc/v2/pkg/crc/ssh"
 	"github.com/crc-org/crc/v2/pkg/libmachine"
 	libmachinehost "github.com/crc-org/crc/v2/pkg/libmachine/host"
@@ -39,6 +40,7 @@ type FakeVirtualMachine struct {
 	FailingStop   bool
 	FailingState  bool
 	FakeSSHClient *FakeSSHClient
+	PortsExposed  bool
 }
 
 func (vm *FakeVirtualMachine) Close() error {
@@ -96,6 +98,16 @@ func (vm *FakeVirtualMachine) API() libmachine.API {
 
 func (vm *FakeVirtualMachine) GetHost() *libmachinehost.Host {
 	panic("not implemented")
+}
+
+func (vm *FakeVirtualMachine) ExposePorts(_ crcPreset.Preset, _, _ uint) error {
+	vm.PortsExposed = true
+	return nil
+}
+
+func (vm *FakeVirtualMachine) UnExposePorts() error {
+	vm.PortsExposed = false
+	return nil
 }
 
 func NewFakeVirtualMachine(failingStop bool, failingState bool) *FakeVirtualMachine {

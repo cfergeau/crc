@@ -3,6 +3,8 @@ package machine
 import (
 	"fmt"
 
+	crcPreset "github.com/crc-org/crc/v2/pkg/crc/preset"
+
 	"github.com/crc-org/crc/v2/pkg/crc/constants"
 	"github.com/crc-org/crc/v2/pkg/crc/machine/bundle"
 	"github.com/crc-org/crc/v2/pkg/crc/machine/state"
@@ -26,6 +28,8 @@ type VirtualMachine interface {
 	Driver() drivers.Driver
 	API() libmachine.API
 	Host() *libmachinehost.Host
+	ExposePorts(preset crcPreset.Preset, ingressHTTPPort, ingressHTTPSPort uint) error
+	UnExposePorts() error
 }
 
 type virtualMachine struct {
