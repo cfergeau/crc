@@ -37,13 +37,13 @@ func (client *client) Status() (*types.ClusterStatusResult, error) {
 		CrcStatus: vmStatus,
 	}
 	switch {
-	case vm.bundle.IsMicroshift():
+	case vm.Bundle().IsMicroshift():
 		clusterStatusResult.OpenshiftStatus = types.OpenshiftStopped
-		clusterStatusResult.OpenshiftVersion = vm.bundle.GetVersion()
+		clusterStatusResult.OpenshiftVersion = vm.Bundle().GetVersion()
 		clusterStatusResult.Preset = preset.Microshift
 	default:
 		clusterStatusResult.OpenshiftStatus = types.OpenshiftStopped
-		clusterStatusResult.OpenshiftVersion = vm.bundle.GetVersion()
+		clusterStatusResult.OpenshiftVersion = vm.Bundle().GetVersion()
 		clusterStatusResult.Preset = preset.OpenShift
 	}
 
@@ -62,10 +62,10 @@ func (client *client) Status() (*types.ClusterStatusResult, error) {
 	clusterStatusResult.DiskSize = diskSize
 
 	switch {
-	case vm.bundle.IsMicroshift():
+	case vm.Bundle().IsMicroshift():
 		clusterStatusResult.OpenshiftStatus = getMicroShiftStatus(context.Background(), ip)
 		clusterStatusResult.PersistentVolumeUse, clusterStatusResult.PersistentVolumeSize = client.getPVCSize(vm)
-	case vm.bundle.IsOpenShift():
+	case vm.Bundle().IsOpenShift():
 		clusterStatusResult.OpenshiftStatus = getOpenShiftStatus(context.Background(), ip)
 	}
 
@@ -112,7 +112,7 @@ func (client *client) GetClusterLoad() (*types.ClusterLoadResult, error) {
 	}, nil
 }
 
-func (client *client) getDiskDetails(vm *virtualMachine) (int64, int64) {
+func (client *client) getDiskDetails(vm VirtualMachine) (int64, int64) {
 	disk, err, _ := client.diskDetails.Memoize("disks", func() (interface{}, error) {
 		sshRunner, err := vm.SSHRunner()
 		if err != nil {
@@ -162,7 +162,7 @@ func getStatus(status *cluster.Status) types.OpenshiftStatus {
 	return types.OpenshiftStopped
 }
 
-func (client *client) getRAMStatus(vm *virtualMachine) (int64, int64) {
+func (client *client) getRAMStatus(vm VirtualMachine) (int64, int64) {
 	ram, err, _ := client.ramDetails.Memoize("ram", func() (interface{}, error) {
 		sshRunner, err := vm.SSHRunner()
 		if err != nil {
@@ -184,7 +184,7 @@ func (client *client) getRAMStatus(vm *virtualMachine) (int64, int64) {
 	return ram.([]int64)[0], ram.([]int64)[1]
 }
 
-func (client *client) getCPUStatus(vm *virtualMachine) []int64 {
+func (client *client) getCPUStatus(vm VirtualMachine) []int64 {
 	sshRunner, err := vm.SSHRunner()
 	if err != nil {
 		logging.Debugf("Cannot get SSH runner: %v", err)
@@ -202,7 +202,7 @@ func (client *client) getCPUStatus(vm *virtualMachine) []int64 {
 
 }
 
-func (client *client) getPVCSize(vm *virtualMachine) (int, int) {
+func (client *client) getPVCSize(vm VirtualMachine) (int, int) {
 	sshRunner, err := vm.SSHRunner()
 	if err != nil {
 		logging.Debugf("Cannot get SSH runner: %v", err)

@@ -60,10 +60,10 @@ func getCrcBundleInfo(preset crcPreset.Preset, bundleName, bundlePath string, en
 	return bundle.Use(bundleName)
 }
 
-func (client *client) updateVMConfig(startConfig types.StartConfig, vm *virtualMachine) error {
+func (client *client) updateVMConfig(startConfig types.StartConfig, vm VirtualMachine) error {
 	/* Memory */
 	logging.Debugf("Updating CRC VM configuration")
-	if err := setMemory(vm.Host, startConfig.Memory); err != nil {
+	if err := setMemory(vm.GetHost(), startConfig.Memory); err != nil {
 		logging.Debugf("Failed to update CRC VM configuration: %v", err)
 		if err == drivers.ErrNotImplemented {
 			logging.Warn("Memory configuration change has been ignored as the machine driver does not support it")
@@ -71,7 +71,7 @@ func (client *client) updateVMConfig(startConfig types.StartConfig, vm *virtualM
 			return err
 		}
 	}
-	if err := setVcpus(vm.Host, startConfig.CPUs); err != nil {
+	if err := setVcpus(vm.GetHost(), startConfig.CPUs); err != nil {
 		logging.Debugf("Failed to update CRC VM configuration: %v", err)
 		if err == drivers.ErrNotImplemented {
 			logging.Warn("CPU configuration change has been ignored as the machine driver does not support it")
@@ -79,13 +79,13 @@ func (client *client) updateVMConfig(startConfig types.StartConfig, vm *virtualM
 			return err
 		}
 	}
-	if err := vm.api.Save(vm.Host); err != nil {
+	if err := vm.API().Save(vm.GetHost()); err != nil {
 		return err
 	}
 
 	/* Disk size */
 	if startConfig.DiskSize != constants.DefaultDiskSize {
-		if err := setDiskSize(vm.Host, startConfig.DiskSize); err != nil {
+		if err := setDiskSize(vm.GetHost(), startConfig.DiskSize); err != nil {
 			logging.Debugf("Failed to update CRC disk configuration: %v", err)
 			if err == drivers.ErrNotImplemented {
 				logging.Warn("Disk size configuration change has been ignored as the machine driver does not support it")
@@ -93,7 +93,7 @@ func (client *client) updateVMConfig(startConfig types.StartConfig, vm *virtualM
 				return err
 			}
 		}
-		if err := vm.api.Save(vm.Host); err != nil {
+		if err := vm.API().Save(vm.GetHost()); err != nil {
 			return err
 		}
 	}
@@ -101,7 +101,7 @@ func (client *client) updateVMConfig(startConfig types.StartConfig, vm *virtualM
 	// we want to set the shared dir password on-the-fly to be used
 	// we do not want this value to be persisted to disk
 	if startConfig.SharedDirPassword != "" {
-		if err := setSharedDirPassword(vm.Host, startConfig.SharedDirPassword); err != nil {
+		if err := setSharedDirPassword(vm.GetHost(), startConfig.SharedDirPassword); err != nil {
 			return fmt.Errorf("Failed to set shared dir password: %w", err)
 		}
 	}
@@ -206,9 +206,9 @@ func growLVForMicroshift(sshRunner *crcssh.Runner, lvFullName string, rootPart s
 	return nil
 }
 
-func configureSharedDirs(vm *virtualMachine, sshRunner *crcssh.Runner) error {
+func configureSharedDirs(vm VirtualMachine, sshRunner *crcssh.Runner) error {
 	logging.Debugf("Configuring shared directories")
-	sharedDirs, err := vm.Driver.GetSharedDirs()
+	sharedDirs, err := vm.Driver().GetSharedDirs()
 	if err != nil {
 		// the libvirt machine driver uses net/rpc, which wraps errors
 		// in rpc.ServerError, but without using golang 1.13 error
@@ -334,7 +334,7 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 	}
 	defer vm.Close()
 
-	currentBundleName := vm.bundle.GetBundleName()
+	currentBundleName := vm.Bundle().GetBundleName()
 	if currentBundleName != bundleName {
 		logging.Debugf("Bundle '%s' was requested, but the existing VM is using '%s'",
 			bundleName, currentBundleName)
@@ -347,8 +347,8 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 		return nil, errors.Wrap(err, "Error getting the machine state")
 	}
 	if vmState == state.Running {
-		logging.Infof("A CRC VM for %s %s is already running", startConfig.Preset.ForDisplay(), vm.bundle.GetVersion())
-		clusterConfig, err := getClusterConfig(vm.bundle)
+		logging.Infof("A CRC VM for %s %s is already running", startConfig.Preset.ForDisplay(), vm.Bundle().GetVersion())
+		clusterConfig, err := getClusterConfig(vm.Bundle())
 		if err != nil {
 			return nil, errors.Wrap(err, "Cannot create cluster configuration")
 		}
@@ -365,7 +365,7 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 		return nil, err
 	}
 
-	logging.Infof("Starting CRC VM for %s %s...", startConfig.Preset, vm.bundle.GetVersion())
+	logging.Infof("Starting CRC VM for %s %s...", startConfig.Preset, vm.Bundle().GetVersion())
 
 	if client.useVSock() {
 		if err := exposePorts(startConfig.Preset, startConfig.IngressHTTPPort, startConfig.IngressHTTPSPort); err != nil {
@@ -457,7 +457,7 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 		return nil, errors.Wrap(err, "Failed to change permissions to root podman socket")
 	}
 
-	proxyConfig, err := getProxyConfig(vm.bundle)
+	proxyConfig, err := getProxyConfig(vm.Bundle())
 	if err != nil {
 		return nil, errors.Wrap(err, "Error getting proxy configuration")
 	}
@@ -472,7 +472,7 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 		SSHRunner: sshRunner,
 		IP:        instanceIP,
 		// TODO: should be more finegrained
-		BundleMetadata: *vm.bundle,
+		BundleMetadata: *vm.Bundle(),
 		NetworkMode:    client.networkMode(),
 	}
 
@@ -502,7 +502,7 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 		logging.Warn(fmt.Sprintf("Failed to query DNS from host: %v", err))
 	}
 
-	if vm.bundle.IsMicroshift() {
+	if vm.Bundle().IsMicroshift() {
 		// **************************
 		//  END OF MICROSHIFT START CODE
 		// **************************
@@ -547,7 +547,7 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 	ocConfig := oc.UseOCWithSSH(sshRunner)
 
 	if err := cluster.ApproveCSRAndWaitForCertsRenewal(ctx, sshRunner, ocConfig, certsExpired[cluster.KubeletClientCert], certsExpired[cluster.KubeletServerCert], certsExpired[cluster.AggregatorClientCert]); err != nil {
-		logBundleDate(vm.bundle)
+		logBundleDate(vm.Bundle())
 		return nil, errors.Wrap(err, "Failed to renew TLS certificates: please check if a newer CRC release is available")
 	}
 
@@ -596,7 +596,7 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 		}
 	}
 
-	if err := updateKubeconfig(ctx, ocConfig, sshRunner, vm.bundle.GetKubeConfigPath()); err != nil {
+	if err := updateKubeconfig(ctx, ocConfig, sshRunner, vm.Bundle().GetKubeConfigPath()); err != nil {
 		return nil, errors.Wrap(err, "Failed to update kubeconfig file")
 	}
 
@@ -607,7 +607,7 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 
 	waitForProxyPropagation(ctx, ocConfig, proxyConfig)
 
-	clusterConfig, err := getClusterConfig(vm.bundle)
+	clusterConfig, err := getClusterConfig(vm.Bundle())
 	if err != nil {
 		return nil, errors.Wrap(err, "Cannot get cluster configuration")
 	}
@@ -694,17 +694,17 @@ func createHost(machineConfig config.MachineConfig, preset crcPreset.Preset) err
 	return nil
 }
 
-func startHost(ctx context.Context, vm *virtualMachine) error {
-	if err := vm.Driver.Start(); err != nil {
+func startHost(ctx context.Context, vm VirtualMachine) error {
+	if err := vm.Driver().Start(); err != nil {
 		return fmt.Errorf("Error in driver during machine start: %s", err)
 	}
 
-	if err := vm.api.Save(vm.Host); err != nil {
+	if err := vm.API().Save(vm.GetHost()); err != nil {
 		return fmt.Errorf("Error saving virtual machine to store after attempting creation: %s", err)
 	}
 
 	logging.Debug("Waiting for machine to be running, this may take a few minutes...")
-	if err := crcerrors.Retry(ctx, 3*time.Minute, host.MachineInState(vm.Driver, libmachinestate.Running), 3*time.Second); err != nil {
+	if err := crcerrors.Retry(ctx, 3*time.Minute, host.MachineInState(vm.Driver(), libmachinestate.Running), 3*time.Second); err != nil {
 		return fmt.Errorf("Error waiting for machine to be running: %s", err)
 	}
 

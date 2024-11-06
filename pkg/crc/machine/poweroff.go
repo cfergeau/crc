@@ -9,7 +9,7 @@ func (client *client) PowerOff() error {
 	}
 	defer vm.Close()
 
-	if err := vm.Kill(); err != nil {
+	if err := vm.GetHost().Kill(); err != nil {
 		return errors.Wrap(err, "Cannot kill machine")
 	}
 	return nil

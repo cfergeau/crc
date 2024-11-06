@@ -9,8 +9,23 @@ import (
 	"github.com/crc-org/crc/v2/pkg/crc/ssh"
 	"github.com/crc-org/crc/v2/pkg/libmachine"
 	libmachinehost "github.com/crc-org/crc/v2/pkg/libmachine/host"
+	"github.com/crc-org/machine/libmachine/drivers"
 	"github.com/pkg/errors"
 )
+
+type VirtualMachine interface {
+	Close() error
+	Remove() error
+	State() (state.State, error)
+	IP() (string, error)
+	SSHPort() int
+	SSHRunner() (*ssh.Runner, error)
+	Stop() error
+	Bundle() *bundle.CrcBundleInfo
+	Driver() drivers.Driver
+	API() libmachine.API
+	GetHost() *libmachinehost.Host
+}
 
 type virtualMachine struct {
 	name string
@@ -34,7 +49,7 @@ func (err *MissingHostError) Error() string {
 
 var errInvalidBundleMetadata = errors.New("Error loading bundle metadata")
 
-func loadVirtualMachine(name string, useVSock bool) (*virtualMachine, error) {
+func loadVirtualMachine(name string, useVSock bool) (VirtualMachine, error) {
 	apiClient := libmachine.NewClient(constants.MachineBaseDir)
 	exists, err := apiClient.Exists(name)
 	if err != nil {
@@ -68,7 +83,7 @@ func (vm *virtualMachine) Close() error {
 }
 
 func (vm *virtualMachine) Remove() error {
-	if err := vm.Driver.Remove(); err != nil {
+	if err := vm.Driver().Remove(); err != nil {
 		return errors.Wrap(err, "Driver cannot remove machine")
 	}
 
@@ -80,7 +95,7 @@ func (vm *virtualMachine) Remove() error {
 }
 
 func (vm *virtualMachine) State() (state.State, error) {
-	vmStatus, err := vm.Driver.GetState()
+	vmStatus, err := vm.Driver().GetState()
 	if err != nil {
 		return state.Error, err
 	}
@@ -91,7 +106,7 @@ func (vm *virtualMachine) IP() (string, error) {
 	if vm.vsock {
 		return "127.0.0.1", nil
 	}
-	return vm.Driver.GetIP()
+	return vm.Driver().GetIP()
 }
 
 func (vm *virtualMachine) SSHPort() int {
@@ -107,4 +122,20 @@ func (vm *virtualMachine) SSHRunner() (*ssh.Runner, error) {
 		return nil, err
 	}
 	return ssh.CreateRunner(ip, vm.SSHPort(), constants.GetPrivateKeyPath(), constants.GetECDSAPrivateKeyPath(), vm.bundle.GetSSHKeyPath())
+}
+
+func (vm *virtualMachine) Bundle() *bundle.CrcBundleInfo {
+	return vm.bundle
+}
+
+func (vm *virtualMachine) Driver() drivers.Driver {
+	return vm.Host.Driver
+}
+
+func (vm *virtualMachine) API() libmachine.API {
+	return vm.api
+}
+
+func (vm *virtualMachine) GetHost() *libmachinehost.Host {
+	return vm.Host
 }
