@@ -20,6 +20,7 @@ type VirtualMachine interface {
 	IP() (string, error)
 	SSHPort() int
 	SSHRunner() (*ssh.Runner, error)
+	Kill() error
 	Stop() error
 	Bundle() *bundle.CrcBundleInfo
 	Driver() drivers.Driver
