@@ -63,7 +63,7 @@ func getCrcBundleInfo(preset crcPreset.Preset, bundleName, bundlePath string, en
 func (client *client) updateVMConfig(startConfig types.StartConfig, vm VirtualMachine) error {
 	/* Memory */
 	logging.Debugf("Updating CRC VM configuration")
-	if err := setMemory(vm.GetHost(), startConfig.Memory); err != nil {
+	if err := setMemory(vm.Host(), startConfig.Memory); err != nil {
 		logging.Debugf("Failed to update CRC VM configuration: %v", err)
 		if err == drivers.ErrNotImplemented {
 			logging.Warn("Memory configuration change has been ignored as the machine driver does not support it")
@@ -71,7 +71,7 @@ func (client *client) updateVMConfig(startConfig types.StartConfig, vm VirtualMa
 			return err
 		}
 	}
-	if err := setVcpus(vm.GetHost(), startConfig.CPUs); err != nil {
+	if err := setVcpus(vm.Host(), startConfig.CPUs); err != nil {
 		logging.Debugf("Failed to update CRC VM configuration: %v", err)
 		if err == drivers.ErrNotImplemented {
 			logging.Warn("CPU configuration change has been ignored as the machine driver does not support it")
@@ -79,13 +79,13 @@ func (client *client) updateVMConfig(startConfig types.StartConfig, vm VirtualMa
 			return err
 		}
 	}
-	if err := vm.API().Save(vm.GetHost()); err != nil {
+	if err := vm.API().Save(vm.Host()); err != nil {
 		return err
 	}
 
 	/* Disk size */
 	if startConfig.DiskSize != constants.DefaultDiskSize {
-		if err := setDiskSize(vm.GetHost(), startConfig.DiskSize); err != nil {
+		if err := setDiskSize(vm.Host(), startConfig.DiskSize); err != nil {
 			logging.Debugf("Failed to update CRC disk configuration: %v", err)
 			if err == drivers.ErrNotImplemented {
 				logging.Warn("Disk size configuration change has been ignored as the machine driver does not support it")
@@ -93,7 +93,7 @@ func (client *client) updateVMConfig(startConfig types.StartConfig, vm VirtualMa
 				return err
 			}
 		}
-		if err := vm.API().Save(vm.GetHost()); err != nil {
+		if err := vm.API().Save(vm.Host()); err != nil {
 			return err
 		}
 	}
@@ -101,7 +101,7 @@ func (client *client) updateVMConfig(startConfig types.StartConfig, vm VirtualMa
 	// we want to set the shared dir password on-the-fly to be used
 	// we do not want this value to be persisted to disk
 	if startConfig.SharedDirPassword != "" {
-		if err := setSharedDirPassword(vm.GetHost(), startConfig.SharedDirPassword); err != nil {
+		if err := setSharedDirPassword(vm.Host(), startConfig.SharedDirPassword); err != nil {
 			return fmt.Errorf("Failed to set shared dir password: %w", err)
 		}
 	}
@@ -699,7 +699,7 @@ func startHost(ctx context.Context, vm VirtualMachine) error {
 		return fmt.Errorf("Error in driver during machine start: %s", err)
 	}
 
-	if err := vm.API().Save(vm.GetHost()); err != nil {
+	if err := vm.API().Save(vm.Host()); err != nil {
 		return fmt.Errorf("Error saving virtual machine to store after attempting creation: %s", err)
 	}
 

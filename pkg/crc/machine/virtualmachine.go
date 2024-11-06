@@ -25,12 +25,12 @@ type VirtualMachine interface {
 	Bundle() *bundle.CrcBundleInfo
 	Driver() drivers.Driver
 	API() libmachine.API
-	GetHost() *libmachinehost.Host
+	Host() *libmachinehost.Host
 }
 
 type virtualMachine struct {
-	name string
-	*libmachinehost.Host
+	name   string
+	host   *libmachinehost.Host
 	bundle *bundle.CrcBundleInfo
 	api    libmachine.API
 	vsock  bool
@@ -72,7 +72,7 @@ func loadVirtualMachine(name string, useVSock bool) (VirtualMachine, error) {
 
 	return &virtualMachine{
 		name:   name,
-		Host:   libmachineHost,
+		host:   libmachineHost,
 		bundle: crcBundleMetadata,
 		api:    apiClient,
 		vsock:  useVSock,
@@ -130,13 +130,21 @@ func (vm *virtualMachine) Bundle() *bundle.CrcBundleInfo {
 }
 
 func (vm *virtualMachine) Driver() drivers.Driver {
-	return vm.Host.Driver
+	return vm.host.Driver
 }
 
 func (vm *virtualMachine) API() libmachine.API {
 	return vm.api
 }
 
-func (vm *virtualMachine) GetHost() *libmachinehost.Host {
-	return vm.Host
+func (vm *virtualMachine) Host() *libmachinehost.Host {
+	return vm.host
+}
+
+func (vm *virtualMachine) Kill() error {
+	return vm.host.Kill()
+}
+
+func (vm *virtualMachine) Stop() error {
+	return vm.host.Stop()
 }
