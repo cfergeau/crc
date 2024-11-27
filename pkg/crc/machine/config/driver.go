@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/crc-org/crc/v2/pkg/crc/logging"
 	"github.com/crc-org/machine/libmachine/drivers"
 )
 
@@ -21,4 +22,5 @@ func InitVMDriverFromMachineConfig(machineConfig MachineConfig, driver *drivers.
 		RemoteUsername: "core",
 	}
 	driver.SSHConfig = &sshConfig
+	logging.Infof("setting SSHConfig to %+v", sshConfig)
 }

@@ -293,6 +293,7 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 		return nil, err
 	}
 
+	logging.Infof("exists: %d", exists)
 	if !exists {
 		telemetry.SetStartType(ctx, telemetry.CreationStartType)
 
@@ -428,6 +429,7 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 		return nil, errors.Wrap(err, "Error updating public key")
 	}
 
+	logging.Infof("Resizing file system")
 	// Trigger disk resize, this will be a no-op if no disk size change is needed
 	if err := growRootFileSystem(sshRunner, startConfig.Preset, startConfig.PersistentVolumeSize); err != nil {
 		return nil, errors.Wrap(err, "Error updating filesystem size")
@@ -448,11 +450,13 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 
 	// Add nameserver to VM if provided by User
 	if startConfig.NameServer != "" {
+		logging.Infof("Configuring additional name servers")
 		if err = addNameServerToInstance(sshRunner, startConfig.NameServer); err != nil {
 			return nil, errors.Wrap(err, "Failed to add nameserver to the VM")
 		}
 	}
 	if startConfig.EnableSharedDirs {
+		logging.Infof("Configuring shared directories")
 		if err := configureSharedDirs(vm, sshRunner); err != nil {
 			return nil, err
 		}
@@ -462,6 +466,7 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 		return nil, errors.Wrap(err, "Failed to change permissions to root podman socket")
 	}
 
+	logging.Infof("Additional networking configuration")
 	proxyConfig, err := getProxyConfig(vm.bundle)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error getting proxy configuration")
@@ -756,6 +761,7 @@ func disableEmergencyLogin(sshRunner *crcssh.Runner) error {
 }
 
 func updateSSHKeyPair(sshRunner *crcssh.Runner, vm *virtualMachine) error {
+	logging.Infof("updateSSHKeyPair")
 	// Read generated public key
 	publicKey, err := os.ReadFile(constants.GetPublicKeyPath())
 	if err != nil {
@@ -774,10 +780,12 @@ func updateSSHKeyPair(sshRunner *crcssh.Runner, vm *virtualMachine) error {
 	}
 
 	macadamDriver, isMacadam := vm.Driver.(*macadam.Driver)
+	logging.Warnf("isMacadam: %b", isMacadam)
 	if isMacadam {
 		sshConfig := macadamDriver.SSH()
 		sshConfig.IdentityPath = constants.GetPrivateKeyPath()
 		if err := macadamDriver.UpdateSSHConfig(sshConfig); err != nil {
+			logging.Infof("UpdateSSHConfig error: %v", err)
 			return err
 		}
 	}

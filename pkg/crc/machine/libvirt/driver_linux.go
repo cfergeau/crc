@@ -3,6 +3,7 @@ package libvirt
 import (
 	macadam "github.com/cfergeau/macadam/pkg/machinedriver"
 	"github.com/crc-org/crc/v2/pkg/crc/constants"
+	"github.com/crc-org/crc/v2/pkg/crc/logging"
 	"github.com/crc-org/crc/v2/pkg/crc/machine/config"
 )
 
@@ -10,6 +11,8 @@ func CreateHost(machineConfig config.MachineConfig) *macadam.Driver {
 	macadamDriver := macadam.NewDriver(machineConfig.Name, constants.MachineBaseDir)
 
 	config.InitVMDriverFromMachineConfig(machineConfig, macadamDriver.VMDriver)
+	logging.Infof("macadam driver: %+v", macadamDriver)
+	logging.Infof("vmdriver driver: %+v", macadamDriver.VMDriver)
 
 	/*
 		if machineConfig.NetworkMode == network.UserNetworkingMode {

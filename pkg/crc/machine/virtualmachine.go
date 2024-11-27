@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/crc-org/crc/v2/pkg/crc/constants"
+	"github.com/crc-org/crc/v2/pkg/crc/logging"
 	"github.com/crc-org/crc/v2/pkg/crc/machine/bundle"
 	"github.com/crc-org/crc/v2/pkg/crc/machine/state"
 	"github.com/crc-org/crc/v2/pkg/crc/ssh"
@@ -96,6 +97,7 @@ func (vm *virtualMachine) IP() (string, error) {
 
 func (vm *virtualMachine) SSHPort() int {
 	if vm.Driver.SSH().Port != 0 {
+		logging.Infof("using port %d from podman machine", vm.Driver.SSH().Port)
 		return vm.Driver.SSH().Port
 	}
 	if vm.vsock {
