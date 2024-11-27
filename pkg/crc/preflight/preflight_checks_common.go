@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/containers/common/pkg/config"
+	"github.com/containers/podman/v5/pkg/machine"
 	"github.com/crc-org/crc/v2/pkg/crc/adminhelper"
 	"github.com/crc-org/crc/v2/pkg/crc/cluster"
 	"github.com/crc-org/crc/v2/pkg/crc/constants"
@@ -188,4 +190,30 @@ func removePodmanFromOcBinDirCheck() Check {
 
 		labels: None,
 	}
+}
+
+var gvproxyCheck = Check{
+	configKeySuffix:  "check-gvproxy",
+	checkDescription: "Checking if gvproxy is correctly installed",
+	check:            checkGvproxy,
+	fixDescription:   "podman is not installed properly",
+	flags:            NoFix,
+
+	labels: None,
+}
+
+func checkGvproxy() error {
+	cfg, err := config.Default()
+	if err != nil {
+		return err
+	}
+
+	binary, err := cfg.FindHelperBinary(machine.ForwarderBinaryName, false)
+	if err != nil {
+		logging.Infof("could not find %s: %v", machine.ForwarderBinaryName, err)
+		return err
+	}
+	logging.Infof("found %v", binary)
+	return nil
+
 }

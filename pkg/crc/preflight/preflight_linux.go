@@ -378,6 +378,7 @@ func getChecks(distro *linux.OsRelease, bundlePath string, preset crcpreset.Pres
 	checks = append(checks, libvirtNetworkPreflightChecks...)
 	checks = append(checks, vsockPreflightCheck)
 	checks = append(checks, bundleCheck(bundlePath, preset, enableBundleQuayFallback))
+	checks = append(checks, gvproxyCheck)
 
 	return checks
 }
