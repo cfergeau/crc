@@ -15,7 +15,6 @@ func InitVMDriverFromMachineConfig(machineConfig MachineConfig, driver *drivers.
 	driver.BundleName = machineConfig.BundleName
 	driver.ImageSourcePath = machineConfig.ImageSourcePath
 	driver.ImageFormat = machineConfig.ImageFormat
-	driver.SSHIdentityPath = machineConfig.SSHKeyPath
 	sshConfig := drivers.SSHConfig{
 		IdentityPath:   machineConfig.SSHKeyPath,
 		Port:           22,

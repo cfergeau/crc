@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	macadam "github.com/cfergeau/macadam/pkg/machinedriver"
 	"github.com/crc-org/crc/v2/pkg/crc/cluster"
 	"github.com/crc-org/crc/v2/pkg/crc/constants"
 	crcerrors "github.com/crc-org/crc/v2/pkg/crc/errors"
@@ -423,7 +424,7 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 
 	// Post VM start immediately update SSH key and copy kubeconfig to instance
 	// dir and VM
-	if err := updateSSHKeyPair(sshRunner); err != nil {
+	if err := updateSSHKeyPair(sshRunner, vm); err != nil {
 		return nil, errors.Wrap(err, "Error updating public key")
 	}
 
@@ -754,7 +755,7 @@ func disableEmergencyLogin(sshRunner *crcssh.Runner) error {
 	return err
 }
 
-func updateSSHKeyPair(sshRunner *crcssh.Runner) error {
+func updateSSHKeyPair(sshRunner *crcssh.Runner, vm *virtualMachine) error {
 	// Read generated public key
 	publicKey, err := os.ReadFile(constants.GetPublicKeyPath())
 	if err != nil {
@@ -772,8 +773,15 @@ func updateSSHKeyPair(sshRunner *crcssh.Runner) error {
 		return err
 	}
 
-	/* This is specific to the podman bundle, but is required to drop the 'default' ssh key */
-	_, _, _ = sshRunner.Run("rm", "/home/core/.ssh/authorized_keys.d/ignition")
+	macadamDriver, isMacadam := vm.Driver.(*macadam.Driver)
+	if isMacadam {
+		sshConfig := macadamDriver.SSH()
+		sshConfig.IdentityPath = constants.GetPrivateKeyPath()
+		if err := macadamDriver.UpdateSSHConfig(sshConfig); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
