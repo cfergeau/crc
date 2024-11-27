@@ -60,7 +60,7 @@ func getCrcBundleInfo(ctx context.Context, preset crcPreset.Preset, bundleName, 
 	return bundle.Use(bundleName)
 }
 
-func (client *client) updateVMConfig(startConfig types.StartConfig, vm *virtualMachine) error {
+func updateVMConfig(startConfig types.StartConfig, vm *virtualMachine) error {
 	/* Memory */
 	logging.Debugf("Updating CRC VM configuration")
 	if err := setMemory(vm.Host, startConfig.Memory); err != nil {
@@ -377,7 +377,7 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 		}
 	}
 
-	if err := client.updateVMConfig(startConfig, vm); err != nil {
+	if err := updateVMConfig(startConfig, vm); err != nil {
 		return nil, errors.Wrap(err, "Could not update CRC VM configuration")
 	}
 
