@@ -21,7 +21,7 @@ type Client struct {
 func New() *Client {
 	return &Client{
 		NetworkClient: networkclient.New(&http.Client{
-			Transport: transport(),
+			Transport: gvtransport(),
 		}, "http://unix/network"),
 		APIClient: client.New(&http.Client{
 			Transport: transport(),

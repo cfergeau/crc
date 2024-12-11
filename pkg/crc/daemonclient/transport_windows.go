@@ -16,3 +16,7 @@ func transport() *http.Transport {
 		},
 	}
 }
+
+func gvtransport() *http.Transport {
+	return transport()
+}
