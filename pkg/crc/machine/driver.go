@@ -1,12 +1,19 @@
 package machine
 
 import (
+	"encoding/json"
+
+	macadam "github.com/cfergeau/macadam/pkg/machinedriver"
 	"github.com/crc-org/crc/v2/pkg/crc/machine/config"
+	crcmac "github.com/crc-org/crc/v2/pkg/crc/machine/macadam"
+	"github.com/crc-org/crc/v2/pkg/libmachine"
 	"github.com/crc-org/crc/v2/pkg/libmachine/host"
-	libmachine "github.com/crc-org/machine/libmachine/drivers"
+	"github.com/crc-org/machine/libmachine/drivers"
+	libdrivers "github.com/crc-org/machine/libmachine/drivers"
+	"github.com/pkg/errors"
 )
 
-type valueSetter func(driver *libmachine.VMDriver) bool
+type valueSetter func(driver *libdrivers.VMDriver) bool
 
 func updateDriverValue(host *host.Host, setDriverValue valueSetter) error {
 	driver, err := loadDriverConfig(host)
@@ -22,7 +29,7 @@ func updateDriverValue(host *host.Host, setDriverValue valueSetter) error {
 }
 
 func setMemory(host *host.Host, memorySize uint) error {
-	memorySetter := func(driver *libmachine.VMDriver) bool {
+	memorySetter := func(driver *libdrivers.VMDriver) bool {
 		if driver.Memory == memorySize {
 			return false
 		}
@@ -34,7 +41,7 @@ func setMemory(host *host.Host, memorySize uint) error {
 }
 
 func setVcpus(host *host.Host, vcpus uint) error {
-	vcpuSetter := func(driver *libmachine.VMDriver) bool {
+	vcpuSetter := func(driver *libdrivers.VMDriver) bool {
 		if driver.CPU == vcpus {
 			return false
 		}
@@ -46,7 +53,7 @@ func setVcpus(host *host.Host, vcpus uint) error {
 }
 
 func setDiskSize(host *host.Host, diskSizeGiB uint) error {
-	diskSizeSetter := func(driver *libmachine.VMDriver) bool {
+	diskSizeSetter := func(driver *libdrivers.VMDriver) bool {
 		capacity := config.ConvertGiBToBytes(diskSizeGiB)
 		if driver.DiskCapacity == capacity {
 			return false
@@ -72,4 +79,41 @@ func setSharedDirPassword(host *host.Host, password string) error {
 		driver.SharedDirs[i].Password = password
 	}
 	return updateDriverStruct(host, driver)
+}
+
+func newHost(api libmachine.API, machineConfig config.MachineConfig) (*host.Host, error) {
+	json, err := json.Marshal(crcmac.CreateHost(machineConfig))
+	if err != nil {
+		return nil, errors.New("Failed to marshal driver options")
+	}
+	return api.NewHost("macadam", "", json)
+}
+
+/* FIXME: host.Host is only known here, and libvirt.Driver is only accessible
+ * in libvirt/driver_linux.go
+ */
+func loadDriverConfig(host *host.Host) (*macadam.Driver, error) {
+	var macadamDriver macadam.Driver
+	err := json.Unmarshal(host.RawDriver, &macadamDriver)
+
+	return &macadamDriver, err
+}
+
+func updateDriverConfig(host *host.Host, driver *macadam.Driver) error {
+	driverData, err := json.Marshal(driver)
+	if err != nil {
+		return err
+	}
+	return host.UpdateConfig(driverData)
+}
+
+/*
+func (r *RPCServerDriver) SetConfigRaw(data []byte, _ *struct{}) error {
+	return json.Unmarshal(data, &r.ActualDriver)
+}
+*/
+
+func updateDriverStruct(_ *host.Host, _ *macadam.Driver) error {
+	// windows was doing: host.Driver = driver
+	return drivers.ErrNotImplemented
 }
