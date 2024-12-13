@@ -277,6 +277,8 @@ require (
 	tags.cncf.io/container-device-interface v0.8.0 // indirect
 )
 
-replace github.com/containers/podman/v5 => github.com/cfergeau/podman/v5 v5.0.0-20241127161353-592fb5161f59
+replace github.com/containers/podman/v5 => github.com/cfergeau/podman/v5 v5.0.0-20241213090455-63ea6fa04b45
 
 replace github.com/crc-org/machine => github.com/cfergeau/machine v0.0.0-20241127155529-1b8b9b8d1078
+
+replace github.com/containers/gvisor-tap-vsock => github.com/cfergeau/gvisor-tap-vsock v0.7.3-0.20241209155656-dc16c2d91990
