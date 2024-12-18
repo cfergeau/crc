@@ -213,6 +213,7 @@ func getChecks(bundlePath string, preset crcpreset.Preset, enableBundleQuayFallb
 	checks = append(checks, crcUsersGroupExistsCheck)
 	checks = append(checks, userPartOfCrcUsersAndHypervAdminsGroupCheck)
 	checks = append(checks, vsockChecks...)
+	checks = append(checks, gvproxyCheck)
 	checks = append(checks, bundleCheck(bundlePath, preset, enableBundleQuayFallback))
 	checks = append(checks, genericCleanupChecks...)
 	checks = append(checks, cleanupCheckRemoveCrcVM)
