@@ -43,10 +43,6 @@ func (client *client) Stop() (state.State, error) {
 	if err != nil {
 		return state.Error, errors.Wrap(err, "Cannot get VM status")
 	}
-	// In case usermode networking make sure all the port bind on host should be released
-	if client.useVSock() {
-		return status, unexposePorts()
-	}
 	return status, nil
 }
 

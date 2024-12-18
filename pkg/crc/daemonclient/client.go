@@ -22,7 +22,7 @@ func New() *Client {
 	return &Client{
 		NetworkClient: networkclient.New(&http.Client{
 			Transport: gvtransport(),
-		}, "http://unix/network"),
+		}, "http://unix"),
 		APIClient: client.New(&http.Client{
 			Transport: transport(),
 		}, "http://unix/api"),

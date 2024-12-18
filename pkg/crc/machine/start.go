@@ -373,12 +373,6 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 
 	logging.Infof("Starting CRC VM for %s %s...", startConfig.Preset, vm.bundle.GetVersion())
 
-	if client.useVSock() {
-		if err := exposePorts(startConfig.Preset, startConfig.IngressHTTPPort, startConfig.IngressHTTPSPort); err != nil {
-			return nil, err
-		}
-	}
-
 	if err := updateVMConfig(startConfig, vm); err != nil {
 		return nil, errors.Wrap(err, "Could not update CRC VM configuration")
 	}
@@ -412,6 +406,12 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 		return nil, errors.Wrap(err, "Failed to connect to the CRC VM with SSH -- virtual machine might be unreachable")
 	}
 	logging.Info("CRC VM is running")
+
+	if client.useVSock() {
+		if err := exposePorts(startConfig.Preset, startConfig.IngressHTTPPort, startConfig.IngressHTTPSPort); err != nil {
+			return nil, err
+		}
+	}
 
 	if startConfig.EmergencyLogin {
 		if err := enableEmergencyLogin(sshRunner); err != nil {

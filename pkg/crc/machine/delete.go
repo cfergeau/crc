@@ -20,13 +20,6 @@ func (client *client) Delete() error {
 		return errors.Wrap(err, "Cannot remove machine")
 	}
 
-	// In case usermode networking make sure all the port bind on host should be released
-	if client.useVSock() {
-		if err := unexposePorts(); err != nil {
-			return err
-		}
-	}
-
 	// Remove the podman system connection for crc
 	if err := podman.RemoveRootlessSystemConnection(); err != nil {
 		logging.Debugf("Failed to remove podman rootless system connection: %v", err)
