@@ -174,6 +174,16 @@ var vsockPreflightCheck = Check{
 	labels: labels{Os: Linux, NetworkMode: User},
 }
 
+var gvproxyCapsPreflightCheck = Check{
+	configKeySuffix:  "check-gvproxy-capabilities",
+	checkDescription: "Checking if gvproxy can open network ports below 1024",
+	check:            checkGvproxyCaps,
+	fixDescription:   "Setting up gvproxy capabilities",
+	fix:              fixGvproxyCaps,
+
+	labels: labels{Os: Linux, NetworkMode: User},
+}
+
 var wsl2PreflightCheck = Check{
 	configKeySuffix:  "check-wsl2",
 	checkDescription: "Checking if running inside WSL2",
@@ -287,6 +297,33 @@ func removeVsockCrcSettings() error {
 	return mErr
 }
 
+func checkGvproxyCaps() error {
+	executable, err := gvproxyExecutable()
+	if err != nil {
+		return err
+	}
+	getcap, _, err := crcos.RunWithDefaultLocale("getcap", executable)
+	if err != nil {
+		return err
+	}
+	if !strings.Contains(getcap, "cap_net_bind_service+eip") &&
+		!strings.Contains(getcap, "cap_net_bind_service=eip") {
+		return fmt.Errorf("capabilities are not correct for %s", executable)
+	}
+
+	return nil
+}
+
+func fixGvproxyCaps() error {
+	executable, err := gvproxyExecutable()
+	if err != nil {
+		return err
+	}
+	_, _, err = crcos.RunPrivileged(fmt.Sprintf("Setting CAP_NET_BIND_SERVICE capability for %s executable", executable), "setcap", "cap_net_bind_service=+eip", executable)
+
+	return err
+}
+
 const (
 	Distro LabelName = iota + lastLabelName
 	DNS
@@ -377,8 +414,9 @@ func getChecks(distro *linux.OsRelease, bundlePath string, preset crcpreset.Pres
 	checks = append(checks, dnsmasqPreflightChecks...)
 	checks = append(checks, libvirtNetworkPreflightChecks...)
 	checks = append(checks, vsockPreflightCheck)
-	checks = append(checks, bundleCheck(bundlePath, preset, enableBundleQuayFallback))
 	checks = append(checks, gvproxyCheck)
+	checks = append(checks, gvproxyCapsPreflightCheck)
+	checks = append(checks, bundleCheck(bundlePath, preset, enableBundleQuayFallback))
 
 	return checks
 }

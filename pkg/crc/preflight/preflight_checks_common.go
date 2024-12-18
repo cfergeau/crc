@@ -202,18 +202,22 @@ var gvproxyCheck = Check{
 	labels: None,
 }
 
-func checkGvproxy() error {
+func gvproxyExecutable() (string, error) {
 	cfg, err := config.Default()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	binary, err := cfg.FindHelperBinary(machine.ForwarderBinaryName, false)
 	if err != nil {
-		logging.Infof("could not find %s: %v", machine.ForwarderBinaryName, err)
-		return err
+		return "", err
 	}
-	logging.Infof("found %v", binary)
-	return nil
 
+	return binary, nil
+}
+
+func checkGvproxy() error {
+	executable, err := gvproxyExecutable()
+	logging.Infof("found %v", executable)
+	return err
 }
