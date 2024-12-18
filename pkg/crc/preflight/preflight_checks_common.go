@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/containers/common/pkg/config"
 	"github.com/containers/podman/v5/pkg/machine"
@@ -196,7 +197,7 @@ var gvproxyCheck = Check{
 	configKeySuffix:  "check-gvproxy",
 	checkDescription: "Checking if gvproxy is correctly installed",
 	check:            checkGvproxy,
-	fixDescription:   "podman is not installed properly",
+	fixDescription:   "gvproxy/podman is not installed properly",
 	flags:            NoFix,
 
 	labels: None,
@@ -219,5 +220,9 @@ func gvproxyExecutable() (string, error) {
 func checkGvproxy() error {
 	executable, err := gvproxyExecutable()
 	logging.Infof("found %v", executable)
+	_, helpStr, err := crcos.RunWithDefaultLocale(executable, "--help")
+	if !strings.Contains(helpStr, "-services string") {
+		return fmt.Errorf("invalid %s executable, it's missing the --services flag added by https://github.com/containers/gvisor-tap-vsock/pull/429", executable)
+	}
 	return err
 }
