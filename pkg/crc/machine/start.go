@@ -324,6 +324,19 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 			SharedDirPassword: startConfig.SharedDirPassword,
 			SharedDirUsername: startConfig.SharedDirUsername,
 		}
+		// FIXME: podman-machine code currently expects a public ssh
+		// key to exist even if it is not going to use it in the crc
+		// usecase.
+		// add a workaround by creating an empty public key until this
+		// is addressed in podman or snc
+		pubkeyPath := crcBundleMetadata.GetSSHKeyPath() + ".pub"
+		if !crcos.FileExists(pubkeyPath) {
+			f, err := os.Create(pubkeyPath)
+			if err != nil {
+				return nil, err
+			}
+			f.Close()
+		}
 		if crcBundleMetadata.IsOpenShift() {
 			machineConfig.KubeConfig = crcBundleMetadata.GetKubeConfigPath()
 		}
