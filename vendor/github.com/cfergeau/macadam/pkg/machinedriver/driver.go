@@ -243,10 +243,9 @@ func (d *Driver) Create() error {
 	return nil
 }
 
-// Start a host
-func (d *Driver) Start() error {
-	machineName := d.vmConfig.Name
-	dirs, err := env.GetMachineDirs(d.vmProvider.VMType())
+func Start(vmConfig *vmconfigs.MachineConfig, vmProvider vmconfigs.VMProvider) error {
+	machineName := vmConfig.Name
+	dirs, err := env.GetMachineDirs(vmProvider.VMType())
 	if err != nil {
 		return err
 	}
@@ -263,9 +262,9 @@ func (d *Driver) Start() error {
 		NoInfo: false,
 		Quiet:  false,
 	}
-	slog.Info(fmt.Sprintf("SSH config: %v", d.vmConfig.SSH))
+	slog.Info(fmt.Sprintf("SSH config: %v", vmConfig.SSH))
 
-	if err := shim.Start(d.vmConfig, d.vmProvider, dirs, startOpts); err != nil {
+	if err := shim.Start(vmConfig, vmProvider, dirs, startOpts); err != nil {
 		return err
 	}
 	fmt.Printf("Machine %q started successfully\n", machineName)
@@ -404,6 +403,11 @@ func (d *Driver) Start() error {
 
 		return nil
 	*/
+}
+
+// Start a host
+func (d *Driver) Start() error {
+	return Start(d.vmConfig, d.vmProvider)
 }
 
 func (d *Driver) GetSharedDirs() ([]drivers.SharedDir, error) {

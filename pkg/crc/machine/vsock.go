@@ -68,6 +68,7 @@ func unexposePorts() error {
 func listOpenPorts(daemonClient *daemonclient.Client) ([]types.ExposeRequest, error) {
 	alreadyOpenedPorts, err := daemonClient.NetworkClient.List()
 	if err != nil {
+		logging.Warnf("NetworkClient.List failed: %v", err)
 		logging.Error("Is 'crc daemon' running? Network mode 'vsock' requires 'crc daemon' to be running, run it manually on different terminal/tab")
 		return nil, err
 	}

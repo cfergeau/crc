@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/containers/gvisor-tap-vsock/pkg/types"
+	"github.com/sirupsen/logrus"
 )
 
 type Client struct {
@@ -46,6 +47,7 @@ func (c *Client) Expose(req *types.ExposeRequest) error {
 	if err != nil {
 		return err
 	}
+	logrus.Warnf("Posting %s to %s", string(bin), fmt.Sprintf("%s%s", c.base, "/services/forwarder/expose"))
 	res, err := c.client.Post(fmt.Sprintf("%s%s", c.base, "/services/forwarder/expose"), "application/json", bytes.NewReader(bin))
 	if err != nil {
 		return err

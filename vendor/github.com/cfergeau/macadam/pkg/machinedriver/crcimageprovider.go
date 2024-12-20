@@ -8,7 +8,6 @@ import (
 
 	"github.com/containers/podman/v5/pkg/machine/define"
 	"github.com/containers/podman/v5/pkg/machine/vmconfigs"
-	crcos "github.com/crc-org/crc/v2/pkg/os"
 )
 
 type CrcImagePuller struct {
@@ -93,7 +92,9 @@ func (puller *CrcImagePuller) Download() error {
 
 	slog.Info(fmt.Sprintf("%+v", puller))
 	slog.Info("file copy", "source", puller.sourcePath, "dest", imagePath.GetPath())
-	if err := crcos.CopyFile(puller.sourcePath, imagePath.GetPath()); err != nil {
+	/* need to use qemu-img with a backing file on linux */
+	/* https://github.com/crc-org/crc/blob/7b69395ff79eeb60c9c9f871933b1b09eb8691f4/pkg/drivers/vfkit/driver_darwin.go#L129-L136 */
+	if err := copyFile(puller.sourcePath, imagePath.GetPath()); err != nil {
 		return err
 	}
 	/*

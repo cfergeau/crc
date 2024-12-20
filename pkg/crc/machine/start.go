@@ -330,7 +330,9 @@ func (client *client) Start(ctx context.Context, startConfig types.StartConfig) 
 		// add a workaround by creating an empty public key until this
 		// is addressed in podman or snc
 		pubkeyPath := crcBundleMetadata.GetSSHKeyPath() + ".pub"
+		logging.Warnf("pub key path: %s", pubkeyPath)
 		if !crcos.FileExists(pubkeyPath) {
+			logging.Warnf("creating empty pubkey")
 			f, err := os.Create(pubkeyPath)
 			if err != nil {
 				return nil, err
