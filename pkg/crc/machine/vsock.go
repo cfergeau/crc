@@ -16,6 +16,19 @@ import (
 	"github.com/pkg/errors"
 )
 
+/*
+	NetworkClient: networkclient.New(&http.Client{
+		Transport: gvtransport(),
+	}, "http://unix"),
+	FIXME: the gvproxy socket to use for the REST API is more dynamic with podman-machine.
+	Probably better to create only a network client here instead of a full 'daemonclient'
+
+	code to lookup the gvproxy socket from podman-machine could be something like this:
+	runDir := dirs.RuntimeDir
+	cmd.PidFile = filepath.Join(runDir.GetPath(), "gv.sock")
+
+*/
+
 func exposePorts(preset crcPreset.Preset, ingressHTTPPort, ingressHTTPSPort uint) error {
 	portsToExpose := vsockPorts(preset, ingressHTTPPort, ingressHTTPSPort)
 	daemonClient := daemonclient.New()
