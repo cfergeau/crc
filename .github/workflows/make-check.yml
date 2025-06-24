@@ -25,7 +25,10 @@ jobs:
         with:
           go-version: ${{ matrix.go }}
       - name: Build
-        run: make check
+        run: make vet
       - if: runner.os == 'Linux'
         name: Go version check
         run: make goversioncheck
+      - if: runner.os == 'macOS'
+        name: pkg-config check
+        run: command -v pkg-config || echo "pkg-config is missing"

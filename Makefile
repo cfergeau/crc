@@ -256,6 +256,10 @@ e2e-story-microshift: install
 fmt: $(TOOLS_BINDIR)/goimports
 	@$(TOOLS_BINDIR)/goimports -l -w $(SOURCE_DIRS)
 
+.PHONY: vet
+vet: gen_release_info
+	go vet -tags "containers_image_openpgp,build" ./...
+
 # Run golangci-lint against code
 .PHONY: lint cross-lint
 lint: $(TOOLS_BINDIR)/golangci-lint gen_release_info
